@@ -1,5 +1,6 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![author](https://img.shields.io/badge/author-AlexGyver-informational.svg)
+## ВНИМАНИЕ! ЭТО БЕТА ВЕРСИЯ!
 # GyverPortal
 Простой конструктор веб интерфейса для esp8266 и ESP32
 - Библиотека является обёрткой для стандартной ESP8266WebServer
