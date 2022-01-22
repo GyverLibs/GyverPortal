@@ -211,7 +211,7 @@ struct Builder {
     void BLOCK_END() {
         *_gp_sptr += F("</div>\n");
     }
-    void BR() {
+    void BREAK() {
         *_gp_sptr += F("<br>\n");
     }
     void HR() {
