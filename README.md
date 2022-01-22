@@ -267,6 +267,7 @@ if (portal.action()) {
 ### 8. Создаём GyverPortal глобально
 ```cpp
 GyverPortal portal;
+void build() {}
 
 void setup() {
   // подключаемся к точке
@@ -287,6 +288,8 @@ void loop() {
 
 ### 9. Создаём GyverPortal локально
 ```cpp
+void build() {}
+
 void f() {
   GyverPortal portal;
   portal.attachBuild(build);
