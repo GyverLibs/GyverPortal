@@ -1,0 +1,71 @@
+#######################################
+# Syntax Coloring Map For GyverPortal
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+GyverPortal	KEYWORD1
+CPdate	KEYWORD1
+CPtime	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+start	KEYWORD2
+stop	KEYWORD2
+showPage	KEYWORD2
+attachBuild	KEYWORD2
+attachForm	KEYWORD2
+
+tick	KEYWORD2
+action	KEYWORD2
+form	KEYWORD2
+
+getString	KEYWORD2
+getChars	KEYWORD2
+copyStr	KEYWORD2
+getInt	KEYWORD2
+getCheck	KEYWORD2
+getDate	KEYWORD2
+getTime	KEYWORD2
+getColor	KEYWORD2
+getSelected	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+BUILD_BEGIN	LITERAL1
+BUILD_END	LITERAL1
+THEME	LITERAL1
+
+GP_DEFAULT	LITERAL1
+GP_LIGHT	LITERAL1
+GP_DARK	LITERAL1
+
+FORM_BEGIN	LITERAL1
+FORM_END	LITERAL1
+FORM_SUBMIT	LITERAL1
+
+TITLE	LITERAL1
+LABEL	LITERAL1
+BR	LITERAL1
+HR	LITERAL1
+
+TEXT	LITERAL1
+PASS	LITERAL1
+CHECK	LITERAL1
+DATE	LITERAL1
+TIME	LITERAL1
+SLIDER	LITERAL1
+COLOR	LITERAL1
+SUBMIT	LITERAL1
+SELECT	LITERAL1
+SWITCH	LITERAL1
+BLOCK_BEGIN	LITERAL1
+BLOCK_END	LITERAL1
+
+CUSTOM_BUILD_BEGIN	LITERAL1
+CUSTOM_BUILD_END	LITERAL1
+PAGE_BEGIN	LITERAL1
+PAGE_END	LITERAL1
