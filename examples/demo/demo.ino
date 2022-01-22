@@ -100,7 +100,7 @@ void setup() {
   */
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin("LLlypa2", "lolpass12345");
+  WiFi.begin("login", "pass");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
