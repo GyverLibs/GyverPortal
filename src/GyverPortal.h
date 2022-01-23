@@ -21,7 +21,7 @@ struct CPtime {
 };
 
 static String* _gp_sptr;
-static int* _gp_ptr;
+static void* _gp_ptr;
 
 // ======================= ПОРТАЛ =======================
 class GyverPortal {
@@ -174,7 +174,7 @@ public:
 
 private:
     void root() {
-        _gp_ptr = (int*)this;
+        _gp_ptr = this;
         if (*build) build();
     }
     String uri;
@@ -390,11 +390,9 @@ void BUILD_BEGIN(String& s) {
     add.PAGE_BEGIN();
 }
 void CUSTOM_BUILD_END() {
-    GyverPortal* p = (GyverPortal*)_gp_ptr;
-    p -> showPage();
+    (*(GyverPortal*)_gp_ptr).showPage();
 }
 void BUILD_END() {
     add.PAGE_END();
-    GyverPortal* p = (GyverPortal*)_gp_ptr;
-    p -> showPage();
+    (*(GyverPortal*)_gp_ptr).showPage();
 }
