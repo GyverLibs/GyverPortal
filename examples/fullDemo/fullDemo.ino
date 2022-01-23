@@ -44,7 +44,7 @@ void build() {
   add.BLOCK_BEGIN();
   add.SUBMIT("Submit!");
   add.FORM_END();
-  add.FORM_SUBMIT("/stop", "Stop");
+  add.FORM_SUBMIT("/exit", "Stop");
   add.BLOCK_END();
   BUILD_END();
 }
@@ -67,12 +67,19 @@ void setup() {
   GyverPortal portal;
   portal.attachBuild(build);  
   portal.attachForm("/action");
-  portal.attachForm("/stop");
+  portal.attachForm("/exit");
   portal.start();
 
   while (portal.tick()) {
     if (portal.action()) {
-      if (portal.form("/exit")) portal.stop();
+      if (portal.form("/exit")) {
+        String s;
+        GP_BUILD(s);
+        add.TITLE("Portal stopped");
+        
+        portal.showPage(s);
+        portal.stop();
+      }
 
       if (portal.form("/action")) {
         data.val = portal.getInt("txt");

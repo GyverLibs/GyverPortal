@@ -41,7 +41,7 @@ public:
         server.begin();
         if (serverMode) dnsServer.start(53, "*", WiFi.softAPIP());
         server.onNotFound([this]() {
-            root();
+            show();
         });
     }
 
@@ -49,18 +49,13 @@ public:
     void attachForm(const char* fname) {
         server.on(fname, HTTP_POST, [this]() {
             uri = server.uri();
-            ready = true;
+            actionF = true;
         });
     }    
     
     // подключить функцию-билдер страницы
     void attachBuild(void (*handler)()) {
         build = *handler;
-    }
-
-    // показать страницу
-    void showPage() {
-        server.send(200, "text/html", *_gp_sptr);
     }
 
     // остановить портал
@@ -73,9 +68,9 @@ public:
     // тикер портала. Вернёт true, если портал запущен
     bool tick() {
         if (!active) return 0;
-        if (ready) {
-            root();
-            ready = false;
+        if (actionF) {
+            show();
+            actionF = false;
         }
         if (serverMode) dnsServer.processNextRequest();
         server.handleClient();
@@ -85,7 +80,7 @@ public:
 
     // вернёт true, если было действие с браузера
     bool action() {
-        return ready;
+        return actionF;
     }
 
     // вернёт true, если было действие с указанной формы
@@ -170,17 +165,24 @@ public:
         }
         return 0;
     }
-
-
-private:
-    void root() {
+    
+    // показать свою страницу
+    void showPage(String &s) {
+        server.send(200, F("text/html"), s);
+    }
+    
+    // вызвать конструктор и показать страницу
+    void show() {
         _gp_ptr = this;
         if (*build) build();
+        _gp_ptr = nullptr;
     }
+
+private:    
     String uri;
     bool serverMode = false;
     bool active = false;
-    bool ready = false;
+    bool actionF = false;
     void (*build)();
     IPAddress apIP;
     DNSServer dnsServer;
@@ -382,17 +384,18 @@ struct Builder {
 
 extern Builder add = Builder();
 
-void CUSTOM_BUILD_BEGIN(String& s) {
+void GP_BUILD(String& s) {
     _gp_sptr = &s;
 }
+void GP_SHOW() {
+    if (_gp_ptr) (*(GyverPortal*)_gp_ptr).showPage(*_gp_sptr);
+}
+
 void BUILD_BEGIN(String& s) {
-    _gp_sptr = &s;
+    GP_BUILD(s);
     add.PAGE_BEGIN();
-}
-void CUSTOM_BUILD_END() {
-    (*(GyverPortal*)_gp_ptr).showPage();
 }
 void BUILD_END() {
     add.PAGE_END();
-    (*(GyverPortal*)_gp_ptr).showPage();
+    GP_SHOW();
 }
