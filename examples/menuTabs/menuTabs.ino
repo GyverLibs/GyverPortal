@@ -49,19 +49,15 @@ void setup() {
 
   GyverPortal portal;
   portal.attachBuild(build);
-  portal.attachForm("/menu1");
-  portal.attachForm("/menu2");
-  portal.attachForm("/menu3");
-  portal.attachForm("/exit");
   portal.start();
 
   while (portal.tick()) {
     if (portal.action()) {
-      if (portal.form("/exit")) portal.stop();
-
-      if (portal.form("/menu1")) m1 = !m1;
-      if (portal.form("/menu2")) m2 = !m2;
-      if (portal.form("/menu3")) m3 = !m3;
+      if (portal.form("/exit")) portal.stop();      
+      if (portal.root()) Serial.println("root");
+      if (portal.form("/menu1")) m1 = !m1;      
+      if (portal.form("/menu2")) m2 = !m2;      
+      if (portal.form("/menu3")) m3 = !m3;      
     }
   }
 }

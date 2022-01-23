@@ -6,8 +6,8 @@ struct Data {
   int val;
   char pass[10];
   bool check;
-  GPdate d;
-  GPtime t;
+  GPdate date;
+  GPtime time;
   int sld;
   uint32_t color;
   int sel;
@@ -23,29 +23,29 @@ void build() {
   add.TITLE("My page");
   add.HR();
   add.FORM_BEGIN("/action");
-  add.LABEL("Some text"); add.TEXT("txt", "value", data.val);
+  add.TEXT("txt", "value", data.val);
   add.BREAK();
   add.PASS("pass", "pass", data.pass);
   add.BREAK();
-  add.LABEL("check 1: ");
+  add.LABEL("Check: ");
   add.CHECK("check", data.check);
   add.BREAK();
-  add.LABEL("Date"); add.DATE("date", data.d);
-  add.BREAK();
-  add.LABEL("Time"); add.TIME("time", data.t);
-  add.BREAK();
-  add.SLIDER("sld", data.sld, 0, 20); add.BREAK();
-  add.LABEL("Color"); add.COLOR("col", data.color);
-  add.BREAK();
-  add.SELECT("sel", "val1,val 2,val 3", data.sel);
-  add.BREAK();
+  add.LABEL("Switch: ");
   add.SWITCH("sw", data.sw);
   add.BREAK();
-  add.BLOCK_BEGIN();
+  add.LABEL("Date"); add.DATE("date", data.date);
+  add.BREAK();
+  add.LABEL("Time"); add.TIME("time", data.time);
+  add.BREAK();
+  add.SLIDER("sld", data.sld, 0, 20);
+  add.BREAK();
+  add.LABEL("Color");
+  add.COLOR("col", data.color);
+  add.BREAK();
+  add.SELECT("sel", "val 1,val 2,val 3", data.sel);
+  add.BREAK();
   add.SUBMIT("Submit!");
   add.FORM_END();
-  add.FORM_SUBMIT("/exit", "Stop");
-  add.BLOCK_END();
   BUILD_END();
 }
 
@@ -65,46 +65,41 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   GyverPortal portal;
-  portal.attachBuild(build);  
+  portal.attachBuild(build);
   portal.start();
+
+  portal.list.init(8);
+  portal.list.add(&data.val, "/action", "txt", T_INT16);
+  portal.list.add(&data.pass, "pass", T_CSTR);
+  portal.list.add(&data.check, "check", T_CHECK);
+  portal.list.add(&data.sw, "sw", T_CHECK);
+  portal.list.add(&data.date, "date", T_DATE);
+  portal.list.add(&data.time, "time", T_TIME);
+  portal.list.add(&data.sld, "sld", T_INT16);
+  portal.list.add(&data.color, "col", T_COLOR); 
 
   while (portal.tick()) {
     if (portal.action()) {
-      if (portal.form("/exit")) {
-        String s;
-        GP_BUILD(s);
-        add.TITLE("Portal stopped");
-        
-        portal.showPage(s);
-        portal.stop();
-      }
-
       if (portal.form("/action")) {
-        data.val = portal.getInt("txt");
-        portal.copyStr("pass", data.pass);
-        data.check = portal.getCheck("check");
-        data.d = portal.getDate("date");
-        data.t = portal.getTime("time");
-        data.sld = portal.getInt("sld");
-        data.color = portal.getColor("col");
+        // для селекта нет авто-парсера, его вручную
         data.sel = portal.getSelected("sel", "val 1,val 2,val 3");
-        data.sw = portal.getCheck("sw");
 
+        // выводим в порт
         Serial.println(data.val);
         Serial.println(data.pass);
         Serial.println(data.check);
-        Serial.print(data.d.year);
+        Serial.println(data.sw);
+        Serial.print(data.date.year);
         Serial.print(',');
-        Serial.print(data.d.month);
+        Serial.print(data.date.month);
         Serial.print(',');
-        Serial.println(data.d.day);
-        Serial.print(data.t.hour);
+        Serial.println(data.date.day);
+        Serial.print(data.time.hour);
         Serial.print(':');
-        Serial.println(data.t.minute);
+        Serial.println(data.time.minute);
         Serial.println(data.sld);
         Serial.println(data.color, HEX);
-        Serial.println(data.sel);
-        Serial.println(data.sw);
+        Serial.println(data.sel);        
       }
     }
   }

@@ -6,22 +6,28 @@
 # Datatypes (KEYWORD1)
 #######################################
 GyverPortal	KEYWORD1
-CPdate	KEYWORD1
-CPtime	KEYWORD1
+GPdate	KEYWORD1
+GPtime	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 start	KEYWORD2
 stop	KEYWORD2
-showPage	KEYWORD2
 show	KEYWORD2
+showPage	KEYWORD2
 attachBuild	KEYWORD2
-attachForm	KEYWORD2
+attachAction	KEYWORD2
+
+list	KEYWORD2
+init	KEYWORD2
+add	KEYWORD2
+clear	KEYWORD2
 
 tick	KEYWORD2
 action	KEYWORD2
 form	KEYWORD2
+root	KEYWORD2
 
 getString	KEYWORD2
 getChars	KEYWORD2
@@ -32,6 +38,7 @@ getDate	KEYWORD2
 getTime	KEYWORD2
 getColor	KEYWORD2
 getSelected	KEYWORD2
+inList	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
@@ -70,3 +77,13 @@ GP_BUILD	LITERAL1
 GP_SHOW	LITERAL1
 PAGE_BEGIN	LITERAL1
 PAGE_END	LITERAL1
+
+T_CSTR	LITERAL1
+T_STRING	LITERAL1
+T_TIME	LITERAL1
+T_DATE	LITERAL1
+T_CHECK	LITERAL1
+T_INT8	LITERAL1
+T_INT	LITERAL1
+T_FLOAT	LITERAL1
+T_COLOR	LITERAL1
