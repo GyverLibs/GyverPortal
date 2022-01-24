@@ -6,7 +6,7 @@ enum GPtype {
     T_TIME,
     T_DATE,
     T_CHECK,
-    T_INT8,
+    T_BYTE,
     T_INT,
     T_FLOAT,
     T_COLOR,
