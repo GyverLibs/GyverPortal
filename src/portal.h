@@ -1,3 +1,4 @@
+#pragma once
 // ======================= ПОРТАЛ =======================
 class GyverPortal {
 public:

@@ -1,4 +1,5 @@
 #pragma once
+// список функций автообновления
 
 enum GPtype {
     T_CSTR,

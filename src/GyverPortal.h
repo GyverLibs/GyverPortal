@@ -1,4 +1,24 @@
-#pragma once
+/*
+    Простой конструктор веб интерфейса для esp8266 и ESP32
+    Документация:
+    GitHub: https://github.com/GyverLibs/GyverPortal
+    Возможности:
+    - Простой конструктор - делаем страницы без знаний HTML и CSS
+    - Библиотека является обёрткой для стандартной ESP8266WebServer
+    - Позволяет быстро создать вебморду для управления и настройки своего девайса
+    - Компактный читаемый код в "скетче", никаких внешних обработчиков и лямбда-функций
+    - Конструктор использует стандартные HTML формы, CSS и javascript
+    - Элементы конструктора хранятся во Flash памяти
+    - Никаких глобальных буферов, всё генерируется на лету
+    - Приятный дизайн из коробки + тёмная тема
+    - Адаптировано под мобильные устройства и ПК
+    - Встроенные инструменты для удобного парсинга значений с формы
+    - Возможность настроить автоматическое обновление значений переменных по действию со страницы
+    - Встроенные жабаскрипты для AJAX, работа без обновления всей страницы:
+*/
+#ifndef _GyverPortal_h
+#define _GyverPortal_h
+
 #include <DNSServer.h>
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
@@ -13,9 +33,6 @@
 #include "utils.h"
 #include "portal.h"
 
-// возможность спрятать блок?
-
-
 // ======================= БИЛДЕР =======================
 struct Builder {
     // ======================= СТРАНИЦА =======================
@@ -28,7 +45,6 @@ struct Builder {
     void AJAX_CLICK() {
         *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var val=\"\";\n"
         "if(arg.type==\"checkbox\")val=arg.checked?'1':'0';\n"
-        "else if(arg.type==\"range\")val=arg.value;\n"
         "else val=arg.value;\n"
         "xhttp.open(\"GET\",\"_GP_click?\"+arg.name+\"=\"+val,true);xhttp.send();}</script>\n");
     }
@@ -418,3 +434,4 @@ void BUILD_END() {
     add.PAGE_END();
     GP_SHOW();
 }
+#endif
