@@ -14,7 +14,10 @@
     - Адаптировано под мобильные устройства и ПК
     - Встроенные инструменты для удобного парсинга значений с формы
     - Возможность настроить автоматическое обновление значений переменных по действию со страницы
-    - Встроенные жабаскрипты для AJAX, работа без обновления всей страницы:
+    - Встроенные жабаскрипты для AJAX, работа без обновления всей страницы
+    
+    v1.0 - релиз
+    v1.1 - улучшил графики и стили
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -38,9 +41,12 @@ struct Builder {
     // ======================= СТРАНИЦА =======================
     void PAGE_BEGIN() {
         *_gp_sptr += F("<!DOCTYPE HTML><html><head>\n"
-        "<script src=\"https://code.highcharts.com/highcharts.js\"></script>\n"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-        "</head><body><div align=\"center\" style=\"margin:auto;max-width:450px;\">\n");
+        
+        "</head><body>\n");
+    }
+    void PAGE_BLOCK_BEGIN() {
+        *_gp_sptr += F("<div align=\"center\" style=\"margin:auto;max-width:450px;\">\n");
     }
     void AJAX_CLICK() {
         *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var val=\"\";\n"
@@ -51,8 +57,11 @@ struct Builder {
     void THEME(const char* style) {
         *_gp_sptr += FPSTR(style);
     }
+    void PAGE_BLOCK_END() {
+        *_gp_sptr += F("</div>");
+    }
     void PAGE_END() {
-        *_gp_sptr += F("</div></body></html>");
+        *_gp_sptr += F("</body></html>");
     }
     
     // ======================= ФОРМА =======================
@@ -208,7 +217,7 @@ struct Builder {
         *_gp_sptr += F("\" id=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" value=\"");
-        char buf[6];
+        char buf[9];
         encodeTime(buf, t);
         *_gp_sptr += buf;
         *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
@@ -291,128 +300,193 @@ struct Builder {
             *_gp_sptr += str;
             *_gp_sptr += "',";
         }
-        *_gp_sptr += F("];\n");
-        *_gp_sptr += F("elms.forEach(function(elm){\n");
-        *_gp_sptr += F("var xhttp=new XMLHttpRequest();\n");
-        *_gp_sptr += F("xhttp.onreadystatechange=function(){\n");
-        *_gp_sptr += F("if(this.readyState==4&&this.status==200){\n");
-        *_gp_sptr += F("var resp=this.responseText;\n");
-        *_gp_sptr += F("var item=document.getElementById(elm);\n");
-        *_gp_sptr += F("if(item.type==\"checkbox\"||item.type==\"radio\")item.checked=Number(resp);\n");
-        *_gp_sptr += F("else if(item.type==undefined)item.innerHTML=resp;\n");
-        *_gp_sptr += F("else item.value=resp;\n");
-        *_gp_sptr += F("}};xhttp.open(\"GET\",\"_GP_update?\"+elm,true);xhttp.send();});},");
+        *_gp_sptr += F("];\n"
+        "elms.forEach(function(elm){\n"
+        "var xhttp=new XMLHttpRequest();\n"
+        "xhttp.onreadystatechange=function(){\n"
+        "if(this.readyState==4&&this.status==200){\n"
+        "var resp=this.responseText;\n"
+        "var item=document.getElementById(elm);\n"
+        "if(item.type==\"checkbox\"||item.type==\"radio\")item.checked=Number(resp);\n"
+        "else if(item.type==undefined)item.innerHTML=resp;\n"
+        "else item.value=resp;\n"
+        "}};xhttp.open(\"GET\",\"_GP_update?\"+elm,true);xhttp.send();});},");
         *_gp_sptr += prd;
         *_gp_sptr += F(");</script>\n");
     }
     
     template <uint8_t ax>
-    void PLOT_DARK(const char* id, const char* vname, const char** labels, int vals[][ax], int am) {
-        *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n");
-        *_gp_sptr += F("<script type=\"text/javascript\">\n");
-        *_gp_sptr += F("google.charts.load('current', {'packages':['corechart']});\n");
-        *_gp_sptr += F("google.charts.setOnLoadCallback(drawChart);\n");
-        *_gp_sptr += F("function drawChart() {\n");
-        *_gp_sptr += F("var data = google.visualization.arrayToDataTable([\n");
+    void PLOT_DARK(const char* id, const char** labels, int vals[][ax], int am) {
+        *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
+        "<script type=\"text/javascript\">\n"
+        "google.charts.load('current', {'packages':['corechart']});\n"
+        "google.charts.setOnLoadCallback(drawChart);\n"
+        "function drawChart() {\n"
+        "var data = google.visualization.arrayToDataTable([\n");
         
         *_gp_sptr += '[';
-        for (int i = 0; i < ax; i++) {
+        for (int i = 0; i < ax+1; i++) {
             *_gp_sptr += '\'';
-            *_gp_sptr += labels[i];
+            if (i) *_gp_sptr += labels[i-1];
             *_gp_sptr += "',";
         }
         *_gp_sptr += "],\n";
         for (int j = 0; j < am; j++) {
             *_gp_sptr += '[';
-            for (int i = 0; i < ax; i++) {
+            for (int i = 0; i < ax+1; i++) {
                 if (!i) *_gp_sptr += '\'';
-                *_gp_sptr += vals[j][i];
+                if (!i) *_gp_sptr += j;
+                else *_gp_sptr += vals[j][i-1];
                 if (!i) *_gp_sptr += '\'';
                 *_gp_sptr += ',';
             }
-            *_gp_sptr += "],\n";
+            *_gp_sptr += F("],\n");
         }
         
-        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'80%','height':'70%'},\n");          
-        *_gp_sptr += F("backgroundColor:'none',hAxis:{title:'");
-        *_gp_sptr += labels[0];
-        *_gp_sptr += F("',titleTextStyle:{color:'#ddd'},textStyle:{color:'#bbb'}},vAxis:{title:'");
-        *_gp_sptr += vname;
-        *_gp_sptr += F("',titleTextStyle:{color:'#ddd'},gridlines:{color:'#777'},textStyle:{color:'#bbb'}},\n");
-        *_gp_sptr += F("legend: {position:'bottom',textStyle:{color:'#eee'}}};\n");
-        *_gp_sptr += F("var chart = new google.visualization.LineChart(document.getElementById('");
+        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'80%','height':'70%'},\n"
+        "backgroundColor:'none',hAxis:{title:'',titleTextStyle:{color:'#ddd'},textStyle:{color:'#bbb'}},\n"
+        "vAxis:{title:'',titleTextStyle:{color:'#ddd'},gridlines:{color:'#777'},textStyle:{color:'#bbb'}},\n"
+        "legend: {position:'bottom',textStyle:{color:'#eee'}}};\n"
+        "var chart = new google.visualization.LineChart(document.getElementById('");
         *_gp_sptr += id;
         *_gp_sptr += F("'));\n");
         *_gp_sptr += F("chart.draw(data, options);}\n");
         *_gp_sptr += F("</script><div id=\"");
         *_gp_sptr += id;
-        *_gp_sptr += F("\" style=\"width:90%;height:500px\"></div>\n");
+        *_gp_sptr += F("\" class=\"chartBlock\"></div>\n");
     }
     
     template <uint8_t ax>
-    void PLOT_LIGHT(const char* id, const char* vname, const char** labels, int vals[][ax], int am) {
-        *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n");
-        *_gp_sptr += F("<script type=\"text/javascript\">\n");
-        *_gp_sptr += F("google.charts.load('current', {'packages':['corechart']});\n");
-        *_gp_sptr += F("google.charts.setOnLoadCallback(drawChart);\n");
-        *_gp_sptr += F("function drawChart() {\n");
-        *_gp_sptr += F("var data = google.visualization.arrayToDataTable([\n");
+    void PLOT_LIGHT(const char* id, const char** labels, int vals[][ax], int am) {
+        *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
+        "<script type=\"text/javascript\">\n"
+        "google.charts.load('current', {'packages':['corechart']});\n"
+        "google.charts.setOnLoadCallback(drawChart);\n"
+        "function drawChart() {\n"
+        "var data = google.visualization.arrayToDataTable([\n");
         
         *_gp_sptr += '[';
-        for (int i = 0; i < ax; i++) {
+        for (int i = 0; i < ax+1; i++) {
             *_gp_sptr += '\'';
-            *_gp_sptr += labels[i];
+            if (i) *_gp_sptr += labels[i-1];
             *_gp_sptr += "',";
         }
         *_gp_sptr += "],\n";
         for (int j = 0; j < am; j++) {
             *_gp_sptr += '[';
-            for (int i = 0; i < ax; i++) {
+            for (int i = 0; i < ax+1; i++) {
                 if (!i) *_gp_sptr += '\'';
-                *_gp_sptr += vals[j][i];
+                if (!i) *_gp_sptr += j;
+                else *_gp_sptr += vals[j][i-1];
                 if (!i) *_gp_sptr += '\'';
                 *_gp_sptr += ',';
             }
-            *_gp_sptr += "],\n";
+            *_gp_sptr += F("],\n");
         }
         
-        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'80%','height':'70%'},\n");          
-        *_gp_sptr += F("backgroundColor:'none',hAxis:{title:'");
-        *_gp_sptr += labels[0];
-        *_gp_sptr += F("'},vAxis:{title:'");
-        *_gp_sptr += vname;
-        *_gp_sptr += F("'},\n");
-        *_gp_sptr += F("legend: {position:'bottom'}};\n");
-        *_gp_sptr += F("var chart = new google.visualization.LineChart(document.getElementById('");
+        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'80%','height':'70%'},\n"
+        "backgroundColor:'none',hAxis:{title:''},vAxis:{title:''},\n"
+        "legend: {position:'bottom'}};\n"
+        "var chart = new google.visualization.LineChart(document.getElementById('");
         *_gp_sptr += id;
         *_gp_sptr += F("'));\n");
-        *_gp_sptr += F("chart.draw(data, options);}\n");
-        *_gp_sptr += F("</script><div id=\"");
+        *_gp_sptr += F("chart.draw(data, options);}\n"
+        "</script><div id=\"");
         *_gp_sptr += id;
-        *_gp_sptr += F("\" style=\"width:90%;height:500px\"></div>\n");
+        *_gp_sptr += F("\" class=\"chartBlock\"></div>\n");
     }
     
-    void AJAX_PLOT(const char* name, const char* label, const char* vaxis, int prd = 1000) {
+    void AJAX_PLOT(const char* name, int axes, int xamount = 20, int prd = 1000) {
         *_gp_sptr += F(""
-        "<div id=\"chart-distance\" class=\"container\"></div><script>"
-        "var chartT = new Highcharts.Chart({chart:{renderTo:'chart-distance'},"
-        "title:{text:'");
-        *_gp_sptr += label;
-        *_gp_sptr += F("'},series:[{showInLegend:false,data:[]}],"
-        "plotOptions: {line:{animation:false,dataLabels:{enabled:true}},series:{color:'#059e8a'}},"
-        "xAxis:{type:'datetime',dateTimeLabelFormats:{second:'%H:%M:%S'}},"
-        "yAxis:{title:{text:'");
-        *_gp_sptr += vaxis;
-        *_gp_sptr += F("'}},credits:{enabled:false}});"
-        "setInterval(function(){var xhttp=new XMLHttpRequest();"
-        "xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){"
-        "var x=(new Date()).getTime(),y=parseFloat(this.responseText);"
-        "if(chartT.series[0].data.length>40)chartT.series[0].addPoint([x, y],true,true,true);"
-        "else chartT.series[0].addPoint([x, y],true,false,true);"
+        "<script src=\"https://code.highcharts.com/highcharts.js\"></script>\n"
+        "<div id=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" class=\"container chartBlock\"></div><script>\n"
+        "var ");
+        *_gp_sptr += name;
+        *_gp_sptr += F("=new Highcharts.Chart({\n"
+        "chart:{borderRadius:10,renderTo:'");
+        *_gp_sptr += name;
+        *_gp_sptr += F("',style:{fontFamily:\"sans-serif\"}},\n"
+        "title:{text:''},"
+        "series:[");
+        for (int i = 0; i < axes; i++) {
+            *_gp_sptr += F("{data:[]}");
+            if (i != axes - 1) *_gp_sptr += ',';
+        }
+        *_gp_sptr += F("],\n"
+        "xAxis:{type:'datetime',dateTimeLabelFormats:{second:'%H:%M:%S'}},\n"
+        "yAxis:{title:{enabled:false}},"
+        "credits:{enabled:false}});\n"
+        "setInterval(function(){var xhttp=new XMLHttpRequest();var ch=");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\n"
+        "xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){\n"
+        "var x=(new Date()).getTime();"
+        "var arr=this.responseText.split(',');"
+        "var move=(ch.series[0].data.length>");
+        *_gp_sptr += xamount;
+        *_gp_sptr += F(");\n"
+        "for(let i=0;i<arr.length;i++)ch.series[i].addPoint([x,Number(arr[i])],true,move,true);\n"
         "}};xhttp.open(\"GET\",\"_GP_update?");
         *_gp_sptr += name;
-        *_gp_sptr += F("\",true);xhttp.send();},1000);</script>");
+        *_gp_sptr += F("\",true);xhttp.send();},\n");
+        *_gp_sptr += prd;
+        *_gp_sptr += F(");</script>\n");
     }
+    /*
+    void AJAX_PLOT_ARRAY(int16_t arr[], int am, const char* name, const char* label, int prd = 1000) {
+        *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
+        "<div class=\"chartBlock\" id=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\"></div>\n"
+        "<script>Highcharts.stockChart('");
+        *_gp_sptr += name;
+        *_gp_sptr += F("',{chart:{events:{load:function(){\n"
+        "var series = this.series[0];\n"
+        "setInterval(function(){var xhttp=new XMLHttpRequest();\n"
+        "xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){\n"
+        "var resp=this.responseText.split(',');\n"
+        //"var x=(new Date(resp[0])).getTime(),y=Number(resp[1]);\n"
+        "var x=(new Date()).getTime(),y=Number(this.responseText);\n"
+        "series.addPoint([x,y],true,false,true);\n"
+        "}};xhttp.open(\"GET\",\"_GP_update?");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\",true);xhttp.send();},");
+        *_gp_sptr += prd;
+        *_gp_sptr += F(");}}},\n");
+
+        *_gp_sptr += F("rangeSelector:{buttons:[\n"
+        "{count:1,type:'minute',text:'1M'},\n"
+        "{count:1,type:'hour',text:'1H'},\n"
+        "{count:1,type:'day',text:'1D'},\n"
+        "{type:'all',text:'All'}],\n"
+        "inputEnabled:false,\n"
+        "selected:0},\n");
+
+        *_gp_sptr += F("title:{text:'");
+        *_gp_sptr += label;
+        *_gp_sptr += F("'},\n"
+        "time:{useUTC:false},\n"
+        "credits:{enabled:false},\n"
+        "series: [{name:'");
+        *_gp_sptr += label;
+        *_gp_sptr += F("',\n"
+        "data:(function(){\n"
+        "var data=[],time=(new Date(\"2022-01-25T16:17\")).getTime(),i;\n"
+        "var arr=[");
+        for (int i = 0; i < am; i++) {
+            *_gp_sptr += arr[i];
+            *_gp_sptr += ',';
+        }
+        *_gp_sptr += F("];\n"
+        "for(i=-arr.length;i<=0;i+=1){data.push([time+i*");
+        *_gp_sptr += prd;
+        *_gp_sptr += F(",arr[arr.length + i]]);}\n"
+        "return data;}())}]});</script>\n");
+    }
+    */
+
 };
 
 extern Builder add = Builder();
@@ -429,8 +503,10 @@ void BUILD_BEGIN(String& s) {
     GP_BUILD(s);
     add.PAGE_BEGIN();
     add.AJAX_CLICK();
+    add.PAGE_BLOCK_BEGIN();
 }
 void BUILD_END() {
+    add.PAGE_BLOCK_END();
     add.PAGE_END();
     GP_SHOW();
 }

@@ -77,7 +77,7 @@ void loop() {
     if (portal.update("pass")) portal.answer(random(1000));
     if (portal.update("sld")) portal.answer(random(10));
     if (portal.update("date")) portal.answer(encodeDate(random(2000, 2030), random(13), random(13)));
-    if (portal.update("time")) portal.answer(encodeTime(random(24), random(60)));
+    if (portal.update("time")) portal.answer(encodeTime(random(24), random(60), random(60)));
     // селект не работает
     if (portal.update("col")) portal.answer(encodeColor(random(0xffffff)));
   }

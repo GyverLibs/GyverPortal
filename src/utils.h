@@ -31,7 +31,7 @@ uint32_t decodeColor(char* hex) {
 
 // ======================= DATE =======================
 struct GPdate {
-    uint16_t year;
+    int16_t year;
     uint8_t month, day;
 };
 // склеить дату в строку str[11]
@@ -77,41 +77,45 @@ GPdate decodeDate(char* str) {
 }
 // ======================= TIME =======================
 struct GPtime {
-    uint8_t hour, minute;
+    uint8_t hour, minute, second;
 };
 
-// склеить время в строку str[6]
+// склеить время в строку str[9]
 void encodeTime(char* str, GPtime& t) {
     str[0] = t.hour / 10 + '0';
     str[1] = t.hour % 10 + '0';
     str[2] = ':';
     str[3] = t.minute / 10 + '0';
     str[4] = t.minute % 10 + '0';
-    str[5] = '\0';
+    str[5] = ':';
+    str[6] = t.second / 10 + '0';
+    str[7] = t.second % 10 + '0';
+    str[8] = '\0';
 }
 
 // склеить время в строку String
 String encodeTime(GPtime& t) {
-    char str[6];
+    char str[9];
     encodeTime(str, t);
     String s(str);
     return s;
 }
 
 // склеить время в строку String
-String encodeTime(uint8_t hour, uint8_t minute) {
-    GPtime t = (GPtime){hour, minute};
+String encodeTime(uint8_t hour, uint8_t minute, uint8_t second = 0) {
+    GPtime t = (GPtime){hour, minute, second};
     return encodeTime(t);
 }
 
-// разобрать строковое время в структуру
+// разобрать строковое время HH:MM:SS в структуру
 GPtime decodeTime(char* str) {
-    GPtime t = (GPtime){0,0};
-    if (strlen(str) == 5) {
-        str[2] = '\0';
+    GPtime t = (GPtime){0,0,0};
+    if (strlen(str) == 8) {
+        str[2] = str[5] = '\0';
         t.hour = atoi(str);
         t.minute = atoi(str+3);
-        str[2] = ':';
+        t.second = atoi(str+6);
+        str[2] = str[5] = ':';
     }
     return t;
 }

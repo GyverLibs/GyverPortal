@@ -156,6 +156,14 @@ public:
         String s(v);
         answer(s.c_str());
     }
+    void answer(int* v, int am) {
+        String s;
+        for (int i = 0; i < am; i++) {
+            s += v[i];
+            if (i != am - 1) s += ',';
+        }
+        answer(s.c_str());
+    }
 
     // ======================= MISC =======================
     // вернёт true, если открыта главная страница (/)

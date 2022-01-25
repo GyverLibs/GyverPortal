@@ -1,20 +1,20 @@
 #include <GyverPortal.h>
-int arr[][3] = {
-  {10, 15, 1},
-  {20, 25, 2},
-  {30, 35, 3},
-  {40, 45, 4},
-  {50, 55, 5},
-};
-const char *names[] = {"value x", "kek", "puk",};
+
+int arr[10][2];
+const char *names[] = {"kek", "puk",};
 
 // билдер страницы
 void build() {
   String s;
   BUILD_BEGIN(s);
-  add.THEME(GP_LIGHT);
-  add.PLOT_DARK<3>("table", "Vaxis", names, arr, 5);
-  add.PLOT_LIGHT<3>("table2", "Vaxis", names, arr, 5);
+  add.THEME(GP_DARK);
+
+  for (int i = 0; i < 10; i++)
+    for (int j = 0; j < 2; j++)
+      arr[i][j] = random(100);
+      
+  //add.PLOT_DARK<2>("table", names, arr, 10);
+  add.PLOT_LIGHT<2>("table", names, arr, 10);
   BUILD_END();
 }
 
