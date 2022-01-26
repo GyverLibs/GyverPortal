@@ -1,4 +1,5 @@
 #pragma once
+#include "log.h"
 // ======================= ПОРТАЛ =======================
 class GyverPortal {
 public:
@@ -31,6 +32,13 @@ public:
         server.on("/_GP_update", [this]() {
             _updateF = 1;
             req = server.argName(0);
+        });
+        server.on("/_GP_log", [this]() {
+            if (log.state && log.available()) {
+                String s;
+                while (log.available()) s += log.read();
+                server.send(200, "text/plane", s);
+            } else server.send(200, "text/plane");
         });
     }
     
@@ -93,7 +101,7 @@ public:
     
     // вернёт true, если был submit с указанной формы
     bool form(const char* name) {
-        return req.startsWith(name);
+        return req.equals(name);
     }
     
     // вернёт имя теукщей submit формы
@@ -109,7 +117,7 @@ public:
     
     // вернёт true, если был клик по указанному элементу (кнопка, чекбокс, свитч, слайдер, селектор)
     bool click(const char* name) {
-        return req.startsWith(name);
+        return req.equals(name);
     }
     
     // вернёт имя теукщего кликнутого компонента
@@ -135,7 +143,7 @@ public:
     
     // вернёт true, если было update с указанного компонента
     bool update(const char* name) {
-        return req.startsWith(name);
+        return req.equals(name);
     }
     
     // вернёт имя обновлённого компонента
@@ -156,10 +164,11 @@ public:
         String s(v);
         answer(s.c_str());
     }
-    void answer(int* v, int am) {
+    void answer(int16_t* v, int am, int dec = 0) {
         String s;
         for (int i = 0; i < am; i++) {
-            s += v[i];
+            if (dec) s += (float)v[i] / dec;
+            else s += v[i];
             if (i != am - 1) s += ',';
         }
         answer(s.c_str());
@@ -246,6 +255,7 @@ public:
     WebServer server;
 #endif
     List list;
+    GPlog log;
 
     // ======================= PRIVATE =======================
 private:
@@ -268,6 +278,7 @@ private:
         }
     }
     
+    bool logF = false;
     String req;
     bool _mode = false;
     bool _active = false;

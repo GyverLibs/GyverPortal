@@ -7,7 +7,7 @@ void build() {
   add.THEME(GP_DARK);
 
   add.AJAX_PLOT("plot1", 1, 20, 1000);
-  add.AJAX_PLOT("plot3", 3, 20, 1000);
+  add.AJAX_PLOT_DARK("plot3", 3, 20, 1000);
   BUILD_END();
 }
 
@@ -33,7 +33,7 @@ void loop() {
   if (portal.update()) {
     if (portal.update("plot1")) portal.answer(random(200));
     if (portal.update("plot3")) {
-      int answ[] = {random(200), random(200), random(200)};
+      int16_t answ[] = {random(200), random(200), random(200)};
       portal.answer(answ, 3);
     }
   }

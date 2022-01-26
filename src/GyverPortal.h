@@ -18,6 +18,20 @@
     
     v1.0 - релиз
     v1.1 - улучшил графики и стили
+    v1.2
+    - Блок NUMBER теперь тип number
+    - Добавил большое текстовое поле AREA
+    - Добавил GPunix
+    - Улучшил парсинг
+    - Добавил BUTTON_MINI
+    - Кнопки могут передавать данные с других компонентов (кроме AREA и чекбоксов)
+    - Добавил PLOT_STOCK - статический график с масштабом
+    - Добавил AJAX_PLOT_DARK
+    - Изменён синтаксис у старых графиков
+    - Фичи GPaddUnix и GPaddInt для графиков
+    - Убрал default тему
+    - Подкрутил стили
+    - Добавил окно лога AREA_LOG и функцию лога в целом
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -44,23 +58,62 @@ struct Builder {
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
         "</head><body>\n");
     }
-    void PAGE_BLOCK_BEGIN() {
-        *_gp_sptr += F("<div align=\"center\" style=\"margin:auto;max-width:450px;\">\n");
-    }
     void AJAX_CLICK() {
         *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var val=\"\";\n"
-        "if(arg.type==\"checkbox\")val=arg.checked?'1':'0';\n"
-        "else val=arg.value;\n"
-        "xhttp.open(\"GET\",\"_GP_click?\"+arg.name+\"=\"+val,true);xhttp.send();}</script>\n");
+        "if(arg.type==\"checkbox\")val=arg.checked?'1':'0';\nelse val=arg.value;\n"
+        "xhttp.open(\"POST\",\"_GP_click?\"+arg.name+\"=\"+val,true);xhttp.send();}\n"
+        "function GP_clickid(btn,tar){var xhttp=new XMLHttpRequest();\n"
+        "xhttp.open(\"POST\",\"_GP_click?\"+btn+\"=\"+document.getElementById(tar).value,true);xhttp.send();\n}"
+        "</script>\n");
     }
     void THEME(const char* style) {
         *_gp_sptr += FPSTR(style);
+    }
+    void PAGE_BLOCK_BEGIN() {
+        *_gp_sptr += F("<div align=\"center\" style=\"margin:auto;max-width:1000px;\">\n");
     }
     void PAGE_BLOCK_END() {
         *_gp_sptr += F("</div>");
     }
     void PAGE_END() {
         *_gp_sptr += F("</body></html>");
+    }
+    void AJAX_UPDATE(const char* list, int prd = 1000) {
+        *_gp_sptr += F("<script>setInterval(function(){\n");
+        *_gp_sptr += "var elms=[";
+        char* str = (char*)list;
+        splitList(NULL);
+        while ((str = splitList((char*)list)) != NULL) {
+            *_gp_sptr += "'";
+            *_gp_sptr += str;
+            *_gp_sptr += "',";
+        }
+        *_gp_sptr += F("];\n"
+        "elms.forEach(function(elm){\n"
+        "var xhttp=new XMLHttpRequest();\n"
+        "xhttp.onreadystatechange=function(){\n"
+        "if(this.readyState==4&&this.status==200){\n"
+        "var resp=this.responseText;\n"
+        "var item=document.getElementById(elm);\n"
+        "if(item.type==\"checkbox\"||item.type==\"radio\")item.checked=Number(resp);\n"
+        "else if(item.type==undefined)item.innerHTML=resp;\n"
+        "else item.value=resp;\n"
+        "}};xhttp.open(\"GET\",\"_GP_update?\"+elm,true);xhttp.send();});},");
+        *_gp_sptr += prd;
+        *_gp_sptr += F(");</script>\n");
+    }
+    void AREA_LOG(int rows = 5) {
+        *_gp_sptr += F("<textarea style=\"height:auto\" id=\"_GP_log\" rows=\"");
+        *_gp_sptr += rows;
+        *_gp_sptr += F("\" disabled></textarea>");
+        *_gp_sptr += F("<script>let _gplog=\"\";\n"
+        "setInterval(function(){var xhttp=new XMLHttpRequest();\n"
+        "xhttp.onreadystatechange=function(){\n"
+        "if(this.readyState==4&&this.status==200){\n"
+        "_gplog+=this.responseText;\n"
+        "var elm=document.getElementById(\"_GP_log\");\n"
+        "elm.innerHTML=_gplog;elm.scrollTop=elm.scrollHeight;}};\n"
+        "xhttp.open(\"GET\",\"_GP_log?\",true);xhttp.send();},1000);</script>\n");
     }
     
     // ======================= ФОРМА =======================
@@ -127,8 +180,38 @@ struct Builder {
         *_gp_sptr += name;
         *_gp_sptr += F("\" onclick=\"GP_click(this)\">\n");
     }
+    void BUTTON(const char* name, const char* value, const char* tar) {
+        *_gp_sptr += F("<input type=\"button\" value=\"");
+        *_gp_sptr += value;
+        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" onclick=\"GP_clickid('");
+        *_gp_sptr += name;
+        *_gp_sptr += F("','");
+        *_gp_sptr += tar;
+        *_gp_sptr += F("')\">\n");
+    }
+    void BUTTON_MINI(const char* name, const char* value) {
+        *_gp_sptr += F("<input class=\"miniButton\" type=\"button\" value=\"");
+        *_gp_sptr += value;
+        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" onclick=\"GP_click(this)\">\n");
+    }
+    void BUTTON_MINI(const char* name, const char* value, const char* tar) {
+        *_gp_sptr += F("<input class=\"miniButton\" type=\"button\" value=\"");
+        *_gp_sptr += value;
+        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" onclick=\"GP_clickid('");
+        *_gp_sptr += name;
+        *_gp_sptr += F("','");
+        *_gp_sptr += tar;
+        *_gp_sptr += F("')\">\n");
+    }
+    
     void NUMBER(const char* name, const char* place, int value = INT32_MAX) {
-        *_gp_sptr += F("<input type=\"text\" name=\"");
+        *_gp_sptr += F("<input type=\"number\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" id=\"");
         *_gp_sptr += name;
@@ -139,6 +222,27 @@ struct Builder {
         *_gp_sptr += F("\" placeholder=\"");
         *_gp_sptr += place;
         *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
+    }
+    void AREA(const char* name, int rows, char* value) {
+        *_gp_sptr += F("<textarea style=\"height:auto\" name=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" id=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" rows=\"");
+        *_gp_sptr += rows;
+        *_gp_sptr += F("\">");
+        *_gp_sptr += value;
+        *_gp_sptr += F("</textarea>");
+    }
+    void AREA(const char* name, int rows = 1) {
+        *_gp_sptr += F("<textarea style=\"height:auto\" name=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" id=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" rows=\"");
+        *_gp_sptr += rows;
+        *_gp_sptr += F("\">");
+        *_gp_sptr += F("</textarea>");
     }
     void TEXT(const char* name, const char* place, const char* value = "") {
         *_gp_sptr += F("<input type=\"text\" name=\"");
@@ -154,6 +258,9 @@ struct Builder {
     void TEXT(const char* name, const char* place, String& value) {
         TEXT(name, place, (const char*)value.c_str());
     }
+    void TEXT(const char* name, const char* place, char* value) {
+        TEXT(name, place, (const char*)value);
+    }
     void PASS(const char* name, const char* place, const char* value = "") {
         *_gp_sptr += F("<input type=\"password\" name=\"");
         *_gp_sptr += name;
@@ -167,6 +274,9 @@ struct Builder {
     }
     void PASS(const char* name, const char* place, String& value) {
         PASS(name, place, (const char*)value.c_str());
+    }
+    void PASS(const char* name, const char* place, char* value) {
+        PASS(name, place, (const char*)value);
     }
     void CHECK(const char* name, bool x = 0) {
         *_gp_sptr += F("<input type=\"checkbox\" name=\"");
@@ -289,33 +399,9 @@ struct Builder {
         *_gp_sptr += F("\">");
     }
     
-    void AJAX_UPDATE(const char* list, int prd = 1000) {
-        *_gp_sptr += F("<script>setInterval(function(){\n");
-        *_gp_sptr += "var elms=[";
-        char* str = (char*)list;
-        splitList(NULL);
-        while ((str = splitList((char*)list)) != NULL) {
-            *_gp_sptr += "'";
-            *_gp_sptr += str;
-            *_gp_sptr += "',";
-        }
-        *_gp_sptr += F("];\n"
-        "elms.forEach(function(elm){\n"
-        "var xhttp=new XMLHttpRequest();\n"
-        "xhttp.onreadystatechange=function(){\n"
-        "if(this.readyState==4&&this.status==200){\n"
-        "var resp=this.responseText;\n"
-        "var item=document.getElementById(elm);\n"
-        "if(item.type==\"checkbox\"||item.type==\"radio\")item.checked=Number(resp);\n"
-        "else if(item.type==undefined)item.innerHTML=resp;\n"
-        "else item.value=resp;\n"
-        "}};xhttp.open(\"GET\",\"_GP_update?\"+elm,true);xhttp.send();});},");
-        *_gp_sptr += prd;
-        *_gp_sptr += F(");</script>\n");
-    }
-    
-    template <uint8_t ax>
-    void PLOT_DARK(const char* id, const char** labels, int vals[][ax], int am) {
+    // ======================= ГРАФИКИ =======================
+    template <uint8_t ax, uint8_t am>
+    void PLOT(const char* id, const char** labels, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
         "<script type=\"text/javascript\">\n"
         "google.charts.load('current', {'packages':['corechart']});\n"
@@ -335,14 +421,60 @@ struct Builder {
             for (int i = 0; i < ax+1; i++) {
                 if (!i) *_gp_sptr += '\'';
                 if (!i) *_gp_sptr += j;
-                else *_gp_sptr += vals[j][i-1];
+                else {
+                    if (dec) *_gp_sptr += (float)vals[i-1][j] / dec;
+                    else *_gp_sptr += vals[i-1][j];
+                }
                 if (!i) *_gp_sptr += '\'';
                 *_gp_sptr += ',';
             }
             *_gp_sptr += F("],\n");
         }
         
-        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'80%','height':'70%'},\n"
+        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'90%','height':'90%'},\n"
+        "backgroundColor:'none',hAxis:{title:''},vAxis:{title:''},\n"
+        "legend: {position:'bottom'}};\n"
+        "var chart = new google.visualization.LineChart(document.getElementById('");
+        *_gp_sptr += id;
+        *_gp_sptr += F("'));\n");
+        *_gp_sptr += F("chart.draw(data, options);}\n"
+        "</script><div id=\"");
+        *_gp_sptr += id;
+        *_gp_sptr += F("\" class=\"chartBlock\"></div>\n");
+    }
+    
+    template <uint8_t ax, uint8_t am>
+    void PLOT_DARK(const char* id, const char** labels, int16_t vals[ax][am], int dec = 0) {
+        *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
+        "<script type=\"text/javascript\">\n"
+        "google.charts.load('current', {'packages':['corechart']});\n"
+        "google.charts.setOnLoadCallback(drawChart);\n"
+        "function drawChart() {\n"
+        "var data = google.visualization.arrayToDataTable([\n");
+        
+        *_gp_sptr += '[';
+        for (int i = 0; i < ax+1; i++) {
+            *_gp_sptr += '\'';
+            if (i) *_gp_sptr += labels[i-1];
+            *_gp_sptr += "',";
+        }
+        *_gp_sptr += "],\n";
+        for (int j = 0; j < am; j++) {
+            *_gp_sptr += '[';
+            for (int i = 0; i < ax+1; i++) {
+                if (!i) *_gp_sptr += '\'';
+                if (!i) *_gp_sptr += j;
+                else {
+                    if (dec) *_gp_sptr += (float)vals[i-1][j] / dec;
+                    else *_gp_sptr += vals[i-1][j];
+                }
+                if (!i) *_gp_sptr += '\'';
+                *_gp_sptr += ',';
+            }
+            *_gp_sptr += F("],\n");
+        }
+        
+        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'90%','height':'90%'},\n"
         "backgroundColor:'none',hAxis:{title:'',titleTextStyle:{color:'#ddd'},textStyle:{color:'#bbb'}},\n"
         "vAxis:{title:'',titleTextStyle:{color:'#ddd'},gridlines:{color:'#777'},textStyle:{color:'#bbb'}},\n"
         "legend: {position:'bottom',textStyle:{color:'#eee'}}};\n"
@@ -355,52 +487,12 @@ struct Builder {
         *_gp_sptr += F("\" class=\"chartBlock\"></div>\n");
     }
     
-    template <uint8_t ax>
-    void PLOT_LIGHT(const char* id, const char** labels, int vals[][ax], int am) {
-        *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
-        "<script type=\"text/javascript\">\n"
-        "google.charts.load('current', {'packages':['corechart']});\n"
-        "google.charts.setOnLoadCallback(drawChart);\n"
-        "function drawChart() {\n"
-        "var data = google.visualization.arrayToDataTable([\n");
-        
-        *_gp_sptr += '[';
-        for (int i = 0; i < ax+1; i++) {
-            *_gp_sptr += '\'';
-            if (i) *_gp_sptr += labels[i-1];
-            *_gp_sptr += "',";
-        }
-        *_gp_sptr += "],\n";
-        for (int j = 0; j < am; j++) {
-            *_gp_sptr += '[';
-            for (int i = 0; i < ax+1; i++) {
-                if (!i) *_gp_sptr += '\'';
-                if (!i) *_gp_sptr += j;
-                else *_gp_sptr += vals[j][i-1];
-                if (!i) *_gp_sptr += '\'';
-                *_gp_sptr += ',';
-            }
-            *_gp_sptr += F("],\n");
-        }
-        
-        *_gp_sptr += F("]);var options = {pointSize:5,curveType:'function','chartArea':{'width':'80%','height':'70%'},\n"
-        "backgroundColor:'none',hAxis:{title:''},vAxis:{title:''},\n"
-        "legend: {position:'bottom'}};\n"
-        "var chart = new google.visualization.LineChart(document.getElementById('");
-        *_gp_sptr += id;
-        *_gp_sptr += F("'));\n");
-        *_gp_sptr += F("chart.draw(data, options);}\n"
-        "</script><div id=\"");
-        *_gp_sptr += id;
-        *_gp_sptr += F("\" class=\"chartBlock\"></div>\n");
-    }
-    
     void AJAX_PLOT(const char* name, int axes, int xamount = 20, int prd = 1000) {
         *_gp_sptr += F(""
         "<script src=\"https://code.highcharts.com/highcharts.js\"></script>\n"
         "<div id=\"");
         *_gp_sptr += name;
-        *_gp_sptr += F("\" class=\"container chartBlock\"></div><script>\n"
+        *_gp_sptr += F("\" class=\"chartBlock\"></div><script>\n"
         "var ");
         *_gp_sptr += name;
         *_gp_sptr += F("=new Highcharts.Chart({\n"
@@ -433,59 +525,117 @@ struct Builder {
         *_gp_sptr += prd;
         *_gp_sptr += F(");</script>\n");
     }
-    /*
-    void AJAX_PLOT_ARRAY(int16_t arr[], int am, const char* name, const char* label, int prd = 1000) {
-        *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
-        "<div class=\"chartBlock\" id=\"");
+    
+    void AJAX_PLOT_DARK(const char* name, int axes, int xamount = 20, int prd = 1000) {
+        *_gp_sptr += F(""
+        "<script src=\"https://code.highcharts.com/highcharts.js\"></script>\n"
+        "<script src=\"https://code.highcharts.com/themes/dark-unica.js\"></script>\n"
+        "<div id=\"");
         *_gp_sptr += name;
-        *_gp_sptr += F("\"></div>\n"
-        "<script>Highcharts.stockChart('");
+        *_gp_sptr += F("\" class=\"chartBlock\"></div><script>\n"
+        "var ");
         *_gp_sptr += name;
-        *_gp_sptr += F("',{chart:{events:{load:function(){\n"
-        "var series = this.series[0];\n"
-        "setInterval(function(){var xhttp=new XMLHttpRequest();\n"
+        *_gp_sptr += F("=new Highcharts.Chart({\n"
+        "chart:{borderRadius:10,renderTo:'");
+        *_gp_sptr += name;
+        *_gp_sptr += F("',style:{fontFamily:\"sans-serif\"}},\n"
+        "title:{text:''},"
+        "series:[");
+        for (int i = 0; i < axes; i++) {
+            *_gp_sptr += F("{data:[]}");
+            if (i != axes - 1) *_gp_sptr += ',';
+        }
+        *_gp_sptr += F("],\n"
+        "xAxis:{type:'datetime',dateTimeLabelFormats:{second:'%H:%M:%S'}},\n"
+        "yAxis:{title:{enabled:false}},"
+        "credits:{enabled:false}});\n"
+        "setInterval(function(){var xhttp=new XMLHttpRequest();var ch=");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\n"
         "xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){\n"
-        "var resp=this.responseText.split(',');\n"
-        //"var x=(new Date(resp[0])).getTime(),y=Number(resp[1]);\n"
-        "var x=(new Date()).getTime(),y=Number(this.responseText);\n"
-        "series.addPoint([x,y],true,false,true);\n"
+        "var x=(new Date()).getTime();"
+        "var arr=this.responseText.split(',');"
+        "var move=(ch.series[0].data.length>");
+        *_gp_sptr += xamount;
+        *_gp_sptr += F(");\n"
+        "for(let i=0;i<arr.length;i++)ch.series[i].addPoint([x,Number(arr[i])],true,move,true);\n"
         "}};xhttp.open(\"GET\",\"_GP_update?");
         *_gp_sptr += name;
-        *_gp_sptr += F("\",true);xhttp.send();},");
+        *_gp_sptr += F("\",true);xhttp.send();},\n");
         *_gp_sptr += prd;
-        *_gp_sptr += F(");}}},\n");
-
-        *_gp_sptr += F("rangeSelector:{buttons:[\n"
+        *_gp_sptr += F(");</script>\n");
+    }
+    
+    template <uint8_t ax, uint8_t am>
+    void PLOT_STOCK(const char* id, const char** labels, GPunix* times, int16_t vals[ax][am], int dec = 0) {
+        *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
+        "<div class=\"chartBlock\" id=\"");
+        *_gp_sptr += id;
+        *_gp_sptr += F("\"></div>");
+        *_gp_sptr += F("<script>Highcharts.stockChart('");
+        *_gp_sptr += id;
+        *_gp_sptr += F("',{chart:{},\n"
+        "rangeSelector:{buttons:[\n"
         "{count:1,type:'minute',text:'1M'},\n"
         "{count:1,type:'hour',text:'1H'},\n"
         "{count:1,type:'day',text:'1D'},\n"
         "{type:'all',text:'All'}],\n"
-        "inputEnabled:false,\n"
-        "selected:0},\n");
-
-        *_gp_sptr += F("title:{text:'");
-        *_gp_sptr += label;
-        *_gp_sptr += F("'},\n"
+        "inputEnabled:false,selected:0},\n"
         "time:{useUTC:false},\n"
-        "credits:{enabled:false},\n"
-        "series: [{name:'");
-        *_gp_sptr += label;
-        *_gp_sptr += F("',\n"
-        "data:(function(){\n"
-        "var data=[],time=(new Date(\"2022-01-25T16:17\")).getTime(),i;\n"
-        "var arr=[");
-        for (int i = 0; i < am; i++) {
-            *_gp_sptr += arr[i];
-            *_gp_sptr += ',';
+        "credits:{enabled:false},series:[\n");
+        for (int axs = 0; axs < ax; axs++) {
+            *_gp_sptr += F("{name:'");
+            *_gp_sptr += labels[axs];
+            *_gp_sptr += F("',data:[\n");
+            for (int ams = 0; ams < am; ams++) {
+                *_gp_sptr += '[';
+                *_gp_sptr += times[ams].unix;
+                *_gp_sptr += F("000");
+                *_gp_sptr += ',';
+                if (dec) *_gp_sptr += (float)vals[axs][ams] / dec;
+                else *_gp_sptr += vals[axs][ams];
+                *_gp_sptr += "],\n";
+            }
+            *_gp_sptr += "]},\n";
         }
-        *_gp_sptr += F("];\n"
-        "for(i=-arr.length;i<=0;i+=1){data.push([time+i*");
-        *_gp_sptr += prd;
-        *_gp_sptr += F(",arr[arr.length + i]]);}\n"
-        "return data;}())}]});</script>\n");
+        *_gp_sptr += F("]});</script>\n");
     }
-    */
-
+    
+    template <uint8_t ax, uint8_t am>
+    void PLOT_STOCK_DARK(const char* id, const char** labels, GPunix* times, int16_t vals[ax][am], int dec = 0) {
+        *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
+        "<script src=\"https://code.highcharts.com/themes/dark-unica.js\"></script>"
+        "<div class=\"chartBlock\" id=\"");
+        *_gp_sptr += id;
+        *_gp_sptr += F("\"></div>");
+        *_gp_sptr += F("<script>Highcharts.stockChart('");
+        *_gp_sptr += id;
+        *_gp_sptr += F("',{chart:{},\n"
+        "rangeSelector:{buttons:[\n"
+        "{count:1,type:'minute',text:'1M'},\n"
+        "{count:1,type:'hour',text:'1H'},\n"
+        "{count:1,type:'day',text:'1D'},\n"
+        "{type:'all',text:'All'}],\n"
+        "inputEnabled:false,selected:0},\n"
+        "time:{useUTC:false},\n"
+        "credits:{enabled:false},series:[\n");
+        for (int axs = 0; axs < ax; axs++) {
+            *_gp_sptr += F("{name:'");
+            *_gp_sptr += labels[axs];
+            *_gp_sptr += F("',data:[\n");
+            for (int ams = 0; ams < am; ams++) {
+                *_gp_sptr += '[';
+                *_gp_sptr += times[ams].unix;
+                *_gp_sptr += F("000");
+                *_gp_sptr += ',';
+                if (dec) *_gp_sptr += (float)vals[axs][ams] / dec;
+                else *_gp_sptr += vals[axs][ams];
+                *_gp_sptr += "],\n";
+            }
+            *_gp_sptr += "]},\n";
+        }
+        *_gp_sptr += F("]});</script>\n");
+    }
 };
 
 extern Builder add = Builder();

@@ -1,21 +1,14 @@
 #include <GyverPortal.h>
-#define PLOT_SIZE 10
-int16_t arr[2][PLOT_SIZE];
-const char *names[] = {"kek", "puk",};
+GyverPortal portal;
 
 // билдер страницы
 void build() {
   String s;
   BUILD_BEGIN(s);
-  add.THEME(GP_LIGHT);
-
-  //add.PLOT_DARK<2, PLOT_SIZE>("table", names, arr);
-  add.PLOT<2, PLOT_SIZE>("table", names, arr);
-
+  add.THEME(GP_DARK);
+  add.AREA_LOG(5);
   BUILD_END();
 }
-
-GyverPortal portal;
 
 void setup() {
   Serial.begin(9600);
@@ -27,18 +20,18 @@ void setup() {
   }
   Serial.println(WiFi.localIP());
 
-  // подключаем билдер и запускаем
   portal.attachBuild(build);
   portal.start();
+  portal.log.start(30);   // передали размер буфера
 }
 
 void loop() {
   portal.tick();
 
   static uint32_t tmr;
-  if (millis() - tmr >= 5000) {
+  if (millis() - tmr > 2000) {
     tmr = millis();
-    GPaddInt(random(100), arr[0], PLOT_SIZE);
-    GPaddInt(random(100), arr[1], PLOT_SIZE);
+    portal.log.print("Hello: #");
+    portal.log.println(random(100));
   }
 }
