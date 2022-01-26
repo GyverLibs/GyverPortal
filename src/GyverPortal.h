@@ -86,7 +86,7 @@ struct Builder {
 
     // ======================= ОФОРМЛЕНИЕ =======================
     void BLOCK_BEGIN() {
-        *_gp_sptr += F("<div class=\"block\">\n");
+        *_gp_sptr += F("<div class=\"block\" id=\"blockBack\">\n");
     }
     void BLOCK_END() {
         *_gp_sptr += F("</div>\n");
@@ -184,7 +184,7 @@ struct Builder {
         *_gp_sptr += name;
         *_gp_sptr += (x ? F("\" checked") : F("\""));
         *_gp_sptr += F(" onclick=\"GP_click(this)\">\n");
-        *_gp_sptr += F("<span class=\"slider round\"></span></label>");
+        *_gp_sptr += F("<span class=\"slider\"></span></label>");
     }
     void DATE(const char* name) {
         *_gp_sptr += F("<input type=\"date\" name=\"");

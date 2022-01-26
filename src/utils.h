@@ -9,9 +9,9 @@ void* _gp_ptr = nullptr;
 String encodeColor(uint32_t color) {
     String s('#');
     for (uint8_t i = 0; i < 6; i++) {
-      char p = ((uint32_t)color >> (5 - i) * 4) & 0xF;
-      p += (p > 9) ? 87 : 48;
-      s += p;
+        char p = ((uint32_t)color >> (5 - i) * 4) & 0xF;
+        p += (p > 9) ? 87 : 48;
+        s += p;
     }
     return s;
 }
@@ -120,6 +120,63 @@ GPtime decodeTime(char* str) {
     return t;
 }
 
+// ===================== DATE-TIME PACK =====================
+// упакованная дата-время
+struct DateTimeP {
+    uint32_t ymdhm; // 0yyyyyyy yyyyymmm mddddhhh hhmmmmmm
+    uint8_t ss;     // 00ssssss
+    uint16_t year() {return (ymdhm >> 19) & 0xfff;}
+    uint8_t month() {return (ymdhm >> 15) & 0xf;}
+    uint8_t day() {return (ymdhm >> 11) & 0xf;}
+    uint8_t hour() {return (ymdhm >> 6) & 0x1f;}
+    uint8_t minute() {return ymdhm & 0x3f;}
+    uint8_t second() {return ss & 0x3f;}
+    void year(uint16_t y) {ymdhm = (ymdhm & ~(0xffful << 19)) | ((uint32_t)(y & 0xfff) << 19);}
+    void month(uint8_t m) {ymdhm = (ymdhm & ~(0xful << 15)) | ((uint32_t)(m & 0xf) << 15);}
+    void day(uint8_t d) {ymdhm = (ymdhm & ~(0xf << 11)) | ((d & 0xf) << 11);}
+    void hour(uint8_t h) {ymdhm = (ymdhm & ~(0x1f << 6)) | ((h & 0x1f) << 6);}
+    void minute(uint8_t m) {ymdhm = (ymdhm & (~0x3f) | (m & 0x3f));}
+    void second(uint8_t s) {ss = s & 0x3f;}
+    void set(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s) {
+        year(y); month(m); day(d); hour(h); minute(mn); second(s);
+    }
+};
+
+// получить в виде yyyy-mm-ddThh:mm:ss
+void encodeDTP(char* buf, DateTimeP dtp) {
+    uint16_t v = dtp.year() * 10;
+    for (int i = 3; i >= 0; i--) buf[i] = (v /= 10) % 10;
+    buf[4] = -3;
+    v = dtp.month();
+    buf[5] = v / 10;
+    buf[6] = v % 10;
+    buf[7] = -3;
+    v = dtp.day();
+    buf[8] = v / 10;
+    buf[9] = v % 10;
+    buf[10] = 36;
+    v = dtp.hour();
+    buf[11] = v / 10;
+    buf[12] = v % 10;
+    buf[13] = 10;
+    v = dtp.minute();
+    buf[14] = v / 10;
+    buf[15] = v % 10;
+    buf[16] = 10;
+    v = dtp.second();
+    buf[17] = v / 10;
+    buf[18] = v % 10;
+    for (int i = 0; i < 19; i++) buf[i] += '0';
+    buf[19] = '\0';
+}
+
+// получить в виде yyyy-mm-ddThh:mm:ss
+String encodeDTP(DateTimeP &dtp) {
+    char buf[20];
+    encodeDTP(buf, dtp);
+    return String(buf);
+}
+
 // ======================= LIST UTIL =======================
 // разделить строку на подстроки. Цыганские фокусы
 char* splitList(char* str) {
@@ -143,14 +200,14 @@ char* splitList(char* str) {
 
 // получить номер, под которым name входит в list (вида "val1,val2,val3")
 int8_t inList(const char* name, const char* list) {
-  char* str = (char*)list;
-  int8_t count = 0, pos = -1;
-  splitList(NULL);
-  while ((str = splitList((char*)list)) != NULL) {
-    if (!strcmp(str, name)) pos = count;
-    count++;
-  }
-  return pos;
+    char* str = (char*)list;
+    int8_t count = 0, pos = -1;
+    splitList(NULL);
+    while ((str = splitList((char*)list)) != NULL) {
+        if (!strcmp(str, name)) pos = count;
+        count++;
+    }
+    return pos;
 }
 
 int8_t inList(String& s, const char* list) {
