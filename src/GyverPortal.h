@@ -42,7 +42,6 @@ struct Builder {
     void PAGE_BEGIN() {
         *_gp_sptr += F("<!DOCTYPE HTML><html><head>\n"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-        
         "</head><body>\n");
     }
     void PAGE_BLOCK_BEGIN() {
