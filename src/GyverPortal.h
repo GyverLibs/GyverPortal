@@ -32,6 +32,8 @@
     - Убрал default тему
     - Подкрутил стили
     - Добавил окно лога AREA_LOG и функцию лога в целом
+    
+    v1.3 - переделал GPunix, мелкие фиксы, для списков можно использовать PSTR
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -81,9 +83,11 @@ struct Builder {
     void AJAX_UPDATE(const char* list, int prd = 1000) {
         *_gp_sptr += F("<script>setInterval(function(){\n");
         *_gp_sptr += "var elms=[";
-        char* str = (char*)list;
+        char buf[strlen(list)];
+        strcpy(buf, list);
+        char* str = buf;
         splitList(NULL);
-        while ((str = splitList((char*)list)) != NULL) {
+        while ((str = splitList(buf)) != NULL) {
             *_gp_sptr += "'";
             *_gp_sptr += str;
             *_gp_sptr += "',";
@@ -365,10 +369,12 @@ struct Builder {
         *_gp_sptr += F("\" id=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
-        char* str = (char*)values;
+        char buf[strlen(values)];
+        strcpy(buf, values);
+        char* str = buf;
         uint8_t count = 0;
         splitList(NULL);
-        while ((str = splitList((char*)values)) != NULL) {
+        while ((str = splitList(buf)) != NULL) {
             *_gp_sptr += F("<option value=\"");
             *_gp_sptr += str;
             *_gp_sptr += F("\"");
@@ -376,7 +382,6 @@ struct Builder {
             *_gp_sptr += F(">");
             *_gp_sptr += str;
             *_gp_sptr += F("</option>\n");
-            count++;
         }
         *_gp_sptr += F("</select>");
     }
@@ -567,7 +572,7 @@ struct Builder {
     }
     
     template <uint8_t ax, uint8_t am>
-    void PLOT_STOCK(const char* id, const char** labels, GPunix* times, int16_t vals[ax][am], int dec = 0) {
+    void PLOT_STOCK(const char* id, const char** labels, uint32_t* times, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
         "<div class=\"chartBlock\" id=\"");
         *_gp_sptr += id;
@@ -589,7 +594,7 @@ struct Builder {
             *_gp_sptr += F("',data:[\n");
             for (int ams = 0; ams < am; ams++) {
                 *_gp_sptr += '[';
-                *_gp_sptr += times[ams].unix;
+                *_gp_sptr += times[ams];
                 *_gp_sptr += F("000");
                 *_gp_sptr += ',';
                 if (dec) *_gp_sptr += (float)vals[axs][ams] / dec;
@@ -602,7 +607,7 @@ struct Builder {
     }
     
     template <uint8_t ax, uint8_t am>
-    void PLOT_STOCK_DARK(const char* id, const char** labels, GPunix* times, int16_t vals[ax][am], int dec = 0) {
+    void PLOT_STOCK_DARK(const char* id, const char** labels, uint32_t* times, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
         "<script src=\"https://code.highcharts.com/themes/dark-unica.js\"></script>"
         "<div class=\"chartBlock\" id=\"");
@@ -625,7 +630,7 @@ struct Builder {
             *_gp_sptr += F("',data:[\n");
             for (int ams = 0; ams < am; ams++) {
                 *_gp_sptr += '[';
-                *_gp_sptr += times[ams].unix;
+                *_gp_sptr += times[ams];
                 *_gp_sptr += F("000");
                 *_gp_sptr += ',';
                 if (dec) *_gp_sptr += (float)vals[axs][ams] / dec;

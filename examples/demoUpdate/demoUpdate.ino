@@ -18,7 +18,9 @@ void build() {
   String s;
   BUILD_BEGIN(s);
   add.THEME(GP_DARK);
-  add.AJAX_UPDATE("t1,val,ch,led,sw,txt,num,pass,sld,date,time,sel,col");
+  
+  // список можно засунуть во Flash через PSTR()
+  add.AJAX_UPDATE(PSTR("t1,val,ch,led,sw,txt,num,pass,sld,date,time,sel,col"));
 
   add.TITLE("Title", "t1");
   add.HR();

@@ -54,9 +54,9 @@ encodeTime	KEYWORD2
 decodeDate	KEYWORD2
 decodeTime	KEYWORD2
 
-GPgmt	KEYWORD2
 GPunix	KEYWORD2
 GPaddUnix	KEYWORD2
+GPaddUnixS	KEYWORD2
 GPaddInt	KEYWORD2
 
 #######################################

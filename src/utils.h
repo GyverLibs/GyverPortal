@@ -121,37 +121,25 @@ GPtime decodeTime(char* str) {
 }
 
 // ===================== DATE-TIME UNIX =====================
-int8_t GPgmt = 3;
-struct GPunix {
-    uint32_t unix;
-    void set(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s) {
-        int my = (m >= 3) ? 1 : 0;
-        y += my - 1970;
-        unix = (((d-1+day(m-1)+((y+1)>>2)-((y+69)/100)+((y+369)/100/4)+365*(y-my))*24ul+h-GPgmt)*60ul+mn)*60ul+s;
-    }
-    uint16_t day(uint8_t m) {
-        uint16_t d = 0;
-        for (int i = 0; i < m; i++) {
-            d += (i < 7) ? ((i == 1) ? 28 : ((i & 1) ? 30 : 31)) : ((i & 1) ? 31 : 30);
-        }
-        return d;
-    }
-    void add(uint16_t sec) {
-        unix += sec;
-    }
-};
+uint32_t GPunix(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s, int8_t gmt = 0) {
+    int my = (m >= 3) ? 1 : 0;
+    y += my - 1970;
+    uint16_t dm = 0;
+    for (int i = 0; i < m - 1; i++) dm += (i<7)?((i==1)?28:((i&1)?30:31)):((i&1)?31:30);
+    return (((d-1+dm+((y+1)>>2)-((y+69)/100)+((y+369)/100/4)+365*(y-my))*24ul+h-gmt)*60ul+mn)*60ul+s;
+}
 
 void GPaddInt(int16_t val, int16_t* arr, uint8_t am) {
     for (int i = 0; i < am - 1; i++) arr[i] = arr[i + 1];
     arr[am - 1] = val;
 }
-void GPaddUnix(GPunix val, GPunix* arr, uint8_t am) {
+void GPaddUnix(uint32_t val, uint32_t* arr, uint8_t am) {
     for (int i = 0; i < am - 1; i++) arr[i] = arr[i + 1];
     arr[am - 1] = val;
 }
-void GPaddUnix(int16_t val, GPunix* arr, uint8_t am) {
+void GPaddUnixS(int16_t val, uint32_t* arr, uint8_t am) {
     for (int i = 0; i < am - 1; i++) arr[i] = arr[i + 1];
-    arr[am - 1].add(val);
+    arr[am - 1] += val;
 }
 
 // ===================== DATE-TIME PACK =====================
@@ -234,7 +222,9 @@ char* splitList(char* str) {
 
 // получить номер, под которым name входит в list (вида "val1,val2,val3")
 int8_t inList(const char* name, const char* list) {
-    char* str = (char*)list;
+    char buf[strlen(list)];
+    strcpy(buf, list);
+    char* str = buf;
     int8_t count = 0, pos = -1;
     splitList(NULL);
     while ((str = splitList((char*)list)) != NULL) {
