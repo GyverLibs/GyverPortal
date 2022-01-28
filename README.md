@@ -491,8 +491,9 @@ void build() {
 ```cpp
 portal.tick();
 if (portal.form()) {
-  if (portal.form("/login")) Serial.println("Login!");
-  if (portal.form("/exit")) Serial.println("Exit!");
+  Serial.print("Submit form: ");
+  if (portal.form("/login")) Serial.println("Login");
+  if (portal.form("/exit")) Serial.println("Exit");
 }
 ```
 
@@ -515,12 +516,8 @@ void setup() {
 В библиотеке реализованы готовые инструменты для полученя данных из компонентов формы (см. документацию выше). Например выведем в порт содержимое поля ввода текста:
 ```cpp
 portal.tick();
-if (portal.form()) {
-  if (portal.form("/login")) {
-    Serial.println(portal.getString("txt"));
-    // где "txt" - имя компонента
-  }
-}
+if (portal.form("/login")) Serial.println(portal.getString("txt"));
+// где "txt" - имя компонента
 ```
 
 <a id="click"></a>
@@ -536,9 +533,7 @@ if (portal.form()) {
 - Для поиска компонента, с которого пришёл сигнал, используем `click(имя)` - вернёт `true`, если имя совпало
 ```cpp
 portal.tick();
-if (portal.click()) {
-  if (portal.click("mybutton")) Serial.println("Click!");
-}
+if (portal.click("mybutton")) Serial.println("Click!");
 ```
 
 ### 4.3 Подключение обработчика

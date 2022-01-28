@@ -36,11 +36,8 @@ void setup() {
 
 void loop() {
   portal.tick();
-
-  if (portal.click()) {
-    if (portal.click("btn")) {
-      // отправляем содержимое поля, оно пришло по клику кнопки
-      portal.log.println(portal.getString("btn"));
-    }
+  if (portal.click("btn")) {
+    // отправляем содержимое поля, оно пришло по клику кнопки
+    portal.log.println(portal.getString("btn"));
   }
 }
