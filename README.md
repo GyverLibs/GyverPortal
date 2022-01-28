@@ -344,7 +344,7 @@ GPaddUnixS(int16_t val, uint32_t* arr, uint8_t am);     // добавить се
   }
   Serial.println(WiFi.localIP());
   // ...
-  portal.begin();   // запускаем портал
+  portal.start();   // запускаем портал
 ```
 Для подключения к порталу нужно зайти в браузере на IP адрес платы, который выдал ей роутер. В примере выше этот адрес выводится в монитор порта.
 
@@ -353,7 +353,7 @@ GPaddUnixS(int16_t val, uint32_t* arr, uint8_t am);     // добавить се
 ```cpp
   WiFi.mode(WIFI_AP);
   WiFi.softAP("My Portal");
-  portal.begin(WIFI_AP);   // запускаем портал с настройкой на режим AP
+  portal.start(WIFI_AP);   // запускаем портал с настройкой на режим AP
 ```
 На стандартных настройках IP адрес для подключения в этом режиме будет *192.168.4.1*
 
