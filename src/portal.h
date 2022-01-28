@@ -101,7 +101,7 @@ public:
     
     // вернёт true, если был submit с указанной формы
     bool form(const char* name) {
-        return req.equals(name);
+        return _formF ? req.equals(name) : 0;
     }
     
     // вернёт имя теукщей submit формы
@@ -117,7 +117,7 @@ public:
     
     // вернёт true, если был клик по указанному элементу (кнопка, чекбокс, свитч, слайдер, селектор)
     bool click(const char* name) {
-        return req.equals(name);
+        return _clickF ? req.equals(name) : 0;
     }
     
     // вернёт имя теукщего кликнутого компонента
