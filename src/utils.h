@@ -229,7 +229,7 @@ int8_t inList(const char* name, const char* list) {
     char* str = buf;
     int8_t count = 0, pos = -1;
     splitList(NULL);
-    while ((str = splitList((char*)list)) != NULL) {
+    while ((str = splitList((char*)buf)) != NULL) {
         if (!strcmp(str, name)) pos = count;
         count++;
     }
