@@ -40,6 +40,7 @@ const char GP_DARK[] PROGMEM =
 "#blockBack>input[type=\"text\"]{background:#13161a}\n"
 "#blockBack>input[type=\"date\"]{background:#13161a}\n"
 "#blockBack>input[type=\"time\"]{background:#13161a}\n"
+"#blockBack>input[type=\"number\"]{background:#13161a}\n"
 "#blockBack>select{background:#13161a}\n"
 "body {font-family:sans-serif;background:#13161a;color:#bbb;margin-top:15px;}\n"
 "hr {width:95%;margin-bottom:10px;border:none;border-top:2px solid #394048;max-width:400px;}\n"
