@@ -143,7 +143,7 @@ public:
     
     // вернёт true, если было update с указанного компонента
     bool update(const char* name) {
-        return req.equals(name);
+        return _updateF ? req.equals(name) : 0;
     }
     
     // вернёт имя обновлённого компонента

@@ -89,7 +89,8 @@ struct Builder {
         splitList(NULL);
         while ((str = splitList(buf)) != NULL) {
             *_gp_sptr += "'";
-            *_gp_sptr += str;
+            if (str[0] == ' ') *_gp_sptr += (str + 1);
+            else *_gp_sptr += str;
             *_gp_sptr += "',";
         }
         *_gp_sptr += F("];\n"
