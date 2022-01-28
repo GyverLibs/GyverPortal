@@ -18,11 +18,12 @@ String encodeColor(uint32_t color) {
 
 // разобрать цвет в число
 uint32_t decodeColor(char* hex) {
-    if (strlen(hex) < 2 || strlen(hex) > 7) return 0;
+    if (strlen(hex) < 6) return 0;
     uint32_t val = 0;
-    for (uint8_t i = 0; i < strlen(hex) - 1; i++) {
+    uint8_t i = (hex[0] == '#') ? 1 : 0;
+    for (; i < strlen(hex); i++) {
         val <<= 4;
-        uint8_t d = hex[i + 1];
+        uint8_t d = hex[i];
         d -= (d <= '9') ? 48 : ((d <= 'F') ? 55 : 87);
         val |= d;
     }
@@ -110,7 +111,8 @@ String encodeTime(uint8_t hour, uint8_t minute, uint8_t second = 0) {
 // разобрать строковое время HH:MM:SS в структуру
 GPtime decodeTime(char* str) {
     GPtime t = (GPtime){0,0,0};
-    if (strlen(str) == 8) {
+    uint8_t len = strlen(str);
+    if (len == 5 || len == 8) {
         str[2] = str[5] = '\0';
         t.hour = atoi(str);
         t.minute = atoi(str+3);

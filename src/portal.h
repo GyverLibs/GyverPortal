@@ -24,16 +24,14 @@ public:
             if (req.startsWith(F("/favicon.ico"))) show();
             else _formF = 1;
         });
-        server.on("/_GP_click", [this]() {
+        server.on("/GP_click", [this]() {
             _clickF = 1;
-            req = server.argName(0);
             server.send(200, "text/plane");
         });
-        server.on("/_GP_update", [this]() {
+        server.on("/GP_update", [this]() {
             _updateF = 1;
-            req = server.argName(0);
         });
-        server.on("/_GP_log", [this]() {
+        server.on("/GP_log", [this]() {
             if (log.state && log.available()) {
                 String s;
                 while (log.available()) s += log.read();
@@ -117,12 +115,12 @@ public:
     
     // вернёт true, если был клик по указанному элементу (кнопка, чекбокс, свитч, слайдер, селектор)
     bool click(const char* name) {
-        return _clickF ? req.equals(name) : 0;
+        return _clickF ? server.argName(0).equals(name) : 0;
     }
     
     // вернёт имя теукщего кликнутого компонента
-    String& clickName() {
-        return req;
+    const String& clickName() {
+        return server.argName(0);
     }
     
     // получить значение кликнутого компонента
@@ -143,12 +141,12 @@ public:
     
     // вернёт true, если было update с указанного компонента
     bool update(const char* name) {
-        return _updateF ? req.equals(name) : 0;
+        return _updateF ? server.argName(0).equals(name) : 0;
     }
     
     // вернёт имя обновлённого компонента
-    String& updateName() {
-        return req;
+    const String& updateName() {
+        return server.argName(0);
     }
     
     // отправить ответ на обновление

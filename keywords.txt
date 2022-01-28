@@ -53,6 +53,8 @@ encodeDate	KEYWORD2
 encodeTime	KEYWORD2
 decodeDate	KEYWORD2
 decodeTime	KEYWORD2
+encodeColor	KEYWORD2
+decodeColor	KEYWORD2
 
 GPunix	KEYWORD2
 GPaddUnix	KEYWORD2

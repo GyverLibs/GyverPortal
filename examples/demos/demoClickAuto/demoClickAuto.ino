@@ -126,7 +126,6 @@ void loop() {
       Serial.println(valSelect);
     }
 
-    // не воркает
     if (portal.click("col")) {
       Serial.print("Color: ");
       Serial.println(valCol, HEX);

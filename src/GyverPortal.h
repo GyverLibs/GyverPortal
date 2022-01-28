@@ -34,6 +34,7 @@
     - Добавил окно лога AREA_LOG и функцию лога в целом
     
     v1.3 - переделал GPunix, мелкие фиксы, для списков можно использовать PSTR
+    v1.4 - мелкие фиксы, клик по COLOR теперь отправляет цвет
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -61,11 +62,12 @@ struct Builder {
         "</head><body>\n");
     }
     void AJAX_CLICK() {
-        *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var val=\"\";\n"
-        "if(arg.type==\"checkbox\")val=arg.checked?'1':'0';\nelse val=arg.value;\n"
-        "xhttp.open(\"POST\",\"_GP_click?\"+arg.name+\"=\"+val,true);xhttp.send();}\n"
+        *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var v;\n"
+        "if(arg.type==\"checkbox\")v=arg.checked?'1':'0';\nelse v=arg.value;\n"
+        "if(v.charAt(0)=='#')v=v.substring(1);\n"
+        "xhttp.open(\"POST\",\"GP_click?\"+arg.name+\"=\"+v,true);xhttp.send();}\n"
         "function GP_clickid(btn,tar){var xhttp=new XMLHttpRequest();\n"
-        "xhttp.open(\"POST\",\"_GP_click?\"+btn+\"=\"+document.getElementById(tar).value,true);xhttp.send();\n}"
+        "xhttp.open(\"POST\",\"GP_click?\"+btn+\"=\"+document.getElementById(tar).value,true);xhttp.send();\n}"
         "</script>\n");
     }
     void THEME(const char* style) {
@@ -103,12 +105,12 @@ struct Builder {
         "if(item.type==\"checkbox\"||item.type==\"radio\")item.checked=Number(resp);\n"
         "else if(item.type==undefined)item.innerHTML=resp;\n"
         "else item.value=resp;\n"
-        "}};xhttp.open(\"GET\",\"_GP_update?\"+elm,true);xhttp.send();});},");
+        "}};xhttp.open(\"GET\",\"GP_update?\"+elm,true);xhttp.send();});},");
         *_gp_sptr += prd;
         *_gp_sptr += F(");</script>\n");
     }
     void AREA_LOG(int rows = 5) {
-        *_gp_sptr += F("<textarea style=\"height:auto\" id=\"_GP_log\" rows=\"");
+        *_gp_sptr += F("<textarea style=\"height:auto\" id=\"GP_log\" rows=\"");
         *_gp_sptr += rows;
         *_gp_sptr += F("\" disabled></textarea>");
         *_gp_sptr += F("<script>let _gplog=\"\";\n"
@@ -116,9 +118,9 @@ struct Builder {
         "xhttp.onreadystatechange=function(){\n"
         "if(this.readyState==4&&this.status==200){\n"
         "_gplog+=this.responseText;\n"
-        "var elm=document.getElementById(\"_GP_log\");\n"
+        "var elm=document.getElementById(\"GP_log\");\n"
         "elm.innerHTML=_gplog;elm.scrollTop=elm.scrollHeight;}};\n"
-        "xhttp.open(\"GET\",\"_GP_log?\",true);xhttp.send();},1000);</script>\n");
+        "xhttp.open(\"GET\",\"GP_log?\",true);xhttp.send();},1000);</script>\n");
     }
     
     // ======================= ФОРМА =======================
@@ -525,7 +527,7 @@ struct Builder {
         *_gp_sptr += xamount;
         *_gp_sptr += F(");\n"
         "for(let i=0;i<arr.length;i++)ch.series[i].addPoint([x,Number(arr[i])],true,move,true);\n"
-        "}};xhttp.open(\"GET\",\"_GP_update?");
+        "}};xhttp.open(\"GET\",\"GP_update?");
         *_gp_sptr += name;
         *_gp_sptr += F("\",true);xhttp.send();},\n");
         *_gp_sptr += prd;
@@ -565,7 +567,7 @@ struct Builder {
         *_gp_sptr += xamount;
         *_gp_sptr += F(");\n"
         "for(let i=0;i<arr.length;i++)ch.series[i].addPoint([x,Number(arr[i])],true,move,true);\n"
-        "}};xhttp.open(\"GET\",\"_GP_update?");
+        "}};xhttp.open(\"GET\",\"GP_update?");
         *_gp_sptr += name;
         *_gp_sptr += F("\",true);xhttp.send();},\n");
         *_gp_sptr += prd;

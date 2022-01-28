@@ -121,7 +121,6 @@ void loop() {
       Serial.println(valSelect);
     }
 
-    // не воркает
     if (portal.click("col")) {
       valCol = portal.getColor("col");
       Serial.print("Color: ");
