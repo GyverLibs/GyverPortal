@@ -35,6 +35,7 @@
     
     v1.3 - переделал GPunix, мелкие фиксы, для списков можно использовать PSTR
     v1.4 - мелкие фиксы, клик по COLOR теперь отправляет цвет
+    v1.5 - добавил блок "слайдер+подпись"
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -338,8 +339,13 @@ struct Builder {
         *_gp_sptr += buf;
         *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
     }
+    void LABEL_MINI(int text) {
+        *_gp_sptr += F("<label class=\"sldLbl\">");
+        *_gp_sptr += text;
+        *_gp_sptr += F("</label>");
+    }
     void SLIDER(const char* name, int value, int min, int max, int step = 1) {
-        LABEL(min);
+        LABEL_MINI(min);
         *_gp_sptr += F("<input type=\"range\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" id=\"");
@@ -353,7 +359,15 @@ struct Builder {
         *_gp_sptr += F("\" step=\"");
         *_gp_sptr += step;
         *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
-        LABEL(max);
+        LABEL_MINI(max);
+    }
+    void SLIDER(const char* name, const char* label, int value, int min, int max, int step = 1) {
+        *_gp_sptr += F("<div class=\"sldBlock\">");
+        *_gp_sptr += F("<label>");
+        *_gp_sptr += label;
+        *_gp_sptr += F("</label>");
+        SLIDER(name, value, min, max, step);
+        *_gp_sptr += F("</div>");
     }
     void COLOR(const char* name, uint32_t value = 0) {
         *_gp_sptr += F("<input type=\"color\" name=\"");
