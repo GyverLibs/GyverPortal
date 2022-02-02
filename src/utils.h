@@ -224,7 +224,7 @@ char* splitList(char* str) {
 
 // получить номер, под которым name входит в list (вида "val1,val2,val3")
 int8_t inList(const char* name, const char* list) {
-    char buf[strlen(list)];
+    char buf[strlen(list) + 1];
     strcpy(buf, list);
     char* str = buf;
     int8_t count = 0, pos = -1;

@@ -36,6 +36,7 @@
     v1.3 - переделал GPunix, мелкие фиксы, для списков можно использовать PSTR
     v1.4 - мелкие фиксы, клик по COLOR теперь отправляет цвет
     v1.5 - добавил блок "слайдер+подпись"
+    v1.5.1 - мелкий фикс копирования строк
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -86,7 +87,7 @@ struct Builder {
     void AJAX_UPDATE(const char* list, int prd = 1000) {
         *_gp_sptr += F("<script>setInterval(function(){\n");
         *_gp_sptr += "var elms=[";
-        char buf[strlen(list)];
+        char buf[strlen(list) + 1];
         strcpy(buf, list);
         char* str = buf;
         splitList(NULL);
@@ -386,7 +387,7 @@ struct Builder {
         *_gp_sptr += F("\" id=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
-        char buf[strlen(values)];
+        char buf[strlen(values) + 1];
         strcpy(buf, values);
         char* str = buf;
         uint8_t count = 0;
