@@ -61,7 +61,7 @@ struct Builder {
     void PAGE_BEGIN() {
         *_gp_sptr += F("<!DOCTYPE HTML><html><head>\n"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-        "</head><body>\n");
+        "<meta charset=\"utf-8\"></head><body>\n");
     }
     void AJAX_CLICK() {
         *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var v;\n"
