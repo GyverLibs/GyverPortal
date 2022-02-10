@@ -3,6 +3,7 @@
 [![Foo](https://img.shields.io/badge/%E2%82%BD$%E2%82%AC%20%D0%9D%D0%B0%20%D0%BF%D0%B8%D0%B2%D0%BE-%D1%81%20%D1%80%D1%8B%D0%B1%D0%BA%D0%BE%D0%B9-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 
 # GyverPortal
+**[English README](/README_EN.md)**  
 Простой конструктор веб интерфейса для esp8266 и ESP32
 - Простой конструктор - делаем страницы без знаний HTML и CSS
 - Библиотека является обёрткой для стандартной ESP8266WebServer
@@ -792,7 +793,7 @@ s += F("<input type=\"email\" class=\"myClass\">");
 - v1.4 - мелкие фиксы, клик по COLOR теперь отправляет цвет
 - v1.5 - добавил блок "слайдер+подпись"
 - v1.5.1 - мелкий фикс копирования строк
-- v1.5.2 - добавлен <meta charset="utf-8">, английский readme
+- v1.5.2 - добавлен <meta charset="utf-8">, английский readme (спасибо VerZsuT)
 
 <a id="feedback"></a>
 ## Баги и обратная связь
