@@ -1,4 +1,4 @@
-[![Foo](https://img.shields.io/badge/Version-1.5.1-brightgreen.svg?style=flat-square)](#versions)
+[![Foo](https://img.shields.io/badge/Version-1.5.2-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/Support-Aleks-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 
@@ -257,7 +257,7 @@ list.add(address, formName, name, type); // add variable, form name, specify com
 
 // parsers
 String getString(char* name);       // get String string from the name component
-char* getChars(char* name);         //get char* string from the name component
+char* getChars(char* name);         // get char* string from the name component
 void copyStr(char* name, char* dest); // rewrite the char string from the name component to itself in dest
 long getInt(char* name);            // get an integer from the name component
 float getFloat(char* name);         // get a float number from the name component
@@ -350,7 +350,7 @@ GPaddUnixS(int16_t val, uint32_t* arr, uint8_t am); // add seconds, array, array
 
 ## 1. Server
 
-The library can work both in a local network (esp connects to the router) and in access point mode (smartphone connects to esp).
+The library can work both in a local network (ESP connects to the router) and in access point mode (smartphone connects to ESP).
 
 ### 1.1. Connecting to the router
 
@@ -467,7 +467,7 @@ The main purpose of use forms:
 
 - The form has its own unique name, must begin with `/`
 - There can be any number of elements inside the form, but only one button of the type **SUBMIT**
-- When you click on SUBMIT, esp gets the name of the form and data from all the elements inside this form
+- When you click on SUBMIT, ESP gets the name of the form and data from all the elements inside this form
 - When you click on SUBMIT, the page is reloaded, so the values of the page components need to be stored in variables and passed on the next page build
 
 An example with two forms, the first can transmit text from the input window, the second - only the fact of pressing the button:
@@ -775,7 +775,7 @@ add.PLOT_STOCK_DARK<numberOfAxes, numberOfData>(name, labels, timeArray, dataArr
 
 This graph requires to display an array of date and time of type `uint32_t` containing time in unix format.
 
-### 7.4. AJAX_PLOT Graph
+### 7.4. AJAX_PLOT graph
 
 Dynamic graph, calls update by its name, requires a response  
 **[See the ajaxPlot example](/examples/demos/ajaxPlot/ajaxPlot.ino)**
@@ -900,6 +900,7 @@ To ensure the functionality of the library mechanisms in custom components, the 
 - v1.4 - minor fixes, clicking on COLOR now sends color
 - v1.5 - added the "slider+signature" block
 - v1.5.1 - minor fix for copying strings
+- v1.5.2 - added *meta charset="utf-8"*, english README (by VerZsuT)
 
 <a id="feedback"></a>
 
