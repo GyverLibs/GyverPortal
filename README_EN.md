@@ -600,7 +600,7 @@ Data parsing from clicks can be performed using the same functions as for forms.
 
 ### 4.5. Connecting a button to another component
 
-The button can be connected to another component, when the button is clicked, update will be called with the button name and data from the specified location. To connect, you need to specify the name of the component with the third argument:
+The button can be connected to another component, when the button is clicked, `click` will be called with the button name and data from the specified component. To connect, you need to specify the name of the component with the third argument:
 
 ```cpp
 add.BUTTON(buttonName, buttonText, componentName);
