@@ -37,7 +37,7 @@ void setup() {
 void loop() {
   portal.tick();
   if (portal.click("btn")) {
-    // отправляем содержимое поля, оно пришло по клику кнопки
+    // отправляем обратно в "монитор" содержимое поля, оно пришло по клику кнопки
     portal.log.println(portal.getString("btn"));
   }
 }
