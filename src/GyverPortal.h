@@ -37,6 +37,7 @@
     v1.4 - мелкие фиксы, клик по COLOR теперь отправляет цвет
     v1.5 - добавил блок "слайдер+подпись"
     v1.5.1 - мелкий фикс копирования строк
+    v1.6 - добавлены инструменты для работы c цветом. Добавил answer() для даты, времени и цвета
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -371,6 +372,15 @@ struct Builder {
         *_gp_sptr += F("</div>");
     }
     void COLOR(const char* name, uint32_t value = 0) {
+        *_gp_sptr += F("<input type=\"color\" name=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" id=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" value=\"");
+        *_gp_sptr += encodeColor(value);
+        *_gp_sptr += F("\" onchange=\"GP_click(this)\">\n");
+    }
+    void COLOR(const char* name, GPcolor value) {
         *_gp_sptr += F("<input type=\"color\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" id=\"");

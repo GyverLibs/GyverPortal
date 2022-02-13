@@ -1,4 +1,4 @@
-[![Foo](https://img.shields.io/badge/Version-1.5.2-brightgreen.svg?style=flat-square)](#versions)
+[![Foo](https://img.shields.io/badge/Version-1.6-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/%E2%82%BD$%E2%82%AC%20%D0%9D%D0%B0%20%D0%BF%D0%B8%D0%B2%D0%BE-%D1%81%20%D1%80%D1%8B%D0%B1%D0%BA%D0%BE%D0%B9-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 
@@ -222,11 +222,15 @@ const String& clickText();          // получить имя текст кли
 bool update();                      // вернёт true, если было обновление
 bool update(char* name);            // вернёт true, если было update с указанного компонента
 String& updateName();               // вернёт имя обновлённого компонента
+
 void answer(String& s);             // отправить ответ на обновление
 void answer(int s);
 void answer(char* s);
 void answer(int16_t* v, int am);         // массив int размерностью am, для графика
 void answer(int16_t* v, int am, int dec);// + делитель
+void answer(GPcolor col);           // ответ с цветом
+void answer(GPdate date);           // ответ с датой
+void answer(GPtime time);           // ответ со временем
 
 bool root();                        // вернёт true, если открыта главная страница (/)
 String& uri();                      // адрес текущего запроса
@@ -286,6 +290,31 @@ uint32_t GPunix(год, месяц, день, час, минута, секунд
 </details>
 
 <details>
+<summary>Хранение и изменение цвета</summary>
+
+```cpp
+// см. пример gpcolor_demo
+
+// структура для хранения цвета
+struct GPcolor {
+    uint8_t r, g, b;
+};
+
+// инициализация
+GPcolor color;
+GPcolor color(uint32_t color);
+GPcolor color(byte r, byte g, byte b);
+
+// к структуре могут быть применены методы
+void setRGB(r, g, b);   // установить цвет побайтно
+setHEX(uint32_t col);   // установить 24 бит цвет
+uint32_t getHEX();      // получить 24 бит цвет
+
+// к структуре можно присвоить uint32_t число
+```
+</details>
+
+<details>
 <summary>Утилиты</summary>
 
 ```cpp
@@ -303,6 +332,7 @@ void encodeTime(char* str, GPtime& t);  // склеить время в стро
 String encodeTime(hour, minute, second);// склеить время в строку String
 GPtime decodeTime(char* str);           // разобрать строковое время[9] в структуру
 
+String encodeColor(GPcolor color);      // собрать GPcolor цвет в String #rrggbb
 String encodeColor(uint32_t color);     // собрать цвет в String #rrggbb
 uint32_t decodeColor(char* hex);        // разобрать цвет #rrggbb в число
 
@@ -795,6 +825,7 @@ s += F("<input type=\"email\" class=\"myClass\">");
 - v1.5 - добавил блок "слайдер+подпись"
 - v1.5.1 - мелкий фикс копирования строк
 - v1.5.2 - добавлен *meta charset="utf-8"*, английский README (спасибо VerZsuT)
+- v1.6 - добавлены инструменты для работы c цветом. Добавил answer() для даты, времени и цвета
 
 <a id="feedback"></a>
 ## Баги и обратная связь

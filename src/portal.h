@@ -171,6 +171,15 @@ public:
         }
         answer(s.c_str());
     }
+    void answer(GPcolor col) {
+        answer(encodeColor(col.getHEX()));
+    }
+    void answer(GPdate date) {
+        answer(encodeDate(date));
+    }
+    void answer(GPtime time) {
+        answer(encodeTime(time));
+    }
 
     // ======================= MISC =======================
     // вернёт true, если открыта главная страница (/)

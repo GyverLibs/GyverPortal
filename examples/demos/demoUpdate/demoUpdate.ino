@@ -11,14 +11,14 @@ int valSlider;
 GPdate valDate;
 GPtime valTime;
 int valSelect;
-uint32_t valCol;
+GPcolor valCol;
 
 // билдер страницы
 void build() {
   String s;
   BUILD_BEGIN(s);
   add.THEME(GP_DARK);
-  
+
   // список можно засунуть во Flash через PSTR()
   add.AJAX_UPDATE(PSTR("t1,val,ch,led,sw,txt,num,pass,sld,date,time,col"));
 
@@ -78,9 +78,30 @@ void loop() {
     if (portal.update("num")) portal.answer(random(1000));
     if (portal.update("pass")) portal.answer(random(1000));
     if (portal.update("sld")) portal.answer(random(10));
-    if (portal.update("date")) portal.answer(encodeDate(random(2000, 2030), random(13), random(13)));
-    if (portal.update("time")) portal.answer(encodeTime(random(24), random(60), random(60)));
+
+    //if (portal.update("date")) portal.answer(encodeDate(random(2000, 2030), random(13), random(13)));
+
+    if (portal.update("date")) {
+      valDate = (GPdate) {
+        random(2000, 2030), random(13), random(13)
+      };
+      portal.answer(valDate);
+    }
+
+    //if (portal.update("time")) portal.answer(encodeTime(random(24), random(60), random(60)));
+
+    if (portal.update("time")) {
+      valTime = (GPtime) {
+        random(24), random(60), random(60)
+      };
+      portal.answer(valTime);
+    }
+
     // селект не работает
-    if (portal.update("col")) portal.answer(encodeColor(random(0xffffff)));
+
+    if (portal.update("col")) {
+      valCol.setHEX(random(0xffffff));
+      portal.answer(valCol);
+    }
   }
 }

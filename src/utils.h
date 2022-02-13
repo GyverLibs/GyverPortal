@@ -5,6 +5,38 @@ String* _gp_sptr = nullptr;
 void* _gp_ptr = nullptr;
 
 // ====================== COLOR =======================
+struct GPcolor {
+    uint8_t r, g, b;
+
+    GPcolor() {}
+    GPcolor(uint32_t col) {
+        setHEX(col);
+    }
+    GPcolor(uint8_t nr, uint8_t ng, uint8_t nb) {
+        setRGB(nr, ng, nb);
+    }
+    
+    void setRGB(uint8_t nr, uint8_t ng, uint8_t nb) {
+        r = nr;
+        g = ng;
+        b = nb;
+    }
+
+    void operator = (uint32_t col) {
+        setHEX(col);
+    }
+
+    void setHEX(uint32_t col) {
+        r = ((uint32_t)col >> 16) & 0xFF;
+        g = ((uint32_t)col >>  8) & 0xFF;
+        b = col & 0xFF;
+    }
+
+    uint32_t getHEX() {
+        return (((uint32_t)r << 16) | ((uint32_t)g << 8) | b);
+    }
+};
+
 // собрать цвет в String
 String encodeColor(uint32_t color) {
     String s('#');
@@ -14,6 +46,10 @@ String encodeColor(uint32_t color) {
         s += p;
     }
     return s;
+}
+
+String encodeColor(GPcolor color) {
+    return encodeColor(color.getHEX());
 }
 
 // разобрать цвет в число

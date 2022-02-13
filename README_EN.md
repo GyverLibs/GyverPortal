@@ -1,4 +1,4 @@
-[![Foo](https://img.shields.io/badge/Version-1.5.1-brightgreen.svg?style=flat-square)](#versions)
+[![Foo](https://img.shields.io/badge/Version-1.6-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/Support-Aleks-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 
@@ -234,6 +234,9 @@ void answer(int s);
 void answer(char* s);
 void answer(int16_t* v, int am);    // int array with dimension 'am', for graph
 void answer(int16_t* v, int am, int dec); // + divider
+void answer(GPcolor col);           // answer with color
+void answer(GPdate date);           // answer with date
+void answer(GPtime time);           // answer with time
 
 bool root();                        // returns true if the main page is open (/)
 String& uri();                      // address of the current request
@@ -295,6 +298,31 @@ uint32_t GPunix(year, month, day, hour, minute, second, gmt);
 </details>
 
 <details>
+<summary>Storing and changing color</summary>
+
+```cpp
+// watch example gpcolor_demo
+
+// struct for storing color
+struct GPcolor {
+    uint8_t r, g, b;
+};
+
+// initialization
+GPcolor color;
+GPcolor color(uint32_t color);
+GPcolor color(byte r, byte g, byte b);
+
+// methods
+void setRGB(r, g, b);   // set color by bytes
+setHEX(uint32_t col);   // set 24 bit color
+uint32_t getHEX();      // get 24 bit color
+
+// it is possible to assign uint32_t value to object
+```
+</details>
+
+<details>
 <summary>Utilities</summary>
 
 ```cpp
@@ -312,6 +340,7 @@ void encodeTime(char* str, GPtime& t);  // convert time to str[9]
 String encodeTime(hour, minute, second);// convert time to string
 GPtime decodeTime(char* str);           // convert string time[9] to structure
 
+String encodeColor(GPcolor color);      // convert GPcolor color to String #rrggbb
 String encodeColor(uint32_t color);     // convert color to string #rrggbb
 uint32_t decodeColor(char* hex);        // convert color #rrggbb to number
 
@@ -900,6 +929,7 @@ To ensure the functionality of the library mechanisms in custom components, the 
 - v1.4 - minor fixes, clicking on COLOR now sends color
 - v1.5 - added the "slider+signature" block
 - v1.5.1 - minor fix for copying strings
+- v1.6 - added color utils. Added answer() for date, time and color
 
 <a id="feedback"></a>
 

@@ -8,6 +8,7 @@
 GyverPortal	KEYWORD1
 GPdate	KEYWORD1
 GPtime	KEYWORD1
+GPcolor	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -55,6 +56,10 @@ decodeDate	KEYWORD2
 decodeTime	KEYWORD2
 encodeColor	KEYWORD2
 decodeColor	KEYWORD2
+
+setHEX	KEYWORD2
+getHEX	KEYWORD2
+setRGB	KEYWORD2
 
 GPunix	KEYWORD2
 GPaddUnix	KEYWORD2

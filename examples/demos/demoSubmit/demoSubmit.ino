@@ -12,7 +12,7 @@ int valSlider;
 GPdate valDate;
 GPtime valTime;
 int valSelect;
-uint32_t valCol;
+GPcolor valCol;
 
 // билдер страницы
 void build() {
@@ -103,7 +103,7 @@ void loop() {
       Serial.print(',');
       Serial.print(valSelect);
       Serial.print(',');
-      Serial.println(valCol, HEX);
+      Serial.println(valCol.getHEX(), HEX);
     }
   }
 }

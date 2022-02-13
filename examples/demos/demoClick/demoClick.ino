@@ -11,7 +11,7 @@ int valSlider;
 GPdate valDate;
 GPtime valTime;
 int valSelect;
-uint32_t valCol;
+GPcolor valCol;
 
 // билдер страницы
 void build() {
@@ -124,7 +124,7 @@ void loop() {
     if (portal.click("col")) {
       valCol = portal.getColor("col");
       Serial.print("Color: ");
-      Serial.println(valCol, HEX);
+      Serial.println(valCol.getHEX(), HEX);
     }
 
     if (portal.click("btn")) Serial.println("Button");
