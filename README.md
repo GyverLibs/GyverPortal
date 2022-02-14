@@ -1,4 +1,4 @@
-[![Foo](https://img.shields.io/badge/Version-1.6-brightgreen.svg?style=flat-square)](#versions)
+[![Foo](https://img.shields.io/badge/Version-1.7-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/%E2%82%BD$%E2%82%AC%20%D0%9D%D0%B0%20%D0%BF%D0%B8%D0%B2%D0%BE-%D1%81%20%D1%80%D1%8B%D0%B1%D0%BA%D0%BE%D0%B9-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 
@@ -831,6 +831,7 @@ s += F("<input type=\"email\" class=\"myClass\">");
 - v1.5.1 - мелкий фикс копирования строк
 - v1.5.2 - добавлен *meta charset="utf-8"*, английский README (спасибо VerZsuT)
 - v1.6 - добавлены инструменты для работы c цветом. Добавил answer() для даты, времени и цвета
+- v1.7 - поддержка ESP32
 
 <a id="feedback"></a>
 ## Баги и обратная связь

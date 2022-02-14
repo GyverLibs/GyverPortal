@@ -1,4 +1,4 @@
-[![Foo](https://img.shields.io/badge/Version-1.6-brightgreen.svg?style=flat-square)](#versions)
+[![Foo](https://img.shields.io/badge/Version-1.7-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/Support-Aleks-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 
@@ -930,6 +930,7 @@ To ensure the functionality of the library mechanisms in custom components, the 
 - v1.5 - added the "slider+signature" block
 - v1.5.1 - minor fix for copying strings
 - v1.6 - added color utils. Added answer() for date, time and color
+- v1.7 - ESP32 support
 
 <a id="feedback"></a>
 

@@ -6,6 +6,7 @@ public:
     // ======================= КОНСТРУКТОР =======================
     GyverPortal() {
         req.reserve(20);
+        buf.reserve(64);
     }
 
     ~GyverPortal() {
@@ -23,6 +24,9 @@ public:
             req = server.uri();
             if (req.startsWith(F("/favicon.ico"))) show();
             else _formF = 1;
+            #ifdef ESP32
+            show();
+            #endif
         });
         server.on("/GP_click", [this]() {
             _clickF = 1;
@@ -30,6 +34,9 @@ public:
         });
         server.on("/GP_update", [this]() {
             _updateF = 1;
+            #ifdef ESP32
+            show();
+            #endif
         });
         server.on("/GP_log", [this]() {
             if (log.state && log.available()) {
@@ -120,17 +127,20 @@ public:
     
     // вернёт имя теукщего кликнутого компонента
     const String& clickName() {
-        return server.argName(0);
+        buf = server.argName(0);
+        return buf;
     }
     
     // получить значение кликнутого компонента
     int clickValue() {
-        return server.arg(0).toInt();
+        int val = server.arg(0).toInt();
+        return val;
     }
     
     // получить текст кликнутого компонента
     const String& clickText() {
-        return server.arg(0);
+        buf = server.arg(0);
+        return buf;
     }
     
     // ======================= UPDATE =======================
@@ -146,7 +156,8 @@ public:
     
     // вернёт имя обновлённого компонента
     const String& updateName() {
-        return server.argName(0);
+        buf = server.argName(0);
+        return buf;
     }
     
     // отправить ответ на обновление
@@ -190,11 +201,13 @@ public:
     // ======================= ПАРСЕРЫ =======================
     // получить String строку с компонента
     const String& getString(const char* n) {
-        return server.arg(n);
+        buf = server.arg(n);
+        return buf;
     }
     // получить char* строку с компонента
     const char* getChars(const char* n) {
-        return server.arg(n).c_str();
+        buf = server.arg(n);
+        return buf.c_str();
     }
     // переписать char строку с компонента к себе
     void copyStr(const char* n, char* d) {
@@ -203,12 +216,14 @@ public:
 
     // получить число с компонента
     int getInt(const char* n) {
-        return server.arg(n).toInt();
+        int val = server.arg(n).toInt();
+        return val;
     }
     
     // получить float с компонента
     float getFloat(const char* n) {
-        return server.arg(n).toFloat();
+        float val = server.arg(n).toFloat();
+        return val;
     }
 
     // получить состояние чекбокса
@@ -235,7 +250,8 @@ public:
     
     // получить номер выбранного пункта в дроплисте
     int8_t getSelected(const char* n, const char* list) {
-        return inList(server.arg(n).c_str(), list);
+        buf = server.arg(n);
+        return inList(buf.c_str(), list);
     }
     
     // ======================= ПРОЧЕЕ =======================
@@ -286,7 +302,7 @@ private:
     }
     
     bool logF = false;
-    String req;
+    String req, buf;
     bool _mode = false;
     bool _active = false;
     bool _formF = 0;
