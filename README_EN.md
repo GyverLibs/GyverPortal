@@ -894,7 +894,7 @@ To ensure the functionality of the library mechanisms in custom components, the 
 - Form components must have the *name* attribute specified for transmitting data via submit.
 - Clickable components must have the *onclick* attribute specified with the function parameter `onclick="GP_click(this)"`. The library itself will intercept the call and direct it to `click()`.
 - Components that need a `click()` signal to change data must have the *onchange* attribute specified with the function parameter `onchange="GP_click(this)"`. The library itself will intercept the call and send it to `click()`.
-- Components that need `update()` updates must have the `id` attribute specified. Its value must also be passed to `add.UPDATE()`.
+- Components that need `update()` updates must have the `id` attribute specified. Its value must also be passed to `add.AJAX_UPDATE()`.
 - If you need a click that transmits data from another component, specify an attribute with the function `onclick="gp_click(btn,tar)"`, where `btn` is the name (for the library) of the clicking component, and `tar` is the attribute`id` of the target component from which you want to transmit data.
 - To manually transmit a click signal to the library, you need to send an http POST request of the form `GP_click?name=value`
 - To manually transmit an update signal to the library, you need to send an http GET request of the form `GP_update?componentId`
