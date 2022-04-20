@@ -279,3 +279,12 @@ int8_t inList(String& s, const char* list) {
 int8_t inList(const String& s, const char* list) {
     return inList(s.c_str(), list);
 }
+
+String IPtoString(IPAddress ip) {//Denys_Ch
+  String res = "";
+  for (int i = 0; i < 3; i++) {
+    res += String((ip >> (8 * i)) & 0xFF) + ".";
+  }
+  res += String(((ip >> 8 * 3)) & 0xFF);
+  return res;
+}
