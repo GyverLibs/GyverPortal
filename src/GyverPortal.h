@@ -434,7 +434,7 @@ struct Builder {
     }
     
     // ======================= ГРАФИКИ =======================
-    template <uint8_t ax, uint8_t am>
+    template <int ax, int am>
     void PLOT(const char* id, const char** labels, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
         "<script type=\"text/javascript\">\n"
@@ -477,7 +477,7 @@ struct Builder {
         *_gp_sptr += F("\" class=\"chartBlock\"></div>\n");
     }
     
-    template <uint8_t ax, uint8_t am>
+    template <int ax, int am>
     void PLOT_DARK(const char* id, const char** labels, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n"
         "<script type=\"text/javascript\">\n"
@@ -600,7 +600,7 @@ struct Builder {
         *_gp_sptr += F(");</script>\n");
     }
     
-    template <uint8_t ax, uint8_t am>
+    template <int ax, int am>
     void PLOT_STOCK(const char* id, const char** labels, uint32_t* times, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
         "<div class=\"chartBlock\" id=\"");
@@ -635,7 +635,7 @@ struct Builder {
         *_gp_sptr += F("]});</script>\n");
     }
     
-    template <uint8_t ax, uint8_t am>
+    template <int ax, int am>
     void PLOT_STOCK_DARK(const char* id, const char** labels, uint32_t* times, int16_t vals[ax][am], int dec = 0) {
         *_gp_sptr += F("<script src=\"https://code.highcharts.com/stock/highstock.js\"></script>\n"
         "<script src=\"https://code.highcharts.com/themes/dark-unica.js\"></script>"
