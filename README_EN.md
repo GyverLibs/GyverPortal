@@ -1,3 +1,5 @@
+This is an automatic translation, may be incorrect in some places. See sources and examples!
+
 [![Foo](https://img.shields.io/badge/Version-1.7-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/Support-Aleks-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
