@@ -160,7 +160,7 @@ GPtime decodeTime(char* str) {
 
 // ===================== DATE-TIME UNIX =====================
 uint32_t GPunix(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s, int8_t gmt = 0) {
-    int my = (m >= 3) ? 1 : 0;
+    int8_t my = (m >= 3) ? 1 : 0;
     y += my - 1970;
     uint16_t dm = 0;
     for (int i = 0; i < m - 1; i++) dm += (i<7)?((i==1)?28:((i&1)?30:31)):((i&1)?31:30);
