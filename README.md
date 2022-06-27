@@ -1,8 +1,7 @@
 [![Foo](https://img.shields.io/badge/Version-1.7-brightgreen.svg?style=flat-square)](#versions)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/%E2%82%BD$%E2%82%AC%20%D0%9D%D0%B0%20%D0%BF%D0%B8%D0%B2%D0%BE-%D1%81%20%D1%80%D1%8B%D0%B1%D0%BA%D0%BE%D0%B9-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
-
-[![Foo](https://img.shields.io/badge/README-ENGLISH-brightgreen.svg?style=for-the-badge)](/README_EN.md)
+[![Foo](https://img.shields.io/badge/README-ENGLISH-brightgreen.svg?style=flat-square)](/README_EN.md)
 
 # GyverPortal
 ### Большая часть библиотеки некорректно работает с ESP32, пофикшу как будет время
