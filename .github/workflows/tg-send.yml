@@ -1,0 +1,19 @@
+
+name: Telegram Message
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    name: Send Message
+    runs-on: ubuntu-latest
+    steps:
+      - name: send telegram message on push
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.event.repository.name }}
+            ${{ github.event.release.body }}
+            https://github.com/${{ github.repository }}
