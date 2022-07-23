@@ -65,6 +65,25 @@ struct Builder {
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
         "<meta charset=\"utf-8\"></head><body>\n");
     }
+	
+	void PAGE_BEGIN(const char* page_name) {											//Denys_Ch
+		*_gp_sptr += F("<!DOCTYPE HTML><html><head>\n"
+		"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+		"<meta charset=\"utf-8\">\n");
+		*_gp_sptr += F("<title>");
+		*_gp_sptr += page_name;
+		*_gp_sptr += F("</title>\n");
+		*_gp_sptr += F("</head><body>\n");	
+	}
+	
+	void OPEN_WEB_PAGE(const char* href,int prd = 1000) {									//Denys_Ch
+		*_gp_sptr += F("<script> setInterval(function(){window.location.href = \"");
+		*_gp_sptr += href;
+		*_gp_sptr += F("\";},");
+		*_gp_sptr += prd;
+		*_gp_sptr += F(");</script>\n");
+	}
+	
     void AJAX_CLICK() {
         *_gp_sptr += F("<script>function GP_click(arg){var xhttp=new XMLHttpRequest();var v;\n"
         "if(arg.type==\"checkbox\")v=arg.checked?'1':'0';\nelse v=arg.value;\n"
@@ -78,7 +97,8 @@ struct Builder {
         *_gp_sptr += FPSTR(style);
     }
     void PAGE_BLOCK_BEGIN() {
-        *_gp_sptr += F("<div align=\"center\" style=\"margin:auto;max-width:1000px;\">\n");
+        //*_gp_sptr += F("<div align=\"center\" style=\"margin:auto;max-width:1000px;\">\n");
+		*_gp_sptr += F("<div align=\"center\" style=\"margin:auto;\">\n");		//Denys_Ch
     }
     void PAGE_BLOCK_END() {
         *_gp_sptr += F("</div>");
@@ -114,7 +134,7 @@ struct Builder {
         *_gp_sptr += F(");</script>\n");
     }
     void AREA_LOG(int rows = 5) {
-        *_gp_sptr += F("<textarea style=\"height:auto\" id=\"GP_log\" rows=\"");
+        *_gp_sptr += F("<textarea style=\"height:auto;max-width:90%;width:90%;\" id=\"GP_log\" rows=\"");
         *_gp_sptr += rows;
         *_gp_sptr += F("\" disabled></textarea>");
         *_gp_sptr += F("<script>let _gplog=\"\";\n"
@@ -154,6 +174,11 @@ struct Builder {
     void BLOCK_END() {
         *_gp_sptr += F("</div>\n");
     }
+	
+	void SCROLL_BOX() {													//Denys_Ch
+		*_gp_sptr += F("<div class=\"scroll_box\" id=\"blockBack\">\n");
+	}
+	
     void BREAK() {
         *_gp_sptr += F("<br>\n");
     }
@@ -187,14 +212,14 @@ struct Builder {
     void BUTTON(const char* name, const char* value) {
         *_gp_sptr += F("<input type=\"button\" value=\"");
         *_gp_sptr += value;
-        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += F("\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" onclick=\"GP_click(this)\">\n");
     }
     void BUTTON(const char* name, const char* value, const char* tar) {
         *_gp_sptr += F("<input type=\"button\" value=\"");
         *_gp_sptr += value;
-        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += F("\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" onclick=\"GP_clickid('");
         *_gp_sptr += name;
@@ -205,20 +230,78 @@ struct Builder {
     void BUTTON_MINI(const char* name, const char* value) {
         *_gp_sptr += F("<input class=\"miniButton\" type=\"button\" value=\"");
         *_gp_sptr += value;
-        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += F("\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" onclick=\"GP_click(this)\">\n");
     }
     void BUTTON_MINI(const char* name, const char* value, const char* tar) {
         *_gp_sptr += F("<input class=\"miniButton\" type=\"button\" value=\"");
         *_gp_sptr += value;
-        *_gp_sptr += "\" name=\"";
+        *_gp_sptr += F("\" name=\"");
         *_gp_sptr += name;
         *_gp_sptr += F("\" onclick=\"GP_clickid('");
         *_gp_sptr += name;
         *_gp_sptr += F("','");
         *_gp_sptr += tar;
         *_gp_sptr += F("')\">\n");
+    }
+	
+	//Denys_Ch
+	void BUTTON_SELECT(const char* name, const char* value) {
+        *_gp_sptr += F("<button class=\"button_select\" name=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" onclick=\"{const div = this.parentElement.children;");
+		*_gp_sptr += F("for (let i = 0; i<div.length; i++) {if (div[i].className == 'button_select') { div[i].style.backgroundColor = '#24272e';}");
+		*_gp_sptr += F("this.style.backgroundColor = '#3c414d';");
+		
+		*_gp_sptr += F("GP_click(this)");
+		
+		*_gp_sptr += F("}}\">");
+		
+        *_gp_sptr += value;
+		
+		*_gp_sptr += F("</button>\n");
+		
+    }
+	
+	//Denys_Ch  name- имя кнопки value-текст лэйбла value_submit- текст кнопки submit label_id-айди лэйбла 
+	void UPLOAD_BUTTON(const char* name,const char* value,const char* value_submit ,const char* label_id="", bool line = 0) {
+        *_gp_sptr += F("<br>\n<label class=\"upload_button_label\" id=\"");
+        *_gp_sptr += label_id;
+        *_gp_sptr += F("\" for=\"");
+		*_gp_sptr += name;
+		*_gp_sptr += F("\">");
+        *_gp_sptr += value;
+        *_gp_sptr += F("</label>\n");
+		
+		*_gp_sptr += F("<input type=\"file\" class=\"upload_button_button\" name=\"");
+        *_gp_sptr += name;
+		*_gp_sptr += F("\" id=\"");
+		*_gp_sptr += name;
+        *_gp_sptr += F("\" onclick=\"GP_click(this)\">\n");
+		
+		if(!line) *_gp_sptr += F("<br>\n<br>");
+		
+		*_gp_sptr += F("<input type=\"submit\" formenctype=\"multipart/form-data\" value=\"");
+        *_gp_sptr += value_submit;
+        *_gp_sptr += F("\">\n");
+	}	
+	
+	void HREF_BEGIN(const char* GP_href) { 	//Denys_Ch
+        *_gp_sptr += F("<a class=\"\" href=\"");
+		*_gp_sptr += GP_href;
+        *_gp_sptr += F("\">\n");
+    }
+	
+	void HREF_END() { 						//Denys_Ch
+		*_gp_sptr += F("</a>\n");
+    }
+	
+	void HREF(const char* GP_href) { 		//Denys_Ch
+        *_gp_sptr += F("<a class=\"\" href=\"");
+		*_gp_sptr += GP_href;
+        *_gp_sptr += F("\">\n");
+		*_gp_sptr += F("</a>");
     }
     
     void NUMBER(const char* name, const char* place, int value = INT32_MAX) {
@@ -272,6 +355,17 @@ struct Builder {
     void TEXT(const char* name, const char* place, char* value) {
         TEXT(name, place, (const char*)value);
     }
+	
+	void TEXT_HREF(const char* name, const char* value, const char* GP_href) { //Denys_Ch
+        *_gp_sptr += F("<a href=\"");
+		*_gp_sptr += GP_href;
+        *_gp_sptr += F("\" name=\"");
+        *_gp_sptr += name;
+        *_gp_sptr += F("\" onclick=\"GP_click(this)\">\n");
+        *_gp_sptr += value;
+		*_gp_sptr += F("</a>");
+    }
+	
     void PASS(const char* name, const char* place, const char* value = "") {
         *_gp_sptr += F("<input type=\"password\" name=\"");
         *_gp_sptr += name;
@@ -682,9 +776,10 @@ void GP_SHOW() {
     if (_gp_ptr && _gp_sptr) (*(GyverPortal*)_gp_ptr).showPage(*_gp_sptr);
 }
 
-void BUILD_BEGIN(String& s) {
+void BUILD_BEGIN(String& s, const char* page_name = "NO_NAME") {
     GP_BUILD(s);
-    add.PAGE_BEGIN();
+	if (page_name != "NO_NAME") add.PAGE_BEGIN(page_name);			// Denys_Ch
+	else add.PAGE_BEGIN();
     add.AJAX_CLICK();
     add.PAGE_BLOCK_BEGIN();
 }
