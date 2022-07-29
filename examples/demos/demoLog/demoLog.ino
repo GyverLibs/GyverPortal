@@ -1,19 +1,23 @@
+// пример работы окна лога, выводит случайные hello
+
+#define AP_SSID ""
+#define AP_PASS ""
+
 #include <GyverPortal.h>
 GyverPortal portal;
 
-// билдер страницы
+// конструктор страницы
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
-  add.AREA_LOG(5);
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
+  GP.AREA_LOG(5);
   BUILD_END();
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin("", "");
+  WiFi.begin(AP_SSID, AP_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");

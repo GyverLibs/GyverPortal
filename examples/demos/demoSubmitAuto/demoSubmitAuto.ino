@@ -1,6 +1,11 @@
 // демо с формой, значения компонентов связаны
 // с переменными в скетче
+
+#define AP_SSID ""
+#define AP_PASS ""
+
 #include <GyverPortal.h>
+GyverPortal portal;
 
 // переменные
 bool valCheck;
@@ -12,55 +17,55 @@ int valSlider;
 GPdate valDate;
 GPtime valTime;
 int valSelect;
-uint32_t valCol;
+GPcolor valCol;
 
-// билдер страницы
+// конструктор страницы
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
 
-  add.FORM_BEGIN("/update");
-  add.TITLE("Title", "t1");
-  add.HR();
-  add.LABEL("Value: ");
-  add.LABEL("NAN", "val");      add.BREAK();
-  add.LABEL("Check: ");
-  add.CHECK("ch", valCheck);    add.BREAK();
-  add.LABEL("Led: ");
-  add.LED_RED("led");           add.BREAK();
-  add.LABEL("Switch: ");
-  add.SWITCH("sw", valSwitch);  add.BREAK();
-  add.TEXT("txt", "text", valText);      add.BREAK();
-  add.NUMBER("num", "number", valNum);  add.BREAK();
-  add.PASS("pass", "pass", valPass);     add.BREAK();
-  add.SLIDER("sld", valSlider, 0, 10);  add.BREAK();
-  add.DATE("date", valDate);       add.BREAK();
-  add.TIME("time", valTime);       add.BREAK();
-  add.SELECT("sel", "val 1,val 2,val 3", valSelect);  add.BREAK();
-  add.COLOR("col", valCol);     add.BREAK();
-  add.BUTTON("btn", "Button");
-  add.SUBMIT("Submit");
-  add.FORM_END();
+  GP.FORM_BEGIN("/update");
+  GP.TITLE("Title", "t1");
+  GP.HR();
+  GP.LABEL("Value: ");
+  GP.LABEL("NAN", "val");      GP.BREAK();
+  GP.LABEL("Check: ");
+  GP.CHECK("ch", valCheck);    GP.BREAK();
+  GP.LABEL("Led: ");
+  GP.LED_RED("led");           GP.BREAK();
+  GP.LABEL("Switch: ");
+  GP.SWITCH("sw", valSwitch);  GP.BREAK();
+  GP.TEXT("txt", "text", valText);     GP.BREAK();
+  GP.NUMBER("num", "number", valNum);  GP.BREAK();
+  GP.PASS("pass", "pass", valPass);    GP.BREAK();
+  GP.SLIDER("sld", valSlider, 0, 10);  GP.BREAK();
+  GP.DATE("date", valDate);       GP.BREAK();
+  GP.TIME("time", valTime);       GP.BREAK();
+  GP.SELECT("sel", "val 1,val 2,val 3", valSelect);  GP.BREAK();
+  GP.COLOR("col", valCol);        GP.BREAK();
+  GP.BUTTON("btn", "Button");     GP.BREAK();
+  GP.SUBMIT("Submit");
+  GP.FORM_END();
 
   BUILD_END();
 }
 
-GyverPortal portal;
-
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin("", "");
+  WiFi.begin(AP_SSID, AP_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println(WiFi.localIP());
 
-  // подключаем билдер и запускаем
+  // подключаем конструктор и запускаем
   portal.attachBuild(build);
+  portal.attach(action);
   portal.start();
+
+  // инициализация авто списка
   portal.list.init(9);
   portal.list.add(&valCheck, "ch", T_CHECK);
   portal.list.add(&valSwitch, "sw", T_CHECK);
@@ -74,16 +79,12 @@ void setup() {
   portal.list.add(&valCol, "col", T_COLOR);
 }
 
-void loop() {
-  portal.tick();
-
+void action() {
   // одна из форм была submit
   if (portal.form()) {
-
     // проверяем, была ли это форма "/update"
     if (portal.form("/update")) {
       valSelect = portal.getSelected("sel", "val 1,val 2,val 3");
-
       // выводим для отладки
       Serial.print(valCheck);
       Serial.print(',');
@@ -97,13 +98,17 @@ void loop() {
       Serial.print(',');
       Serial.print(valSlider);
       Serial.print(',');
-      Serial.print(encodeDate(valDate));
+      Serial.print(valDate.encode());
       Serial.print(',');
-      Serial.print(encodeTime(valTime));
+      Serial.print(valTime.encode());
       Serial.print(',');
       Serial.print(valSelect);
       Serial.print(',');
-      Serial.println(valCol, HEX);
+      Serial.println(valCol.encode());
     }
   }
+}
+
+void loop() {
+  portal.tick();
 }

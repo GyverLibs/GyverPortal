@@ -1,3 +1,9 @@
+// пример использования "блоков" для оформления
+// данные храним, но никак не используем, это просто пример
+
+#define AP_SSID ""
+#define AP_PASS ""
+
 #include <GyverPortal.h>
 GyverPortal portal;
 
@@ -12,43 +18,51 @@ struct SomeData {
 SomeData data;
 
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
-  add.AJAX_UPDATE("led, st");
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
+  GP.AJAX_UPDATE("led, st");
 
-  add.LABEL("Settings");
-  add.BLOCK_BEGIN();
-  add.LABEL("Power:");
-  add.SWITCH("sw", data.state);
-  add.BREAK();
-  add.LABEL("Local status:");
-  add.LABEL("OK");
-  add.BLOCK_END();
+  GP.LABEL("Settings");
+  GP.BLOCK_BEGIN();
+  GP.LABEL("Power:");
+  GP.SWITCH("sw", data.state);
+  GP.BREAK();
+  GP.LABEL("Local status:");
+  GP.LABEL("OK");
+  GP.BLOCK_END();
 
-  add.FORM_BEGIN("/save");
+  GP.FORM_BEGIN("/save");
 
-  add.LABEL("WiFi");
-  add.BLOCK_BEGIN();
-  add.TEXT("ssid", "SSID", data.ssid);
-  add.BREAK();
-  add.TEXT("pass", "Password", data.pass);
-  add.BLOCK_END();
+  GP.LABEL("WiFi");
+  GP.BLOCK_BEGIN();
+  GP.TEXT("ssid", "SSID", data.ssid);
+  GP.BREAK();
+  GP.TEXT("pass", "Password", data.pass);
+  GP.BLOCK_END();
 
-  add.LABEL("MQTT");
-  add.BLOCK_BEGIN();
-  add.TEXT("host", "Host", data.host);
-  add.BREAK();
-  add.NUMBER("port", "Port", data.port);
-  add.BLOCK_END();
+  GP.LABEL("MQTT");
+  GP.BLOCK_BEGIN();
+  GP.TEXT("host", "Host", data.host);
+  GP.BREAK();
+  GP.NUMBER("port", "Port", data.port);
+  GP.BLOCK_END();
 
-  add.SUBMIT("Save");
-  add.FORM_END();
+  GP.SUBMIT("Save");
+  GP.FORM_END();
 
   BUILD_END();
 }
 
 void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(AP_SSID, AP_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(WiFi.localIP());
+
   portal.attachBuild(build);
   portal.start();
 }

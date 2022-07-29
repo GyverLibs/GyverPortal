@@ -14,23 +14,22 @@ struct LoginPass {
 LoginPass lp;
 
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
 
-  add.FORM_BEGIN("/login");
-  add.TEXT("lg", "Login", lp.ssid);
-  add.BREAK();
-  add.TEXT("ps", "Password", lp.pass);
-  add.SUBMIT("Submit");
-  add.FORM_END();
+  GP.FORM_BEGIN("/login");
+  GP.TEXT("lg", "Login", lp.ssid);
+  GP.BREAK();
+  GP.TEXT("ps", "Password", lp.pass);
+  GP.SUBMIT("Submit");
+  GP.FORM_END();
 
   BUILD_END();
 }
 
 void setup() {
   delay(2000);
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println();
 
   // читаем логин пароль из памяти
@@ -52,6 +51,7 @@ void setup() {
   }
   Serial.println();
   Serial.print("Connected! Local IP: ");
+
   Serial.println(WiFi.localIP());
 }
 
@@ -66,20 +66,21 @@ void loginPortal() {
   GyverPortal portal;
   portal.attachBuild(build);
   portal.start(WIFI_AP);
+  portal.attach(action);
 
   // работа портала
-  while (portal.tick()) {
-    if (portal.form("/login")) {      // кнопка нажата
-      portal.copyStr("lg", lp.ssid);  // копируем себе
-      portal.copyStr("ps", lp.pass);
-      EEPROM.put(0, lp);              // сохраняем
-      EEPROM.commit();                // записываем
-      WiFi.softAPdisconnect();        // отключаем AP
-      break;                          // выходим из цикла
-    }
+  while (portal.tick());
+}
+
+void action(GyverPortal& p) {
+  if (p.form("/login")) {      // кнопка нажата
+    p.copyStr("lg", lp.ssid);  // копируем себе
+    p.copyStr("ps", lp.pass);
+    EEPROM.put(0, lp);              // сохраняем
+    EEPROM.commit();                // записываем
+    WiFi.softAPdisconnect();        // отключаем AP
   }
 }
 
 void loop() {
-
 }

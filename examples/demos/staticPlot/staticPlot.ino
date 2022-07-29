@@ -1,33 +1,37 @@
+// тест графика PLOT/PLOT_DARK
+
+#define AP_SSID ""
+#define AP_PASS ""
+
 #include <GyverPortal.h>
+GyverPortal portal;
+
 #define PLOT_SIZE 10
 int16_t arr[2][PLOT_SIZE];
 const char *names[] = {"kek", "puk",};
 
-// билдер страницы
+// конструктор страницы
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_LIGHT);
+  BUILD_BEGIN();
+  GP.THEME(GP_LIGHT);
 
-  //add.PLOT_DARK<2, PLOT_SIZE>("table", names, arr);
-  add.PLOT<2, PLOT_SIZE>("table", names, arr);
+  //GP.PLOT_DARK<2, PLOT_SIZE>("table", names, arr);
+  GP.PLOT<2, PLOT_SIZE>("table", names, arr);
 
   BUILD_END();
 }
 
-GyverPortal portal;
-
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin("", "");
+  WiFi.begin(AP_SSID, AP_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println(WiFi.localIP());
 
-  // подключаем билдер и запускаем
+  // подключаем конструктор и запускаем
   portal.attachBuild(build);
   portal.start();
 }

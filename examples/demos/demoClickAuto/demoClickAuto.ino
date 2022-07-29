@@ -1,6 +1,10 @@
 // получаем AJAX клики со страницы и значения с компонентов
 // автоматическое обновление переменных
+#define AP_SSID ""
+#define AP_PASS ""
+
 #include <GyverPortal.h>
+GyverPortal portal;
 
 // переменные
 bool valCheck;
@@ -12,52 +16,52 @@ int valSlider;
 GPdate valDate;
 GPtime valTime;
 int valSelect;
-uint32_t valCol;
+GPcolor valCol;
 
-// билдер страницы
+// конструктор страницы
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
 
-  add.TITLE("Title", "t1");
-  add.HR();
-  add.LABEL("Value: ");
-  add.LABEL("NAN", "val");      add.BREAK();
-  add.LABEL("Check: ");
-  add.CHECK("ch", valCheck);    add.BREAK();
-  add.LABEL("Led: ");
-  add.LED_RED("led");           add.BREAK();
-  add.LABEL("Switch: ");
-  add.SWITCH("sw", valSwitch);  add.BREAK();
-  add.TEXT("txt", "text");      add.BREAK();
-  add.NUMBER("num", "number");  add.BREAK();
-  add.PASS("pass", "pass");     add.BREAK();
-  add.SLIDER("sld", valSlider, 0, 10);  add.BREAK();
-  add.DATE("date", valDate);       add.BREAK();
-  add.TIME("time", valTime);       add.BREAK();
-  add.SELECT("sel", "val 1,val 2,val 3", valSelect);  add.BREAK();
-  add.COLOR("col", valCol);     add.BREAK();
-  add.BUTTON("btn", "Button");
+  GP.TITLE("Title", "t1");
+  GP.HR();
+  GP.LABEL("Value: ");
+  GP.LABEL("NAN", "val");      GP.BREAK();
+  GP.LABEL("Check: ");
+  GP.CHECK("ch", valCheck);    GP.BREAK();
+  GP.LABEL("Led: ");
+  GP.LED_RED("led");           GP.BREAK();
+  GP.LABEL("Switch: ");
+  GP.SWITCH("sw", valSwitch);  GP.BREAK();
+  GP.TEXT("txt", "text");      GP.BREAK();
+  GP.NUMBER("num", "number");  GP.BREAK();
+  GP.PASS("pass", "pass");     GP.BREAK();
+  GP.SLIDER("sld", valSlider, 0, 10);  GP.BREAK();
+  GP.DATE("date", valDate);    GP.BREAK();
+  GP.TIME("time", valTime);    GP.BREAK();
+  GP.SELECT("sel", "val 1,val 2,val 3", valSelect);  GP.BREAK();
+  GP.COLOR("col", valCol);     GP.BREAK();
+  GP.BUTTON("btn", "Button");
 
   BUILD_END();
 }
 
-GyverPortal portal;
-
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin("", "");
+  WiFi.begin(AP_SSID, AP_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println(WiFi.localIP());
 
-  // подключаем билдер и запускаем
+  // подключаем конструктор и запускаем
   portal.attachBuild(build);
+  portal.attach(action);
   portal.start();
+
+  // настраиваем лист автообновления
   portal.list.init(9);
   portal.list.add(&valCheck, "ch", T_CHECK);
   portal.list.add(&valSwitch, "sw", T_CHECK);
@@ -71,12 +75,10 @@ void setup() {
   portal.list.add(&valCol, "col", T_COLOR);
 }
 
-void loop() {
-  portal.tick();
-
+void action() {
   // был клик по компоненту
   if (portal.click()) {
-    // проверяем компоненты и обновляем переменные
+    // выводим новые значения с компонентов
     if (portal.click("ch")) {
       Serial.print("Check: ");
       Serial.println(valCheck);
@@ -109,12 +111,12 @@ void loop() {
 
     if (portal.click("date")) {
       Serial.print("Date: ");
-      Serial.println(encodeDate(valDate));
+      Serial.println(valDate.encode());
     }
 
     if (portal.click("time")) {
       Serial.print("Time: ");
-      Serial.println(encodeTime(valTime));
+      Serial.println(valTime.encode());
     }
 
     // вручную
@@ -128,9 +130,13 @@ void loop() {
 
     if (portal.click("col")) {
       Serial.print("Color: ");
-      Serial.println(valCol, HEX);
+      Serial.println(valCol.encode());
     }
 
     if (portal.click("btn")) Serial.println("Button");
   }
+}
+
+void loop() {
+  portal.tick();
 }

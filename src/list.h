@@ -13,8 +13,8 @@ enum GPtype {
     T_COLOR,
 };
 
-struct List {
-    ~List() {
+struct GPlist {
+    ~GPlist() {
         clear();
     }
 

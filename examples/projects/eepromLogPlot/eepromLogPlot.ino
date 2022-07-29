@@ -1,6 +1,9 @@
 // лог данных с записью в EEPROM и выводом графика в браузер
 // храним точки графика с привязкой к реальному времени из интернета
 
+#define AP_SSID ""
+#define AP_PASS ""
+
 #define GMT_OFF 3       // часовой пояс, +3 для Москвы
 #define LOG_PRD 1       // период обновления данных, секунд
 #define PLOT_SIZE 100   // длина графика, точек
@@ -16,32 +19,30 @@ const char *names[] = {"Random", "Counter"};
 
 #include <ESP8266WiFi.h>
 #include "time.h"
-#include <GyverPortal.h>
 #include <EEPROM.h>
+#include <GyverPortal.h>
+GyverPortal portal;
 
-// билдер страницы
+// конструктор страницы
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
 
-  add.PLOT_STOCK_DARK<2, PLOT_SIZE>("plot", names, data.unix, data.vals);
+  GP.PLOT_STOCK_DARK<2, PLOT_SIZE>("plot", names, data.unix, data.vals);
   BUILD_END();
 }
 
-GyverPortal portal;
-
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin("", "");
+  WiFi.begin(AP_SSID, AP_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println(WiFi.localIP());
 
-  // подключаем билдер и запускаем
+  // подключаем конструктор и запускаем
   portal.attachBuild(build);
   portal.start();
 

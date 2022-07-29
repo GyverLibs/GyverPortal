@@ -10,21 +10,23 @@ GPdate	KEYWORD1
 GPtime	KEYWORD1
 GPcolor	KEYWORD1
 
+GP_NO_MDNS	KEYWORD1
+GP_NO_DNS	KEYWORD1
+
+_GP	KEYWORD1
+
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 start	KEYWORD2
 stop	KEYWORD2
 show	KEYWORD2
-showPage	KEYWORD2
 attachBuild	KEYWORD2
-attachForm	KEYWORD2
-attachClick	KEYWORD2
-attachUpdate	KEYWORD2
+attach	KEYWORD2
 
 list	KEYWORD2
 init	KEYWORD2
-add	KEYWORD2
+GP	KEYWORD2
 clear	KEYWORD2
 
 tick	KEYWORD2
@@ -37,10 +39,8 @@ formName	KEYWORD2
 update	KEYWORD2
 updateName	KEYWORD2
 answer	KEYWORD2
-root	KEYWORD2
 
 getString	KEYWORD2
-getChars	KEYWORD2
 copyStr	KEYWORD2
 getInt	KEYWORD2
 getCheck	KEYWORD2
@@ -50,16 +50,12 @@ getColor	KEYWORD2
 getSelected	KEYWORD2
 
 inList	KEYWORD2
-encodeDate	KEYWORD2
-encodeTime	KEYWORD2
-decodeDate	KEYWORD2
-decodeTime	KEYWORD2
-encodeColor	KEYWORD2
-decodeColor	KEYWORD2
 
 setHEX	KEYWORD2
 getHEX	KEYWORD2
 setRGB	KEYWORD2
+encode	KEYWORD2
+decode	KEYWORD2
 
 GPunix	KEYWORD2
 GPaddUnix	KEYWORD2

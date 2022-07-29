@@ -1,12 +1,20 @@
 #pragma once
 #include "log.h"
+
+#ifndef GP_NO_MDNS
+#ifdef ESP8266
+#include <ESP8266mDNS.h>
+#else
+#include <ESPmDNS.h>
+#endif
+#endif
+
 // ======================= ПОРТАЛ =======================
 class GyverPortal {
 public:
     // ======================= КОНСТРУКТОР =======================
     GyverPortal() {
-        req.reserve(20);
-        buf.reserve(64);
+        _uri.reserve(15);
     }
 
     ~GyverPortal() {
@@ -14,52 +22,283 @@ public:
     }
     
     // ======================= СИСТЕМА =======================
-    // запустить портал. Можно передать WIFI_AP для запуска DNS сервера
-    void start(uint8_t mode = WIFI_STA) {
-        _mode = (mode == WIFI_AP);
+    // запустить портал. Можно передать имя MDNS (оставь пустым "" если MDNS не нужен) и порт
+    void start(const String& mdns, uint16_t port = 80) {
         _active = 1;
-        server.begin();
-        if (_mode) dnsServer.start(53, "*", WiFi.softAPIP());
+        _dns = (WiFi.getMode() == WIFI_AP);
+    #ifndef GP_NO_MDNS
+        if (mdns.length()) {
+            _mdnsF = 1;
+            MDNS.begin(mdns.c_str());  
+            MDNS.addService("http", "tcp", port);
+        }
+    #endif
+        server.begin(port);
+    #ifndef GP_NO_DNS
+        if (_dns) dnsServer.start(53, "*", WiFi.softAPIP());
+    #endif
+        
         server.onNotFound([this]() {
-            req = server.uri();
-            if (req.startsWith(F("/favicon.ico"))) show();
-            else _formF = 1;
+            bool showPage = 0;
+            _uri = server.uri();
+            if (_uri.startsWith(F("/favicon.ico"))) {       // не знаю почему этот запрос приходит
+                server.send(200, "text/plane");             // но мы его игнорируем
+                return;
+            } else if (_uri.startsWith(F("/GP_click"))) {   // клик
+                _clickF = 1;
+                checkList();
+                server.send(200, "text/plane");             // отвечаем ничем
+            } else if (_uri.startsWith(F("/GP_update"))) {  // апдейт
+                _updateF = 1;
+                _answerF = 1;                               // запомнили что апдейт
+            } else if (_uri.startsWith(F("/GP_log"))) {     // лог
+                if (log.available()) server.send(200, "text/plane", log.read());
+                else server.send(200, "text/plane");
+                return;
+            } else {                                        // форма или открыта любая страница
+                _formF = 1;
+                checkList();
+                showPage = 1;
+            }
+
+            // подключен новый обработчик действия
+            if (_action || _actionR) {
+                if (_action) _action();         // вызов обычного
+                if (_actionR) _actionR(*this);  // вызов с объектом
+                if (_answerF) server.send(200, "text/plane");   // юзер не ответил на update - отвечаем за него
+                if (showPage) show();                           // отправляем страницу
+                _answerF = _updateF = _clickF = _formF = 0;     // скидываем флаги
+            } else {
             #ifdef ESP32
-            show();
+                if (showPage) show(); // затычка для esp32, отправляем страницу даже без обработчика
             #endif
+            }
         });
-        server.on("/GP_click", [this]() {
-            _clickF = 1;
-            server.send(200, "text/plane");
-        });
-        server.on("/GP_update", [this]() {
-            _updateF = 1;
-            #ifdef ESP32
-            show();
-            #endif
-        });
-        server.on("/GP_log", [this]() {
-            if (log.state && log.available()) {
-                String s;
-                while (log.available()) s += log.read();
-                server.send(200, "text/plane", s);
-            } else server.send(200, "text/plane");
-        });
+    }
+    void start(__attribute__((unused)) uint8_t mode = WIFI_STA) {
+        start("");
     }
     
     // остановить портал
     void stop() {
         _active = 0;
-        if (_mode) dnsServer.stop();
+    #ifndef GP_NO_DNS
+        if (_dns) dnsServer.stop();
+    #endif
         server.stop();
     }
     
     // ======================= АТТАЧИ =======================
+    // подключить функцию-обработчик действия
+    void attach(void (*handler)()) {
+        _action = *handler;
+    }
+    void attach(void (*handler)(GyverPortal& p)) {
+        _actionR = *handler;
+    }
+    
     // подключить функцию-билдер страницы
     void attachBuild(void (*handler)()) {
         _build = *handler;
     }
+
+    // ======================= ТИКЕР =======================
+    // тикер портала. Вернёт true, если портал запущен
+    bool tick() {
+        if (!_active) return 0;
+        
+        // deprecated
+    #ifdef ESP8266
+        if (!_action && !_actionR) {
+            if (_formF) show();
+            if (_updateF) server.send(200, "text/plane");
+            _updateF = _clickF = _formF = 0;
+        }
+    #endif
+        // deprecated
+        
+        // server poll
+    #ifndef GP_NO_DNS
+        if (_dns) dnsServer.processNextRequest();
+    #endif
+    #if !defined(GP_NO_MDNS) && defined(ESP8266)
+        if (_mdnsF) MDNS.update();
+    #endif
+        server.handleClient();
+        // server poll
+        
+        // deprecated
+    #ifdef ESP8266
+        if (!_action && !_actionR) {
+            if (_formF && _form) _form(this);
+            if (_clickF && _click) _click(this);
+            if (_updateF && _update) _update(this);
+        }
+    #endif
+        // deprecated
+        
+        yield();
+        return 1;
+    }
+
+    // ======================= FORM =======================
+    // вернёт true, если было нажатие на любой submit
+    bool form() {
+        return _formF;
+    }
     
+    // вернёт true, если был submit с указанной формы
+    bool form(const String& name) {
+        return _formF ? _uri.equals(name) : 0;
+    }
+    
+    // вернёт имя теукщей submit формы
+    String formName() {
+        return String(_uri);
+    }
+    
+    // ======================= CLICK =======================
+    // вернёт true, если был клик по (кнопка, чекбокс, свитч, слайдер, селектор)
+    bool click() {
+        return _clickF;
+    }
+    
+    // вернёт true, если был клик по указанному элементу (кнопка, чекбокс, свитч, слайдер, селектор)
+    bool click(const String& name) {
+        return _clickF ? server.argName(0).equals(name) : 0;
+    }
+    
+    // вернёт имя теукщего кликнутого компонента
+    String clickName() {
+        return String(server.argName(0));
+    }
+    
+    // получить значение кликнутого компонента
+    int clickValue() {
+        return server.arg(0).toInt();
+    }
+    
+    // получить текст кликнутого компонента
+    String clickText() {
+        return String(server.arg(0));
+    }
+    
+    // ======================= UPDATE =======================
+    // вернёт true, если было обновление
+    bool update() {
+        return _updateF;
+    }
+    
+    // вернёт true, если было update с указанного компонента
+    bool update(const String& name) {
+        return _updateF ? server.argName(0).equals(name) : 0;
+    }
+    
+    // вернёт имя обновлённого компонента
+    String updateName() {
+        return String(server.argName(0));
+    }
+    
+    // отправить ответ на обновление
+    void answer(const String& s) {
+        _updateF = 0;
+        _answerF = 0;
+        server.send(200, "text/plane", s);
+    }
+    void answer(int v) {
+        answer(String(v));
+    }
+    void answer(int* v, int am, int dec = 0) {
+        String s;
+        s.reserve(am * 4);
+        for (int i = 0; i < am; i++) {
+            if (dec) s += (float)v[i] / dec;
+            else s += v[i];
+            if (i != am - 1) s += ',';
+        }
+        answer(s);
+    }
+    
+    void answer(GPcolor& col) {
+        answer(col.encode());
+    }
+    void answer(GPdate& date) {
+        answer(date.encode());
+    }
+    void answer(GPtime& time) {
+        answer(time.encode());
+    }
+
+    /*// ======================= MISC =======================
+    // вернёт true, если открыта главная страница (/)
+    bool root() {
+        return (req[0] == '/' && req[1] == '\0');
+    }*/
+    
+    // ======================= ПАРСЕРЫ =======================
+    // получить String строку с компонента
+    String getString(const String& n) {
+        return String(server.arg(n));
+    }
+    // переписать char строку с компонента к себе
+    void copyStr(const String& n, char* d) {
+        if (server.hasArg(n)) strcpy(d, server.arg(n).c_str());
+    }
+
+    // получить число с компонента
+    int getInt(const String& n) {
+        return server.arg(n).toInt();
+    }
+    
+    // получить float с компонента
+    float getFloat(const String& n) {
+        return server.arg(n).toFloat();
+    }
+
+    // получить состояние чекбокса
+    bool getCheck(const String& n) {
+        if (server.hasArg(n)) return (server.arg(n)[0] == '1' || server.arg(n)[0] == 'o');
+        return 0;
+    }
+
+    // получить дату с компонента
+    GPdate getDate(const String& n) {
+        return GPdate(server.arg(n));
+    }
+
+    // получить время с компонента
+    GPtime getTime(const String& n) {
+        return GPtime(server.arg(n));
+    }
+
+    // получить цвет с компонента
+    GPcolor getColor(const String& n) {
+        return GPcolor(server.arg(n));
+    }
+    
+    // получить номер выбранного пункта в дроплисте
+    int8_t getSelected(const String& n, const String& list) {
+        return inList(server.arg(n).c_str(), list.c_str());
+    }
+    
+    // ======================= ПРОЧЕЕ =======================    
+    // вызвать конструктор и показать страницу
+    void show() {
+        String s;
+        _GP = &s;
+        if (*_build) _build();
+        server.send(200, F("text/html"), *_GP);
+    }
+    
+#ifdef ESP8266
+    ESP8266WebServer server;
+#else
+    WebServer server;
+#endif
+    GPlist list;
+    GPlog log;
+    
+    // ======================= DEPRECATED =======================
     // подключить функцию, которая вызывается при клике (кнопка, чекбокс, свитч, слайдер, селектор)
     void attachClick(void (*handler)(GyverPortal* p)) {
         _click = *handler;
@@ -74,211 +313,6 @@ public:
     void attachUpdate(void (*handler)(GyverPortal* p)) {
         _update = *handler;
     }
-
-    // ======================= ТИКЕР =======================
-    // тикер портала. Вернёт true, если портал запущен
-    bool tick() {
-        if (!_active) return 0;
-        if (_formF) show();
-        if (_updateF) server.send(200, "text/plane");
-        _updateF = _clickF = _formF = 0;
-
-        if (_mode) dnsServer.processNextRequest();
-        server.handleClient();
-        if (_formF) {
-            checkList();
-            if (*_form) _form(this);
-        }
-        if (_clickF) {
-            checkList();
-            if (*_click) _click(this);
-        }
-        if (_updateF && *_update) _update(this);
-        yield();
-        return 1;
-    }
-
-    // ======================= FORM =======================
-    // вернёт true, если было нажатие на любой submit
-    bool form() {
-        return _formF;
-    }
-    
-    // вернёт true, если был submit с указанной формы
-    bool form(const char* name) {
-        return _formF ? req.equals(name) : 0;
-    }
-    
-    // вернёт имя теукщей submit формы
-    String& formName() {
-        return req;
-    }
-    
-    // ======================= CLICK =======================
-    // вернёт true, если был клик по (кнопка, чекбокс, свитч, слайдер, селектор)
-    bool click() {
-        return _clickF;
-    }
-    
-    // вернёт true, если был клик по указанному элементу (кнопка, чекбокс, свитч, слайдер, селектор)
-    bool click(const char* name) {
-        return _clickF ? server.argName(0).equals(name) : 0;
-    }
-    
-    // вернёт имя теукщего кликнутого компонента
-    const String& clickName() {
-        buf = server.argName(0);
-        return buf;
-    }
-    
-    // получить значение кликнутого компонента
-    int clickValue() {
-        int val = server.arg(0).toInt();
-        return val;
-    }
-    
-    // получить текст кликнутого компонента
-    const String& clickText() {
-        buf = server.arg(0);
-        return buf;
-    }
-    
-    // ======================= UPDATE =======================
-    // вернёт true, если было обновление
-    bool update() {
-        return _updateF;
-    }
-    
-    // вернёт true, если было update с указанного компонента
-    bool update(const char* name) {
-        return _updateF ? server.argName(0).equals(name) : 0;
-    }
-    
-    // вернёт имя обновлённого компонента
-    const String& updateName() {
-        buf = server.argName(0);
-        return buf;
-    }
-    
-    // отправить ответ на обновление
-    void answer(String s) {
-        _updateF = 0;
-        server.send(200, "text/plane", s);
-    }
-    void answer(char* s) {
-        _updateF = 0;
-        server.send(200, "text/plane", s);
-    }
-    void answer(int v) {
-        String s(v);
-        answer(s.c_str());
-    }
-    void answer(int16_t* v, int am, int dec = 0) {
-        String s;
-        for (int i = 0; i < am; i++) {
-            if (dec) s += (float)v[i] / dec;
-            else s += v[i];
-            if (i != am - 1) s += ',';
-        }
-        answer(s.c_str());
-    }
-    void answer(GPcolor col) {
-        answer(encodeColor(col.getHEX()));
-    }
-    void answer(GPdate date) {
-        answer(encodeDate(date));
-    }
-    void answer(GPtime time) {
-        answer(encodeTime(time));
-    }
-
-    // ======================= MISC =======================
-    // вернёт true, если открыта главная страница (/)
-    bool root() {
-        return (req[0] == '/' && req[1] == '\0');
-    }
-    
-    // ======================= ПАРСЕРЫ =======================
-    // получить String строку с компонента
-    const String& getString(const char* n) {
-        buf = server.arg(n);
-        return buf;
-    }
-    // получить char* строку с компонента
-    const char* getChars(const char* n) {
-        buf = server.arg(n);
-        return buf.c_str();
-    }
-    // переписать char строку с компонента к себе
-    void copyStr(const char* n, char* d) {
-        if (server.hasArg(n)) strcpy(d, server.arg(n).c_str());
-    }
-
-    // получить число с компонента
-    int getInt(const char* n) {
-        int val = server.arg(n).toInt();
-        return val;
-    }
-    
-    // получить float с компонента
-    float getFloat(const char* n) {
-        float val = server.arg(n).toFloat();
-        return val;
-    }
-
-    // получить состояние чекбокса
-    bool getCheck(const char* n) {
-        if (server.hasArg(n)) return (server.arg(n)[0] == '1' || server.arg(n)[0] == 'o');
-        return 0;
-    }
-
-    // получить дату с компонента
-    GPdate getDate(const char* n) {
-        return decodeDate((char*)server.arg(n).c_str());
-    }
-
-    // получить время с компонента
-    GPtime getTime(const char* n) {
-        return decodeTime((char*)server.arg(n).c_str());
-    }
-
-    // получить цвет с компонента
-    uint32_t getColor(const char* n) {
-        if (!server.hasArg(n)) return 0;
-        return decodeColor((char*)server.arg(n).c_str());
-    }
-    
-    // получить номер выбранного пункта в дроплисте
-    int8_t getSelected(const char* n, const char* list) {
-        buf = server.arg(n);
-        return inList(buf.c_str(), list);
-    }
-    
-    // ======================= ПРОЧЕЕ =======================
-    // показать свою страницу
-    void showPage(String &s) {
-        server.send(200, F("text/html"), s);
-    }
-    
-    // вызвать конструктор и показать страницу
-    void show() {
-        _gp_ptr = this;
-        if (*_build) _build();
-        _gp_ptr = nullptr;
-    }
-    
-    // адрес запроса (внутри action)
-    String& uri() {
-        return req;
-    }
-    
-#ifdef ESP8266
-    ESP8266WebServer server;
-#else
-    WebServer server;
-#endif
-    List list;
-    GPlog log;
 
     // ======================= PRIVATE =======================
 private:
@@ -295,23 +329,31 @@ private:
                 case T_BYTE:    *(int8_t*)list.vals[i] = (int8_t)getInt(list.names[i]); break;
                 case T_INT:     *(long*)list.vals[i] = getInt(list.names[i]);       break;
                 case T_FLOAT:   *(float*)list.vals[i] = getFloat(list.names[i]);    break;
-                case T_COLOR:   *(uint32_t*)list.vals[i] = getColor(list.names[i]); break;
+                case T_COLOR:   *(GPcolor*)list.vals[i] = getColor(list.names[i]);  break;
                 }
             }
         }
     }
-    
-    bool logF = false;
-    String req, buf;
-    bool _mode = false;
+    bool _mdnsF = false;
+    bool _dns = false;
     bool _active = false;
+    
     bool _formF = 0;
     bool _updateF = 0;
     bool _clickF = 0;
+    bool _answerF = 0;
+    String _uri;
+    
     void (*_build)() = nullptr;
+    void (*_action)() = nullptr;
+    void (*_actionR)(GyverPortal& p) = nullptr;
+    
+#ifndef GP_NO_DNS
+    DNSServer dnsServer;
+#endif
+
+    // ======================= DEPRECATED =======================
     void (*_click)(GyverPortal* p) = nullptr;
     void (*_form)(GyverPortal* p) = nullptr;
     void (*_update)(GyverPortal* p) = nullptr;
-    IPAddress apIP;
-    DNSServer dnsServer;
 };

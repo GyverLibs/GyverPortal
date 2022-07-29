@@ -1,45 +1,48 @@
-#include <GyverPortal.h>
-#define PLOT_SIZE 100
+// тест графика PLOT_STOCK
 
+#define AP_SSID ""
+#define AP_PASS ""
+
+#include <GyverPortal.h>
+GyverPortal portal;
+
+#define PLOT_SIZE 100
 int16_t arr[2][PLOT_SIZE];
 uint32_t dates[PLOT_SIZE];
 const char *names[] = {"kek", "puk",};
 
-// билдер страницы
+// конструктор страницы
 void build() {
-  String s;
-  BUILD_BEGIN(s);
-  add.THEME(GP_DARK);
+  BUILD_BEGIN();
+  GP.THEME(GP_DARK);
 
-  add.PLOT_STOCK_DARK<2, PLOT_SIZE>("plot", names, dates, arr);
+  GP.PLOT_STOCK_DARK<2, PLOT_SIZE>("plot", names, dates, arr);
   BUILD_END();
 }
 
-GyverPortal portal;
-
 void setup() {
-  // ставим последний элемент массива на текущую дату
-  // gmt 3 для Москвы
-  dates[PLOT_SIZE-1] = GPunix(2022, 1, 22, 21, 59, 0, 3);
-  
-  for (int i = 0; i < PLOT_SIZE; i++) {
-    GPaddInt(i*2, arr[0], PLOT_SIZE);
-    GPaddInt(i*5, arr[1], PLOT_SIZE);
-
-    // добавляем значения графика по 5 секунд
-    GPaddUnixS(5, dates, PLOT_SIZE);
-  }
-
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin("", "");
+  WiFi.begin(AP_SSID, AP_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println(WiFi.localIP());
 
-  // подключаем билдер и запускаем
+  // ставим последний элемент массива на текущую дату
+  // gmt 3 для Москвы
+  dates[PLOT_SIZE - 1] = GPunix(2022, 1, 22, 21, 59, 0, 3);
+
+  for (int i = 0; i < PLOT_SIZE; i++) {
+    GPaddInt(i * 2, arr[0], PLOT_SIZE);
+    GPaddInt(i * 5, arr[1], PLOT_SIZE);
+
+    // добавляем значения графика по 5 секунд
+    GPaddUnixS(5, dates, PLOT_SIZE);
+  }
+
+  // подключаем конструктор и запускаем
   portal.attachBuild(build);
   portal.start();
 }
