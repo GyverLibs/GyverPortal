@@ -1,13 +1,7 @@
 #pragma once
 #include "log.h"
 
-#ifndef GP_NO_MDNS
-#ifdef ESP8266
-#include <ESP8266mDNS.h>
-#else
-#include <ESPmDNS.h>
-#endif
-#endif
+#define GP_UNUSED __attribute__((unused)) 
 
 // ======================= ПОРТАЛ =======================
 class GyverPortal {
@@ -21,11 +15,12 @@ public:
         stop();
     }
     
-    // ======================= СИСТЕМА =======================
+    // ========================= СИСТЕМА =========================
     // запустить портал. Можно передать имя MDNS (оставь пустым "" если MDNS не нужен) и порт
-    void start(const String& mdns, uint16_t port = 80) {
+    void start(GP_UNUSED const String& mdns, uint16_t port = 80) {
         _active = 1;
         _dns = (WiFi.getMode() == WIFI_AP);
+    
     #ifndef GP_NO_MDNS
         if (mdns.length()) {
             _mdnsF = 1;
@@ -33,13 +28,16 @@ public:
             MDNS.addService("http", "tcp", port);
         }
     #endif
+        
         server.begin(port);
+    
     #ifndef GP_NO_DNS
         if (_dns) dnsServer.start(53, "*", WiFi.softAPIP());
     #endif
         
         server.onNotFound([this]() {
-            bool showPage = 0;
+            if (_auth && !server.authenticate(_login, _pass)) return server.requestAuthentication();
+            _showPage = 0;
             _uri = server.uri();
             if (_uri.startsWith(F("/favicon.ico"))) {       // не знаю почему этот запрос приходит
                 server.send(200, "text/plane");             // но мы его игнорируем
@@ -55,10 +53,12 @@ public:
                 if (log.available()) server.send(200, "text/plane", log.read());
                 else server.send(200, "text/plane");
                 return;
-            } else {                                        // форма или открыта любая страница
-                _formF = 1;
-                checkList();
-                showPage = 1;
+            } else {                                        // форма или любая страница
+                if (server.args()) {                        // есть данные в запросе, это форма
+                    _formF = 1;
+                    checkList();
+                }
+                _showPage = 1;
             }
 
             // подключен новый обработчик действия
@@ -66,16 +66,16 @@ public:
                 if (_action) _action();         // вызов обычного
                 if (_actionR) _actionR(*this);  // вызов с объектом
                 if (_answerF) server.send(200, "text/plane");   // юзер не ответил на update - отвечаем за него
-                if (showPage) show();                           // отправляем страницу
+                if (_showPage) show();                           // отправляем страницу
                 _answerF = _updateF = _clickF = _formF = 0;     // скидываем флаги
             } else {
             #ifdef ESP32
-                if (showPage) show(); // затычка для esp32, отправляем страницу даже без обработчика
+                if (_showPage) show(); // затычка для esp32, отправляем страницу даже без обработчика
             #endif
             }
         });
     }
-    void start(__attribute__((unused)) uint8_t mode = WIFI_STA) {
+    void start(GP_UNUSED uint8_t mode = WIFI_STA) {
         start("");
     }
     
@@ -86,6 +86,32 @@ public:
         if (_dns) dnsServer.stop();
     #endif
         server.stop();
+    }
+    
+    // =========================== AUTH ===========================
+    // включить авторизацию по логину-паролю
+    void enableAuth(const char* login, const char* pass) {
+        _auth = 1;
+        _login = login;
+        _pass = pass;
+    }
+    
+    // отключить авторизацию
+    void disableAuth() {
+        _auth = 0;
+    }
+    
+    // ============================ OTA ============================
+    void enableOTA() {
+    #ifndef GP_NO_OTA
+        httpUpdater.setup(&server, F("/ota_update"));
+    #endif
+    }
+
+    void enableOTA(GP_UNUSED const String& login, GP_UNUSED const String& pass) {
+    #ifndef GP_NO_OTA
+        httpUpdater.setup(&server, F("/ota_update"), login, pass);
+    #endif
     }
     
     // ======================= АТТАЧИ =======================
@@ -110,7 +136,7 @@ public:
         // deprecated
     #ifdef ESP8266
         if (!_action && !_actionR) {
-            if (_formF) show();
+            if (_showPage) show();
             if (_updateF) server.send(200, "text/plane");
             _updateF = _clickF = _formF = 0;
         }
@@ -153,8 +179,8 @@ public:
     }
     
     // вернёт имя теукщей submit формы
-    String formName() {
-        return String(_uri);
+    String& formName() {
+        return _uri;
     }
     
     // ======================= CLICK =======================
@@ -229,11 +255,15 @@ public:
         answer(time.encode());
     }
 
-    /*// ======================= MISC =======================
+    // ======================= MISC =======================
     // вернёт true, если открыта главная страница (/)
     bool root() {
-        return (req[0] == '/' && req[1] == '\0');
-    }*/
+        return (_uri[0] == '/' && _uri[1] == '\0');
+    }
+    // адрес запроса
+    String& uri() {
+        return _uri;
+    }
     
     // ======================= ПАРСЕРЫ =======================
     // получить String строку с компонента
@@ -289,12 +319,21 @@ public:
         if (*_build) _build();
         server.send(200, F("text/html"), *_GP);
     }
-    
+
 #ifdef ESP8266
     ESP8266WebServer server;
 #else
     WebServer server;
 #endif
+
+#ifndef GP_NO_OTA
+#ifdef ESP8266
+    ESP8266HTTPUpdateServer httpUpdater;
+#else
+    HTTPUpdateServer httpUpdater;
+#endif
+#endif
+
     GPlist list;
     GPlog log;
     
@@ -337,6 +376,11 @@ private:
     bool _mdnsF = false;
     bool _dns = false;
     bool _active = false;
+    bool _showPage = 0;
+    
+    bool _auth = false;
+    const char* _login;
+    const char* _pass;
     
     bool _formF = 0;
     bool _updateF = 0;

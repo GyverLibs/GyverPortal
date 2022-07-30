@@ -1,23 +1,4 @@
 /*
-https://community.alexgyver.ru/threads/gyverportal.6632/page-2#post-122947
-https://snipp.ru/html-css/style-radio
-
-канвас
-https://www.w3schools.com/html/html5_canvas.asp
-https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
-https://developer.mozilla.org/ru/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
-https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_canvas_createimagedata
-
-ota https://github.com/GyverLibs/GyverPortal/issues/12
-#include <ESP8266HTTPUpdateServer.h> // после #include <ESP8266WebServer.h>
-ESP8266HTTPUpdateServer httpUpdater; // после ESP8266WebServer server;
-httpUpdater.setup(&server); // перед server.begin();
-/update для ота
-
-авторизация https://github.com/GyverLibs/GyverPortal/issues/15
-*/
-
-/*
     Простой конструктор веб интерфейса для esp8266 и ESP32
     Документация:
     GitHub: https://github.com/GyverLibs/GyverPortal
@@ -74,6 +55,24 @@ httpUpdater.setup(&server); // перед server.begin();
     - Удалены старые функции преобразования цвета и даты-времени (см. доку)
     - Портал теперь возвращает цвет в формате GPcolor, автообновление переменных тоже работает с GPcolor
     - Все примеры протестированы на esp8266 и esp32
+    
+    v2.1
+    - Вернул функции root() и uri() для удобства создания многостраничности
+    - Добавлен пример организации многостраничности
+    - Добавлена кнопка-ссылка BUTTON_LINK
+    - Добавлена авторизация по логину-паролю (см. доку)
+    - Добавлено OTA обновление прошивки из браузера, в т.ч. с паролем (см. доку)
+*/
+/*
+    TODO
+    https://community.alexgyver.ru/threads/gyverportal.6632/page-2#post-122947
+    https://snipp.ru/html-css/style-radio
+
+    канвас
+    https://www.w3schools.com/html/html5_canvas.asp
+    https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
+    https://developer.mozilla.org/ru/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+    https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_canvas_createimagedata
 */
 #ifndef _GyverPortal_h
 #define _GyverPortal_h
@@ -85,9 +84,22 @@ httpUpdater.setup(&server); // перед server.begin();
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#ifndef GP_NO_MDNS
+#include <ESP8266mDNS.h>
+#endif
+#ifndef GP_NO_OTA
+#include <ESP8266HTTPUpdateServer.h>
+#endif
 #else
+
 #include <WiFi.h>
 #include <WebServer.h>
+#ifndef GP_NO_MDNS
+#include <ESPmDNS.h>
+#endif
+#ifndef GP_NO_OTA
+#include <HTTPUpdateServer.h>
+#endif
 #endif
 
 #include "themes.h"
@@ -222,41 +234,44 @@ struct Builder {
     }
     
     // ======================= КОМПОНЕНТЫ =======================
-    void BUTTON(const char* name, const char* value) {
+    void BUTTON(const char* name, const char* value, const char* tar="") {
         *_GP += F("<input type=\"button\" value=\"");
         *_GP += value;
         *_GP += "\" name=\"";
         *_GP += name;
-        *_GP += F("\" onclick=\"GP_click(this)\">\n");
+        if (strlen(tar)) {
+            *_GP += F("\" onclick=\"GP_clickid('");
+            *_GP += name;
+            *_GP += F("','");
+            *_GP += tar;
+            *_GP += F("')\">\n");
+        } else {
+            *_GP += F("\" onclick=\"GP_click(this)\">\n");
+        }
     }
-    void BUTTON(const char* name, const char* value, const char* tar) {
+    
+    void BUTTON_LINK(const char* url, const char* value) {
         *_GP += F("<input type=\"button\" value=\"");
         *_GP += value;
-        *_GP += "\" name=\"";
-        *_GP += name;
-        *_GP += F("\" onclick=\"GP_clickid('");
-        *_GP += name;
-        *_GP += F("','");
-        *_GP += tar;
-        *_GP += F("')\">\n");
+        *_GP += F("\" onclick=\"location.href='");
+        *_GP += url;
+        *_GP += F("';\">\n");
     }
-    void BUTTON_MINI(const char* name, const char* value) {
+    
+    void BUTTON_MINI(const char* name, const char* value, const char* tar="") {
         *_GP += F("<input class=\"miniButton\" type=\"button\" value=\"");
         *_GP += value;
         *_GP += "\" name=\"";
         *_GP += name;
-        *_GP += F("\" onclick=\"GP_click(this)\">\n");
-    }
-    void BUTTON_MINI(const char* name, const char* value, const char* tar) {
-        *_GP += F("<input class=\"miniButton\" type=\"button\" value=\"");
-        *_GP += value;
-        *_GP += "\" name=\"";
-        *_GP += name;
-        *_GP += F("\" onclick=\"GP_clickid('");
-        *_GP += name;
-        *_GP += F("','");
-        *_GP += tar;
-        *_GP += F("')\">\n");
+        if (strlen(tar)) {
+            *_GP += F("\" onclick=\"GP_clickid('");
+            *_GP += name;
+            *_GP += F("','");
+            *_GP += tar;
+            *_GP += F("')\">\n");
+        } else {
+            *_GP += F("\" onclick=\"GP_click(this)\">\n");
+        }
     }
     
     void NUMBER(const char* name, const char* place, int value = INT32_MAX) {
@@ -310,6 +325,7 @@ struct Builder {
     void TEXT(const char* name, const char* place, char* value) {
         TEXT(name, place, (const char*)value);
     }
+    
     void PASS(const char* name, const char* place, const char* value = "") {
         *_GP += F("<input type=\"password\" name=\"");
         *_GP += name;
@@ -327,6 +343,7 @@ struct Builder {
     void PASS(const char* name, const char* place, char* value) {
         PASS(name, place, (const char*)value);
     }
+    
     void CHECK(const char* name, bool x = 0) {
         *_GP += F("<input type=\"checkbox\" name=\"");
         *_GP += name;
@@ -344,6 +361,7 @@ struct Builder {
         *_GP += F(" onclick=\"GP_click(this)\">\n");
         *_GP += F("<span class=\"slider\"></span></label>");
     }
+    
     void DATE(const char* name) {
         *_GP += F("<input type=\"date\" name=\"");
         *_GP += name;
@@ -361,6 +379,7 @@ struct Builder {
         *_GP += d.encode();
         *_GP += F("\" onchange=\"GP_click(this)\">\n");
     }
+    
     void TIME(const char* name) {
         *_GP += F("<input type=\"time\" name=\"");
         *_GP += name;
@@ -378,6 +397,7 @@ struct Builder {
         *_GP += t.encode();
         *_GP += F("\" onchange=\"GP_click(this)\">\n");
     }
+    
     void LABEL_MINI(int text) {
         *_GP += F("<label class=\"sldLbl\">");
         *_GP += text;
@@ -408,6 +428,7 @@ struct Builder {
         SLIDER(name, value, min, max, step);
         *_GP += F("</div>");
     }
+    
     void COLOR(const char* name, uint32_t value = 0) {
         *_GP += F("<input type=\"color\" name=\"");
         *_GP += name;
@@ -453,6 +474,7 @@ struct Builder {
         }
         *_GP += F("</select>");
     }
+    
     void LED_RED(const char* name, bool state = 0) {
         *_GP += F("<input class=\"led red\" type=\"radio\" disabled ");
         if (state) *_GP += F("checked ");
