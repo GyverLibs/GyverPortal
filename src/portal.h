@@ -319,6 +319,10 @@ public:
         if (*_build) _build();
         server.send(200, F("text/html"), *_GP);
     }
+    //Обработчик HTML запросов
+    void handle_request(const Uri &uri, void (*handler)()){
+        server.on(uri,*handler);
+    }
 
 #ifdef ESP8266
     ESP8266WebServer server;
