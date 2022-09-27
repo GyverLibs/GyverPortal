@@ -210,7 +210,8 @@ public:
     
     
     // ========================== OTA ==========================
-    #ifndef GP_NO_OTA    CustomOTAUpdate OTAUpdate;
+    #ifndef GP_NO_OTA
+    CustomOTAUpdate OTAUpdate; 
     #endif
     
     // включить OTA обновление с авторизацией
