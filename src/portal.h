@@ -215,7 +215,7 @@ public:
     #endif
     
     // включить OTA обновление с авторизацией
-    void enableOTA(const String& login, const String& pass) {
+    void enableOTA(__attribute__((unused)) const String& login, __attribute__((unused)) const String& pass) {
         #ifndef GP_NO_OTA
         OTAUpdate.begin(&server, login, pass);
         #endif
