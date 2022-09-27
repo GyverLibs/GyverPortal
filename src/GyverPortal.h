@@ -153,7 +153,9 @@ int _gp_bufsize;
 Builder add;    // legacy
 Builder GP;
 
+#ifndef GP_NO_OTA
 #include "CustomOTA.h"
+#endif
 #include "custom.h"
 
 #endif
