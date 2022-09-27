@@ -1,8 +1,69 @@
 #pragma once
+#include <Arduino.h>
 
-// ======================= ДАТА =======================
-String* _GP = nullptr;
-//void* _gp_ptr = nullptr;
+#define GP_PGM(name, val) static const char name[] PROGMEM = val
+
+// ==================== COLORS =====================
+GP_PGM(GP_RED, "#bf1e1e");
+GP_PGM(GP_RED_B, "#e11414");
+GP_PGM(GP_PINK, "#bb32aa");
+GP_PGM(GP_PINK_B, "#db13c1");
+GP_PGM(GP_VIOL, "#802ecb");
+GP_PGM(GP_VIOL_B, "#a60cf5");
+GP_PGM(GP_BLUE, "#3b3ebd");
+GP_PGM(GP_BLUE_B, "#353aff");
+GP_PGM(GP_CYAN, "#1f8fa9");
+GP_PGM(GP_CYAN_B, "#06b3db");
+GP_PGM(GP_GREEN, "#37a93c");
+GP_PGM(GP_GREEN_B, "#25d52c");
+GP_PGM(GP_YELLOW, "#b4b700");
+GP_PGM(GP_ORANGE, "#b37f0d");
+GP_PGM(GP_ORANGE_B, "#ff4500");
+GP_PGM(GP_GRAY, "#5e5e5e");
+GP_PGM(GP_BLACK, "#13161a");
+
+enum GPalign {
+    GP_CENTER,
+    GP_LEFT,
+    GP_RIGHT,
+    GP_EDGES,
+};
+
+// получить align для flex
+PGM_P GPgetAlign(GPalign a);
+
+// ================ STRING UTILS ==================
+struct GP_parser {
+    GP_parser() {
+        str.reserve(20);
+    }
+    
+    bool parse(const String& s) {
+        if (i >= (int)s.length() - 1) return 0;
+        i = s.indexOf(',', from);
+        if (i < 0) i = s.length();
+        int to = i;
+        if (s[to - 1] == ' ') to--;
+        if (s[from] == ' ') from++;
+        str = s.substring(from, to);
+        from = i + 1;
+        count++;
+        return 1;
+    }
+    
+    int i = 0, from = 0;
+    int count = -1;
+    String str;
+};
+
+// получить номер, под которым name входит в list вида "val1,val2,val3"
+int GPinList(const String& s, const String& list);
+
+// получить строку, которая входит в список list "val1,val2,val3" под номером idx
+String GPlistIdx(int idx, const String& li);
+
+// получить тип файла (вида image/png) по его пути uri
+String GPfileType(const String& uri);
 
 // ====================== COLOR =======================
 struct GPcolor {
@@ -64,22 +125,27 @@ struct GPcolor {
 // ======================= DATE =======================
 struct GPdate {
     uint16_t year = 0;
-    uint8_t month = 0, day = 0;
+    uint8_t month = 1, day = 1;
     
     GPdate() {}
-    GPdate(uint16_t nyear, uint8_t nmonth, uint8_t nday) {
-        year = nyear;
-        month = nmonth;
-        day = nday;
+    GPdate(int nyear, int nmonth, int nday) {
+        set(nyear, nmonth, nday);
     }
     GPdate(const String& str) {
         decode(str);
     }
     
+    void set(int nyear, int nmonth, int nday) {
+        year = nyear;
+        month = nmonth;
+        day = nday;
+    }
+    
     String encode() {
         String s;
         s.reserve(10+1);
-        s += year;
+        if (!year) s += F("0000");
+        else s += year;
         s += '-';
         s += month / 10;
         s += month % 10;
@@ -101,15 +167,18 @@ struct GPtime {
     uint8_t hour = 0, minute = 0, second = 0;
     
     GPtime() {}
-    GPtime(uint8_t nhour, uint8_t nminute, uint8_t nsecond = 0) {
-        hour = nhour;
-        minute = nminute;
-        second = nsecond;
+    GPtime(int nhour, int nminute, int nsecond = 0) {
+        set(nhour, nminute, nsecond);
     }
     GPtime(const String& str) {
         decode(str);
     }
     
+    void set(int nhour, int nminute, int nsecond = 0) {
+        hour = nhour;
+        minute = nminute;
+        second = nsecond;
+    }
     String encode() {
         String s;
         s.reserve(8+1);
@@ -132,78 +201,11 @@ struct GPtime {
     }
 };
 
-// deprecated
-String encodeDate(GPdate d) {
-    return d.encode();
-}
-String encodeTime(GPtime t) {
-    return t.encode();
-}
-String encodeColor(GPcolor c) {
-    return c.encode();
-}
-
 // ===================== DATE-TIME UNIX =====================
-uint32_t GPunix(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s, int8_t gmt = 0) {
-    int8_t my = (m >= 3) ? 1 : 0;
-    y += my - 1970;
-    uint16_t dm = 0;
-    for (int i = 0; i < m - 1; i++) dm += (i<7)?((i==1)?28:((i&1)?30:31)):((i&1)?31:30);
-    return (((d-1+dm+((y+1)>>2)-((y+69)/100)+((y+369)/100/4)+365*(y-my))*24ul+h-gmt)*60ul+mn)*60ul+s;
-}
+uint32_t GPunix(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s, int8_t gmt = 0);
+uint32_t GPunix(GPdate d, GPtime t, int8_t gmt = 0);
 
-void GPaddInt(int16_t val, int16_t* arr, uint8_t am) {
-    for (int i = 0; i < am - 1; i++) arr[i] = arr[i + 1];
-    arr[am - 1] = val;
-}
-void GPaddUnix(uint32_t val, uint32_t* arr, uint8_t am) {
-    for (int i = 0; i < am - 1; i++) arr[i] = arr[i + 1];
-    arr[am - 1] = val;
-}
-void GPaddUnixS(int16_t val, uint32_t* arr, uint8_t am) {
-    for (int i = 0; i < am - 1; i++) arr[i] = arr[i + 1];
-    arr[am - 1] += val;
-}
-
-// ======================= LIST UTIL =======================
-// разделить строку на подстроки. Цыганские фокусы
-char* splitList(char* str) {
-    static uint8_t prev, end;
-    if (str == NULL) prev = end = 0;
-    else {
-        if (prev) *(str + prev - 1) = ',';
-        char* cur = strchr(str+prev, ',');
-        if (cur) {
-            *cur = '\0';
-            uint8_t b = prev;
-            prev = cur - str + 1;
-            return str + b;
-        } else if (!end) {
-            end = 1;
-            return str + prev;
-        }
-    }
-    return NULL;
-}
-
-// получить номер, под которым name входит в list (вида "val1,val2,val3")
-int8_t inList(const char* name, const char* list) {
-    char buf[strlen(list) + 1];
-    strcpy(buf, list);
-    char* str = buf;
-    int8_t count = 0, pos = -1;
-    splitList(NULL);
-    while ((str = splitList((char*)buf)) != NULL) {
-        if (!strcmp(str, name)) pos = count;
-        count++;
-    }
-    return pos;
-}
-
-int8_t inList(String& s, const char* list) {
-    return inList(s.c_str(), list);
-}
-
-int8_t inList(const String& s, const char* list) {
-    return inList(s.c_str(), list);
-}
+// добавить новое значение в массив с перемоткой (для графиков)
+void GPaddInt(int16_t val, int16_t* arr, uint8_t am);
+void GPaddUnix(uint32_t val, uint32_t* arr, uint8_t am);
+void GPaddUnixS(int16_t val, uint32_t* arr, uint8_t am);

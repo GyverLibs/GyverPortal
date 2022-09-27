@@ -8,10 +8,11 @@ GyverPortal portal;
 
 // конструктор страницы
 void build() {
-  BUILD_BEGIN();
+  GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
+  GP.BUTTON("bt","bt");
   GP.AREA_LOG(5);
-  BUILD_END();
+  GP.BUILD_END();
 }
 
 void setup() {

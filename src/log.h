@@ -2,15 +2,20 @@
 #include <Print.h>
 class GPlog : public Print {
 public:
+    GPlog() {}
+    GPlog(const char* nname) : name(nname) {}
+
     void start(int n = 64) {
-        if (buffer) return;
+        if (buffer) delete [] buffer;
         head = 0;
         size = n;
         buffer = new char [size];
     }
+    
     ~GPlog() {
         stop();
     }
+    
     void stop() {
         if (buffer) {
             delete [] buffer;
@@ -33,12 +38,23 @@ public:
         return buffer;
     }
     
+    void clear() {
+        head = 0;
+        buffer[head] = '\0';
+    }
+    
     bool available() {
         return (buffer && head);
     }
     
-private:
+    bool state() {
+        return buffer;
+    }
+    
+    const char* name = nullptr;
     char* buffer = nullptr;
+    
+private:
     int size;
     int head = 0;
 };
