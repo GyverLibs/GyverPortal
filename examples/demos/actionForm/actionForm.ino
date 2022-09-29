@@ -72,8 +72,8 @@ void action() {
     if (portal.form("/update")) {
       // забираем значения и обновляем переменные
       // 1. получаем и присваиваем вручную
-      valCheck = portal.getCheck("ch");
-      valSwitch = portal.getCheck("sw");
+      valCheck = portal.getBool("ch");
+      valSwitch = portal.getBool("sw");
       valText = portal.getString("txt");
       valNum = portal.getInt("num");
 
@@ -84,7 +84,7 @@ void action() {
       portal.copyDate("date", valDate);
       portal.copyTime("time", valTime);
       portal.copyColor("col", valCol);
-      portal.copySelected("sel", valSelect);
+      portal.copyInt("sel", valSelect);
       
       // выводим для отладки
       Serial.print(valCheck);

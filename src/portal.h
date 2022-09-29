@@ -396,8 +396,8 @@ public:
     
     
     // ===================== CLICK AUTO =====================
-    bool clickStr(const String& n, char* t) {
-        return _clickF ? copyStr(n, t) : 0;
+    bool clickStr(const String& n, char* t, int len = 0) {
+        return _clickF ? copyStr(n, t, len) : 0;
     }
     bool clickString(const String& n, String& t) {
         return _clickF ? copyString(n, t) : 0;
@@ -408,8 +408,8 @@ public:
     bool clickFloat(const String& n, float& t) {
         return _clickF ? copyFloat(n, t) : 0;
     }
-    bool clickCheck(const String& n, bool& t) {
-        return _clickF ? copyCheck(n, t) : 0;
+    bool clickBool(const String& n, bool& t) {
+        return _clickF ? copyBool(n, t) : 0;
     }
     bool clickDate(const String& n, GPdate& t) {
         return _clickF ? copyDate(n, t) : 0;
@@ -419,9 +419,6 @@ public:
     }
     bool clickColor(const String& n, GPcolor& t) {
         return _clickF ? copyColor(n, t) : 0;
-    }
-    bool clickSelected(const String& n, int& t) {
-        return _clickF ? copySelected(n, t) : 0;
     }
 
     
@@ -624,7 +621,7 @@ public:
     bool updateFloat(const String& n, float f, int dec = 2) {
         return update(n) ? (answer(f, dec), 1) : 0;
     }
-    bool updateCheck(const String& n, bool f) {
+    bool updateBool(const String& n, bool f) {
         return update(n) ? (answer(f), 1) : 0;
     }
     bool updateDate(const String& n, GPdate f) {
@@ -634,9 +631,6 @@ public:
         return update(n) ? (answer(f), 1) : 0;
     }
     bool updateColor(const String& n, GPcolor f) {
-        return update(n) ? (answer(f), 1) : 0;
-    }
-    bool updateSelected(const String& n, int f) {
         return update(n) ? (answer(f), 1) : 0;
     }
     
@@ -825,13 +819,13 @@ public:
     }
 
     // получить состояние чекбокса
-    bool getCheck(const String& n) {
-        return (server.arg(n)[0] == '1' || server.arg(n)[0] == 'o');
+    bool getBool(const String& n) {
+        return (server.arg(n)[0] != '0' || server.arg(n)[0] == 'o');
     }
-    bool getCheck() {
-        return (server.arg(0)[0] == '1' || server.arg(0)[0] == 'o');
+    bool getBool() {
+        return (server.arg(0)[0] != '0' || server.arg(0)[0] == 'o');
     }
-
+    
     // получить дату с компонента
     GPdate getDate(const String& n) {
         return GPdate(server.arg(n));
@@ -855,19 +849,12 @@ public:
     GPcolor getColor() {
         return GPcolor(server.arg(0));
     }
-    
-    // получить номер выбранного пункта в дроплисте
-    int getSelected(const String& n) {
-        return server.arg(n).toInt();
-    }
-    int getSelected() {
-        return server.arg(0).toInt();
-    }
+
     
     // ===================== COPY-ПАРСЕРЫ =====================
     // БЕЗОПАСНЫЕ ФУНКЦИИ (проверяют запрос). Копируют данные из запроса в переменную
-    bool copyStr(const String& n, char* t) {
-        return server.hasArg(n) ? (strcpy(t, server.arg(n).c_str()), 1) : 0;
+    bool copyStr(const String& n, char* t, int len = 0) {
+        return (server.hasArg(n) && (!len || argLength(n) < len)) ? (strcpy(t, server.arg(n).c_str()), 1) : 0;
     }
     bool copyString(const String& n, String& t) {
         return server.hasArg(n) ? (t = server.arg(n), 1) : 0;
@@ -878,8 +865,8 @@ public:
     bool copyFloat(const String& n, float& t) {
         return server.hasArg(n) ? (t = getFloat(n), 1) : 0;
     }
-    bool copyCheck(const String& n, bool& t) {
-        return server.hasArg(n) ? (t = getCheck(n), 1) : 0;
+    bool copyBool(const String& n, bool& t) {
+        return server.hasArg(n) ? (t = getBool(n), 1) : 0;
     }
     bool copyDate(const String& n, GPdate& t) {
         return server.hasArg(n) ? (t = getDate(n), 1) : 0;
@@ -889,9 +876,6 @@ public:
     }
     bool copyColor(const String& n, GPcolor& t) {
         return server.hasArg(n) ? (t = getColor(n), 1) : 0;
-    }
-    bool copySelected(const String& n, int& t) {
-        return server.hasArg(n) ? (t = getInt(n), 1) : 0;
     }
     
     
@@ -915,10 +899,10 @@ public:
     }
     
     bool copyObj(GP_CHECK& ch) {
-        return copyCheck(ch.name, ch.state);
+        return copyBool(ch.name, ch.state);
     }
     bool copyObj(GP_SWITCH& sw) {
-        return copyCheck(sw.name, sw.state);
+        return copyBool(sw.name, sw.state);
     }
     
     bool copyObj(GP_DATE& d) {
@@ -939,7 +923,7 @@ public:
     }
     
     bool copyObj(GP_SELECT& s) {
-        return copySelected(s.name, s.selected);
+        return copyInt(s.name, s.selected);
     }
     
     
@@ -1018,12 +1002,16 @@ public:
     }
 #endif
     
-    // ======================= DEPRECATED =======================
+    // ======================= LEGACY =======================
     void attachClick(void (*handler)(GyverPortal* p)) {_click = *handler;}
     void attachForm(void (*handler)(GyverPortal* p)) {_form = *handler;}
     void attachUpdate(void (*handler)(GyverPortal* p)) {_update = *handler;}
     int clickValue() {return server.arg(0).toInt();}
     String clickText() {return String(server.arg(0));}
+    int getSelected(const String& n) { return server.arg(n).toInt(); }
+    int getSelected() { return server.arg(0).toInt(); }
+    bool getCheck(const String& n) { return getBool(n); }
+    bool getCheck() { return getBool(); }
     
     // ======================= PRIVATE =======================
 private:
@@ -1036,7 +1024,7 @@ private:
                 case T_STRING:  *(String*)list.vals[i] = getString(list.names[i]);      break;
                 case T_TIME:    *(GPtime*)list.vals[i] = getTime(list.names[i]);        break;
                 case T_DATE:    *(GPdate*)list.vals[i] = getDate(list.names[i]);        break;
-                case T_CHECK:   *(bool*)list.vals[i] = getCheck(list.names[i]);         break;
+                case T_CHECK:   *(bool*)list.vals[i] = getBool(list.names[i]);         break;
                 case T_BYTE:    *(int8_t*)list.vals[i] = (int8_t)getInt(list.names[i]); break;
                 case T_INT:     *(long*)list.vals[i] = getInt(list.names[i]);           break;
                 case T_FLOAT:   *(float*)list.vals[i] = getFloat(list.names[i]);        break;

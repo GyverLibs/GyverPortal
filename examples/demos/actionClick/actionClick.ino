@@ -69,13 +69,13 @@ void action() {
     
     // 1. переписали вручную
     if (portal.click("ch")) {
-      valCheck = portal.getCheck("ch");
+      valCheck = portal.getBool("ch");
       Serial.print("Check: ");
       Serial.println(valCheck);
     }
 
     // 2. автоматическое обновление переменной
-    if (portal.clickCheck("sw", valSwitch)) {
+    if (portal.clickBool("sw", valSwitch)) {
       Serial.print("Switch: ");
       Serial.println(valSwitch);
     }
@@ -120,7 +120,7 @@ void action() {
       Serial.println(valCol.encode());
     }
 
-    if (portal.clickSelected("sel", valSelect)) {
+    if (portal.clickInt("sel", valSelect)) {
       Serial.print("Select: ");
       Serial.println(valSelect);
     }

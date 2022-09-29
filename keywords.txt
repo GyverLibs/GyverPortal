@@ -51,11 +51,10 @@ clickStr	KEYWORD2
 clickString	KEYWORD2
 clickInt	KEYWORD2
 clickFloat	KEYWORD2
-clickCheck	KEYWORD2
+clickBool	KEYWORD2
 clickDate	KEYWORD2
 clickTime	KEYWORD2
 clickColor	KEYWORD2
-clickSelected	KEYWORD2
 
 form	KEYWORD2
 formSub	KEYWORD2
@@ -83,21 +82,19 @@ fileName	KEYWORD2
 getString	KEYWORD2
 getInt	KEYWORD2
 getFloat	KEYWORD2
-getCheck	KEYWORD2
+getBool	KEYWORD2
 getDate	KEYWORD2
 getTime	KEYWORD2
 getColor	KEYWORD2
-getSelected	KEYWORD2
 
 copyStr	KEYWORD2
 copyString	KEYWORD2
 copyInt	KEYWORD2
 copyFloat	KEYWORD2
-copyCheck	KEYWORD2
+copyBool	KEYWORD2
 copyDate	KEYWORD2
 copyTime	KEYWORD2
 copyColor	KEYWORD2
-copySelected	KEYWORD2
 
 copyObj	KEYWORD2
 
@@ -106,11 +103,10 @@ argLength	KEYWORD2
 updateString	KEYWORD2
 updateInt	KEYWORD2
 updateFloat	KEYWORD2
-updateCheck	KEYWORD2
+updateBool	KEYWORD2
 updateDate	KEYWORD2
 updateTime	KEYWORD2
 updateColor	KEYWORD2
-updateSelected	KEYWORD2
 
 updateLog	KEYWORD2
 
