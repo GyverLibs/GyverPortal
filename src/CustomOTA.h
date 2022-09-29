@@ -139,6 +139,7 @@ public:
 				Update.end();
 				_UpdateError = F("Upload aborted");
 				_UpdateEnd = true;
+                if (_OTAabort) _OTAabort();
 				return;
 			}
 		});
@@ -170,9 +171,19 @@ public:
         _OTAbeforeRestart = *handler;
     }
     
-    // одключить функцию которая вызывается перед рестартом платы
+    // подключить функцию которая вызывается перед рестартом платы
     void detachBeforeRestart() {
         _OTAbeforeRestart = nullptr;
+    }
+    
+    // подключить функцию которая вызывается при прерывании загрузки обновления
+    void attachAbort(void (*handler)()) {
+        _OTAabort = *handler;
+    }
+    
+    // подключить функцию которая вызывается при прерывании загрузки обновления
+    void detachAbort() {
+        _OTAabort = nullptr;
     }
     
     void defBuild(bool UpdateEnd, const String& UpdateError) {
@@ -222,5 +233,6 @@ private:
     String _UpdateError;
     bool _UpdateEnd;
     void (*_OTAbuild)(bool UpdateEnd, const String& UpdateError) = nullptr;
-    void (*_OTAbeforeRestart)();
+    void (*_OTAbeforeRestart)() = nullptr;
+    void (*_OTAabort)() = nullptr;
 };
