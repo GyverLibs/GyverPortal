@@ -147,6 +147,10 @@ public:
                 break;
             case UPLOAD_FILE_ABORTED:
                 if (file) file.close();
+                _abortF = 1;
+                if (_action) _action();
+                else if (_actionR) _actionR(*this);
+                _abortF = 0;
                 //server.send(200, "text/html", F("<h2>Upload Error, <a href='/'>return back</a></h2>"));
                 break;
             }
@@ -308,9 +312,14 @@ public:
         return _uplF && name.equals(uploadName());
     }
     
-    // вернёт true, если завершена загрузка файла
+    // вернёт true, если загрузка файла завершена
     bool uploadEnd() {
         return _uplEF;
+    }
+    
+    // вернёт true, если загрузка файла прервана
+    bool uploadAbort() {
+        return _abortF;
     }
     
     // автоматическое скачивание файла по uri (по умолч. выкл, false)
@@ -1050,7 +1059,7 @@ private:
     
     bool _mdnsF = 0, _dns = 0, _active = 0, _showPage = 0;
     bool _formF = 0, _updateF = 0, _clickF = 0, _answerF = 0, _reqF = 0;
-    bool _fileDF = 0, _uplEF = 0, _uplF = 0, _autoD = 0, _autoU = 0;
+    bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 0, _autoU = 0;
     
     void (*_build)() = nullptr;
     void (*_buildR)(GyverPortal& p) = nullptr;

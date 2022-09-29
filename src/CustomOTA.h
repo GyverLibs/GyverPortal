@@ -161,7 +161,7 @@ public:
         _OTAbuild = *handler;
     }
     
-    // одключить функцию-билдер страницы OTA update
+    // отключить функцию-билдер страницы OTA update
     void detachUpdateBuild() {
         _OTAbuild = nullptr;
     }

@@ -12,7 +12,6 @@ GP_NO_DNS	KEYWORD1
 GP_NO_OTA	KEYWORD1
 GP_NO_UPLOAD	KEYWORD1
 GP_NO_DOWNLOAD	KEYWORD1
-GP_FS	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -74,6 +73,7 @@ sendFile	KEYWORD2
 
 upload	KEYWORD2
 uploadEnd	KEYWORD2
+uploadAbort	KEYWORD2
 uploadAuto	KEYWORD2
 saveFile	KEYWORD2
 uploadName	KEYWORD2
