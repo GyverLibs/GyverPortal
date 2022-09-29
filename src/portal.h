@@ -1,19 +1,18 @@
 #pragma once
 
+#ifdef ESP8266
+#include <ESP8266WebServer.h>
+extern ESP8266WebServer *_gp_s;
+#else
+#include <WebServer.h>
+extern WebServer *_gp_s;
+#endif
+
 #include "utils.h"
 #include "list.h"
 #include "log.h"
 #include "objects.h"
 #include "CustomOTA.h"
-
-#ifdef ESP8266
-#include <ESP8266WebServer.h>
-extern ESP8266WebServer* _gp_s;
-#else
-
-#include <WebServer.h>
-extern WebServer* _gp_s;
-#endif
 
 extern int _gp_bufsize;
 extern String* _gp_page;
@@ -211,13 +210,13 @@ public:
     
     // ========================== OTA ==========================
     #ifndef GP_NO_OTA
-    CustomOTAUpdate OTAUpdate; 
+    CustomOTAUpdate OTA; 
     #endif
     
     // включить OTA обновление с авторизацией
     void enableOTA(__attribute__((unused)) const String& login, __attribute__((unused)) const String& pass) {
         #ifndef GP_NO_OTA
-        OTAUpdate.begin(&server, login, pass);
+        OTA.begin(&server, login, pass);
         #endif
     }
     
@@ -787,6 +786,14 @@ public:
     // true если uri совпадает
     bool uri(const String& s) {
         return _uri.equals(s);
+    }
+    
+    // длина текста в полученном значении
+    int argLength(const String& n) {
+        return server.arg(n).length();
+    }
+    int argLength() {
+        return server.arg(0).length();
     }
     
     

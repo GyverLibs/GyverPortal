@@ -101,6 +101,8 @@ copySelected	KEYWORD2
 
 copyObj	KEYWORD2
 
+argLength	KEYWORD2
+
 updateString	KEYWORD2
 updateInt	KEYWORD2
 updateFloat	KEYWORD2
