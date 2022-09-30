@@ -1446,9 +1446,9 @@ struct Builder {
                 if (dec) *_gp_page += (float)vals[axs][ams] / dec;
                 else *_gp_page += vals[axs][ams];
                 *_gp_page += "],\n";
+                send();
             }
             *_gp_page += "]},\n";
-            send();
         }
         *_gp_page += F("]});</script>\n");
         send();
@@ -1490,9 +1490,9 @@ struct Builder {
                 if (dec) *_gp_page += (float)vals[axs][ams] / dec;
                 else *_gp_page += vals[axs][ams];
                 *_gp_page += "],\n";
+                send();
             }
             *_gp_page += "]},\n";
-            send();
         }
         *_gp_page += F("]});</script>\n");
         send();
