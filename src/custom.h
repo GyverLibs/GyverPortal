@@ -8,7 +8,7 @@ void GP_MY_BLOCK(const String& data) {
     String s;               // создай строку
     s += F("some html");    // собери html код
     s += data;              // добавь данные из аргументов
-    GP.SEND(s);           // отправь через GP.SEND
+    GP.SEND(s);             // отправь через GP.SEND
 }
 
 // шаблон одиночного блока (например скрипт, набор стилей итд)

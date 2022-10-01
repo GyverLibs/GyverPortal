@@ -12,7 +12,7 @@ function GP_clickUD(arg, dir) {
   GP_send('/GP_click?' + arg.name + '=1&_dir=' + dir);
 }
 
-function GP_click(arg) {
+function GP_click(arg, r = 0) {
   var v;
   if (arg.type == 'number') {
     if (arg.hasAttribute('min') && Number(arg.value) <= Number(arg.min)) arg.value = arg.min;
@@ -22,6 +22,9 @@ function GP_click(arg) {
   else v = arg.value;
   if (v.charAt(0) == '#') v = v.substring(1);
   GP_send('/GP_click?' + arg.name + '=' + v);
+  if (r != 0) setTimeout(function() {
+    location.reload();
+  }, r);
 }
 
 function GP_clickid(btn, tar) {

@@ -3,6 +3,8 @@
 #include "objects.h"
 #include "log.h"
 
+#define GP_AUTO_RELOAD 150
+
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
 extern ESP8266WebServer* _gp_s;
@@ -37,16 +39,16 @@ struct Builder {
     
     // ===================== ОТПРАВКА RAW =====================
     void SEND(const String& s) {
-        send(0);
-        _gp_s->sendContent(s);
+        *_gp_page += s;
+        send();
     }
     void SEND_P(PGM_P s) {
-        send(0);
+        send(true);
         _gp_s->sendContent_P(s);
     }
     
-    void send(int sz = -1) {
-        if (_gp_page->length() > (sz < 0 ? _gp_bufsize : sz)) {
+    void send(bool force = 0) {
+        if ((int)_gp_page->length() > (force ? 0 : _gp_bufsize)) {
             _gp_s->sendContent(*_gp_page);
             *_gp_page = "";
         }
@@ -131,24 +133,25 @@ struct Builder {
     // ======================= СТРАНИЦА =======================
     void PAGE_BEGIN() {
         _gp_nav_id = 0;
-        SEND_P(PSTR("<!DOCTYPE HTML><html><head>\n"
+        SEND(F("<!DOCTYPE HTML><html><head>\n"
         "<meta charset='utf-8'>\n"
         "<meta name='viewport' content='width=device-width, initial-scale=1'>\n"
         "</head><body>\n"));
     }
     void JS_TOP_FILE() {
-        SEND_P(PSTR("<script src='/gp_data/scripts.js'></script>\n"));
+        SEND(F("<script src='/gp_data/scripts.js'></script>\n"));
     }
     void JS_TOP() {
         SEND_P(PSTR("<script>\n"
         "function GP_hint(id,txt){document.getElementById(id).title=txt;}\n"
         "function GP_send(req){var xhttp=new XMLHttpRequest();xhttp.open('POST',req,true);xhttp.send();}\n"
         "function GP_clickUD(arg,dir){GP_send('/GP_click?'+arg.name+'=1&_dir='+dir);}\n"
-        "function GP_click(arg){var v; if(arg.type=='number'){\n"
+        "function GP_click(arg,r=0){var v;if(arg.type=='number'){\n"
         "if(arg.hasAttribute('min')&&Number(arg.value)<=Number(arg.min))arg.value=arg.min;\n"
         "if(arg.hasAttribute('max')&&Number(arg.value)>=Number(arg.max))arg.value=arg.max;}\n"
         "if(arg.type=='checkbox')v=arg.checked?'1':'0';else v=arg.value;\n"
-        "if(v.charAt(0)=='#')v=v.substring(1);GP_send('/GP_click?'+arg.name+'='+v);}\n"
+        "if(v.charAt(0)=='#')v=v.substring(1);GP_send('/GP_click?'+arg.name+'='+v);\n"
+        "if(r!=0)setTimeout(function(){location.reload();},r);}\n"
         "function GP_clickid(btn,tar){GP_send('/GP_click?'+btn+'='+document.getElementById(tar).value);}\n"
         "function GP_change(arg){arg.style.backgroundSize=(arg.value-arg.min)*100/(arg.max-arg.min)+'% 100%';\n"
         "document.getElementById(arg.id+'_val').value=arg.value}\n"
@@ -165,7 +168,7 @@ struct Builder {
         "</script>\n"));
     }
     void JS_BOTTOM() {
-        SEND_P(PSTR("<script>document.querySelectorAll('input[type=range]').forEach(x=>{GP_change(x)})</script>\n"));
+        SEND(F("<script>document.querySelectorAll('input[type=range]').forEach(x=>{GP_change(x)})</script>\n"));
     }
     
     void THEME(PGM_P style) {
@@ -185,10 +188,10 @@ struct Builder {
         send();
     }
     void PAGE_BLOCK_END() {
-        SEND_P(PSTR("</div>\n"));
+        SEND(F("</div>\n"));
     }
     void PAGE_END() {
-        SEND_P(PSTR("</body></html>"));
+        SEND(F("</body></html>"));
     }
     
     void SPOILER_BEGIN(const String& text, PGM_P st = GP_GREEN) {
@@ -210,7 +213,7 @@ struct Builder {
         send();
     }
     void SPOILER_END() {
-        SEND_P(PSTR("</div></details>\n"));
+        SEND(F("</div></details>\n"));
     }
     
     void HINT(const String& name, const String& txt) {
@@ -250,10 +253,10 @@ struct Builder {
     }
     
     void JQ_SUPPORT_FILE() {
-        SEND_P(PSTR("<script src='/gp_data/jquery.js'></script>\n"));
+        SEND(F("<script src='/gp_data/jquery.js'></script>\n"));
     }
     void JQ_SUPPORT() {
-        SEND_P(PSTR("<script src='https://code.jquery.com/jquery-3.6.1.min.js'></script>\n"));
+        SEND(F("<script src='https://code.jquery.com/jquery-3.6.1.min.js'></script>\n"));
     }
     void JQ_UPDATE_BEGIN(int prd = 1000, int del = 100) {
         *_gp_page += F("<script>var globalupd=1;\n"
@@ -265,7 +268,7 @@ struct Builder {
         send();
     }
     void JQ_UPDATE_END() {
-        SEND_P(PSTR("</div>\n"));
+        SEND(F("</div>\n"));
     }
     
     // 
@@ -355,7 +358,7 @@ struct Builder {
         send();
     }
     void FORM_END() {
-        SEND_P(PSTR("</form>\n"));
+        SEND(F("</form>\n"));
     }
     void SUBMIT(const String& text, PGM_P st = GP_GREEN) {
         *_gp_page += F("<input type='submit' value='");
@@ -391,7 +394,7 @@ struct Builder {
 
     // ======================= ОФОРМЛЕНИЕ =======================
     void GRID_BEGIN() {
-        SEND_P(PSTR("<div class='grid' id='grid'>\n"));
+        SEND(F("<div class='grid' id='grid'>\n"));
     }
     void GRID_END() {
         BLOCK_END();
@@ -454,7 +457,7 @@ struct Builder {
         send();
     }
     void BLOCK_END() {
-        SEND_P(PSTR("</div>\n"));
+        SEND(F("</div>\n"));
     }
     
     void BOX_BEGIN(GPalign al = GP_EDGES, const String& w = "100%") {
@@ -466,14 +469,14 @@ struct Builder {
         send();
     }
     void BOX_END() {
-        SEND_P(PSTR("</div>\n"));
+        SEND(F("</div>\n"));
     }
     
     void BREAK() {
-        SEND_P(PSTR("<br>\n"));
+        SEND(F("<br>\n"));
     }
     void HR() {
-        SEND_P(PSTR("<hr>\n"));
+        SEND(F("<hr>\n"));
     }
     
     // ======================= ТЕКСТ =======================
@@ -561,7 +564,7 @@ struct Builder {
     
     // ======================= ИКОНКИ =======================
     void ICON_SUPPORT() {
-        SEND_P(PSTR("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>\n"));
+        SEND(F("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>\n"));
     }
     
     String ICON(const String& name, int size = 0) {
@@ -655,7 +658,7 @@ struct Builder {
         _gp_nav_pos++;
     }
     void NAV_BLOCK_END() {
-        SEND_P(PSTR("</div>\n"));
+        SEND(F("</div>\n"));
     }
     
     // ======================= ФАЙЛЫ =======================
@@ -733,7 +736,7 @@ struct Builder {
     }
     
     // ======================= КНОПКА =======================
-    void BUTTON_RAW(const String& name, const String& value, const String& tar, PGM_P st, const String& width = "", const String& cls = "") {
+    void BUTTON_RAW(const String& name, const String& value, const String& tar, PGM_P st, const String& width = "", const String& cls = "", bool dis = 0, bool rel = 0) {
         *_gp_page += F("<input type='button' ");
         if (cls.length()) {
             *_gp_page += F("class='");
@@ -761,23 +764,32 @@ struct Builder {
             *_gp_page += name;
             *_gp_page += F("','");
             *_gp_page += tar;
-            *_gp_page += F("')\">\n");
+            *_gp_page += F("')\"");
         } else {
-            *_gp_page += F("onclick='GP_click(this)'>\n");
+            *_gp_page += F("onclick='GP_click(this,");
+            *_gp_page += rel ? GP_AUTO_RELOAD : 0;
+            *_gp_page += F(")'");
         }
+        if (dis) *_gp_page += F(" disabled");
+        *_gp_page += F(">\n");
         send();
     }
     
-    void BUTTON(const String& name, const String& value, const String& tar="", PGM_P st = GP_GREEN, const String& width = "") {
-        BUTTON_RAW(name, value, tar, st, width);
+    void BUTTON(const String& name, const String& value, const String& tar="", PGM_P st = GP_GREEN, const String& width = "", bool dis = 0, bool rel = 0) {
+        BUTTON_RAW(name, value, tar, st, width, "", dis, rel);
     }
-    void BUTTON_MINI(const String& name, const String& value, const String& tar="", PGM_P st = GP_GREEN, const String& width = "") {
-        BUTTON_RAW(name, value, tar, st, width, F("miniButton"));
+    void BUTTON_MINI(const String& name, const String& value, const String& tar="", PGM_P st = GP_GREEN, const String& width = "", bool dis = 0, bool rel = 0) {
+        BUTTON_RAW(name, value, tar, st, width, F("miniButton"), dis, rel);
     }
     
     // ======================= КНОПКА-ССЫЛКА =======================
-    void BUTTON_LINK_RAW(const String& url, const String& value, PGM_P st = GP_GREEN, const String& width = "", const String& cls = "") {
+    void BUTTON_LINK_RAW(const String& url, const String& value, PGM_P st = GP_GREEN, const String& width = "", const String& cls = "", const String& name = "") {
         *_gp_page += F("<input type='button' ");
+        if (name.length()) {
+            *_gp_page += F("name='");
+            *_gp_page += name;
+            *_gp_page += "' "; 
+        }
         if (cls.length()) {
             *_gp_page += F("class='");
             *_gp_page += cls;
@@ -796,16 +808,23 @@ struct Builder {
         }
         *_gp_page += F("' value='");
         *_gp_page += value;
-        *_gp_page += F("' onclick='location.href=\"");
-        *_gp_page += url;
-        *_gp_page += F("\";'>\n");
+        
+        if (name.length()){
+            *_gp_page += F("' onclick='GP_click(this);setTimeout(function(){location.href=\"");
+            *_gp_page += url;
+            *_gp_page += F("\";},150);'>\n");
+        } else {
+            *_gp_page += F("' onclick='location.href=\"");
+            *_gp_page += url;
+            *_gp_page += F("\";'>\n");
+        }
         send();
     }
-    void BUTTON_LINK(const String& url, const String& value, PGM_P st = GP_GREEN, const String& width = "") {
-        BUTTON_LINK_RAW(url, value, st, width);
+    void BUTTON_LINK(const String& url, const String& value, PGM_P st = GP_GREEN, const String& width = "", const String& name = "") {
+        BUTTON_LINK_RAW(url, value, st, width, "", name);
     }
-    void BUTTON_MINI_LINK(const String& url, const String& value, PGM_P st = GP_GREEN, const String& width = "") {
-        BUTTON_LINK_RAW(url, value, st, width, F("miniButton"));
+    void BUTTON_MINI_LINK(const String& url, const String& value, PGM_P st = GP_GREEN, const String& width = "", const String& name = "") {
+        BUTTON_LINK_RAW(url, value, st, width, F("miniButton"), name);
     }
     
     // ==================== КНОПКА-СКАЧКА ====================
@@ -1140,8 +1159,8 @@ struct Builder {
         *_gp_page += F("onchange='GP_click(this)'>\n");
         send();
     }
-
-    void SELECT(const String& name, const String& list, int sel = 0, bool nums = 0, bool dis = false) {
+    
+    void SELECT(const String& name, const String& list, int sel = 0, bool nums = 0, bool dis = false, bool rel = 0) {
         if (sel < 0) sel = 0;
         *_gp_page += F("<select name='");
         *_gp_page += name;
@@ -1149,7 +1168,10 @@ struct Builder {
         *_gp_page += name;
         *_gp_page += "' ";
         if (dis) *_gp_page += F("disabled ");
-        *_gp_page += F("onchange='GP_click(this)'>\n");
+        *_gp_page += F("onchange='GP_click(this,");
+		*_gp_page += rel ? GP_AUTO_RELOAD : 0;
+		*_gp_page += F(")'>\n");
+        
         GP_parser p;
         int idx = 0; 
         while (p.parse(list)) {
@@ -1169,7 +1191,7 @@ struct Builder {
         *_gp_page += F("</select>\n");
         send();
     }
-    void SELECT(const String& name, String* list, int sel = 0, bool nums = 0, bool dis = false) {
+    void SELECT(const String& name, String* list, int sel = 0, bool nums = 0, bool dis = false, bool rel = 0) {
         if (sel < 0) sel = 0;
         *_gp_page += F("<select name='");
         *_gp_page += name;
@@ -1177,7 +1199,9 @@ struct Builder {
         *_gp_page += name;
         *_gp_page += "' ";
         if (dis) *_gp_page += F("disabled ");
-        *_gp_page += F("onchange='GP_click(this)'>\n");
+        *_gp_page += F("onchange='GP_click(this,");
+		*_gp_page += rel ? GP_AUTO_RELOAD : 0;
+		*_gp_page += F(")'>\n");
         int idx = 0; 
         while (list[idx].length()) {
             *_gp_page += F("<option value='");
@@ -1196,7 +1220,7 @@ struct Builder {
         *_gp_page += F("</select>\n");
         send();
     }
-    void SELECT(const String& name, char** list, int sel = 0, bool nums = 0, bool dis = false) {
+    void SELECT(const String& name, char** list, int sel = 0, bool nums = 0, bool dis = false, bool rel = 0) {
         if (sel < 0) sel = 0;
         *_gp_page += F("<select name='");
         *_gp_page += name;
@@ -1204,7 +1228,9 @@ struct Builder {
         *_gp_page += name;
         *_gp_page += "' ";
         if (dis) *_gp_page += F("disabled ");
-        *_gp_page += F("onchange='GP_click(this)'>\n");
+        *_gp_page += F("onchange='GP_click(this,");
+		*_gp_page += rel ? GP_AUTO_RELOAD : 0;
+		*_gp_page += F(")'>\n");
         int idx = 0; 
         while (list[idx]!=nullptr) {
             *_gp_page += F("<option value='");
