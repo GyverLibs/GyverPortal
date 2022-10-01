@@ -3,8 +3,6 @@
 #include "objects.h"
 #include "log.h"
 
-#define GP_AUTO_RELOAD 150
-
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
 extern ESP8266WebServer* _gp_s;
@@ -20,6 +18,13 @@ static uint8_t _gp_nav_pos = 0;
 static uint8_t _gp_nav_id = 0;
 
 struct Builder {
+    int reloadTimeout = 150;
+    
+    // задержка перезагрузки страницы для SELECT и BUTTON при включенном rel
+    void setReloadTimeout(int tout) {
+        reloadTimeout = tout;
+    }
+    
     // ======================= БИЛДЕР =======================
     void BUILD_BEGIN(int width = 350) {
         PAGE_BEGIN();
@@ -767,7 +772,7 @@ struct Builder {
             *_gp_page += F("')\"");
         } else {
             *_gp_page += F("onclick='GP_click(this,");
-            *_gp_page += rel ? GP_AUTO_RELOAD : 0;
+            *_gp_page += rel ? reloadTimeout : 0;
             *_gp_page += F(")'");
         }
         if (dis) *_gp_page += F(" disabled");
@@ -812,7 +817,9 @@ struct Builder {
         if (name.length()){
             *_gp_page += F("' onclick='GP_click(this);setTimeout(function(){location.href=\"");
             *_gp_page += url;
-            *_gp_page += F("\";},150);'>\n");
+            *_gp_page += F("\";},");
+            *_gp_page += reloadTimeout;
+            *_gp_page += F(");'>\n");
         } else {
             *_gp_page += F("' onclick='location.href=\"");
             *_gp_page += url;
@@ -1169,7 +1176,7 @@ struct Builder {
         *_gp_page += "' ";
         if (dis) *_gp_page += F("disabled ");
         *_gp_page += F("onchange='GP_click(this,");
-		*_gp_page += rel ? GP_AUTO_RELOAD : 0;
+		*_gp_page += rel ? reloadTimeout : 0;
 		*_gp_page += F(")'>\n");
         
         GP_parser p;
@@ -1200,7 +1207,7 @@ struct Builder {
         *_gp_page += "' ";
         if (dis) *_gp_page += F("disabled ");
         *_gp_page += F("onchange='GP_click(this,");
-		*_gp_page += rel ? GP_AUTO_RELOAD : 0;
+		*_gp_page += rel ? reloadTimeout : 0;
 		*_gp_page += F(")'>\n");
         int idx = 0; 
         while (list[idx].length()) {
@@ -1229,7 +1236,7 @@ struct Builder {
         *_gp_page += "' ";
         if (dis) *_gp_page += F("disabled ");
         *_gp_page += F("onchange='GP_click(this,");
-		*_gp_page += rel ? GP_AUTO_RELOAD : 0;
+		*_gp_page += rel ? reloadTimeout : 0;
 		*_gp_page += F(")'>\n");
         int idx = 0; 
         while (list[idx]!=nullptr) {
