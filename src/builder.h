@@ -58,82 +58,6 @@ struct Builder {
             *_gp_page = "";
         }
     }
-    
-    // ================== ОТПРАВКА ОБЪЕКТОВ ===================
-    void TITLE(GP_TITLE& title) {
-        TITLE(title.text, title.name);
-    }
-    void LABEL(GP_LABEL& label) {
-        LABEL(label.text, label.name);
-    }
-    void LABEL_BLOCK(GP_LABEL_BLOCK& label) {
-        LABEL_BLOCK(label.text, label.name, label.style);
-    }
-    
-    void LED(GP_LED& led) {
-        LED(led.name, led.state);
-    }
-    void LED_RED(GP_LED_RED& led) {
-        LED_RED(led.name, led.state);
-    }
-    void LED_GREEN(GP_LED_GREEN& led) {
-        LED_GREEN(led.name, led.state);
-    }
-    
-    void BUTTON(GP_BUTTON& btn) {
-        BUTTON(btn.name, btn.text, btn.target, btn.style, btn.width);
-    }
-    void BUTTON_MINI(GP_BUTTON_MINI& btn) {
-        BUTTON_MINI(btn.name, btn.text, btn.target, btn.style, btn.width);
-    }
-    
-    void NUMBER(GP_NUMBER& num) {
-        NUMBER_RAW(num.name, num.placeholder, (num.value == INT32_MAX ? String("") : String(num.value)), num.min, num.max, num.width, num.disabled);
-    }
-    void NUMBER_F(GP_NUMBER_F& num) {
-        NUMBER_F(num.name, num.placeholder, num.value, num.decimals, num.width, num.disabled);
-        NUMBER_RAW(num.name, num.placeholder, (isnan(num.value) ? String("") : String(num.value, (uint16_t)num.decimals)), num.min, num.max, num.width, num.disabled);
-    }
-    
-    void TEXT(GP_TEXT& num) {
-        TEXT(num.name, num.placeholder, num.text, num.width, num.disabled);
-    }
-    void PASS(GP_PASS& num) {
-        PASS(num.name, num.placeholder, num.text, num.width);
-    }
-    
-    void AREA(GP_AREA& ar) {
-        AREA(ar.name, ar.rows, ar.text, ar.disabled);
-    }
-    
-    void CHECK(GP_CHECK& ch) {
-        CHECK(ch.name, ch.state, ch.disabled);
-    }
-    void SWITCH(GP_SWITCH& sw) {
-        SWITCH(sw.name, sw.state, sw.disabled);
-    }
-    
-    void DATE(GP_DATE& d) {
-        DATE(d.name, d.date, d.disabled);
-    }
-    void TIME(GP_TIME& t) {
-        TIME(t.name, t.time, t.disabled);
-    }
-    void COLOR(GP_COLOR& c) {
-        COLOR(c.name, c.color, c.disabled);
-    }
-    
-    void SPINNER(GP_SPINNER& s) {
-        SPINNER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.width);
-    }
-    void SLIDER(GP_SLIDER& s) {
-        SLIDER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled);
-    }
-    
-    void SELECT(GP_SELECT& s) {
-        SELECT(s.name, s.list, s.selected, s.disabled);
-    }
-
 
     // ======================= СТРАНИЦА =======================
     void PAGE_BEGIN() {
@@ -1529,5 +1453,81 @@ struct Builder {
         }
         *_gp_page += F("]});</script>\n");
         send();
+    }
+    
+    
+    // ================== ОТПРАВКА ОБЪЕКТОВ ===================
+    void TITLE(GP_TITLE& title) {
+        TITLE(title.text, title.name);
+    }
+    void LABEL(GP_LABEL& label) {
+        LABEL(label.text, label.name);
+    }
+    void LABEL_BLOCK(GP_LABEL_BLOCK& label) {
+        LABEL_BLOCK(label.text, label.name, label.style);
+    }
+    
+    void LED(GP_LED& led) {
+        LED(led.name, led.state);
+    }
+    void LED_RED(GP_LED_RED& led) {
+        LED_RED(led.name, led.state);
+    }
+    void LED_GREEN(GP_LED_GREEN& led) {
+        LED_GREEN(led.name, led.state);
+    }
+    
+    void BUTTON(GP_BUTTON& btn) {
+        BUTTON(btn.name, btn.text, btn.target, btn.style, btn.width);
+    }
+    void BUTTON_MINI(GP_BUTTON_MINI& btn) {
+        BUTTON_MINI(btn.name, btn.text, btn.target, btn.style, btn.width);
+    }
+    
+    void NUMBER(GP_NUMBER& num) {
+        NUMBER_RAW(num.name, num.placeholder, (num.value == INT32_MAX ? String("") : String(num.value)), num.min, num.max, num.width, num.disabled);
+    }
+    void NUMBER_F(GP_NUMBER_F& num) {
+        NUMBER_F(num.name, num.placeholder, num.value, num.decimals, num.width, num.disabled);
+        NUMBER_RAW(num.name, num.placeholder, (isnan(num.value) ? String("") : String(num.value, (uint16_t)num.decimals)), num.min, num.max, num.width, num.disabled);
+    }
+    
+    void TEXT(GP_TEXT& num) {
+        TEXT(num.name, num.placeholder, num.text, num.width, num.disabled);
+    }
+    void PASS(GP_PASS& num) {
+        PASS(num.name, num.placeholder, num.text, num.width);
+    }
+    
+    void AREA(GP_AREA& ar) {
+        AREA(ar.name, ar.rows, ar.text, ar.disabled);
+    }
+    
+    void CHECK(GP_CHECK& ch) {
+        CHECK(ch.name, ch.state, ch.disabled);
+    }
+    void SWITCH(GP_SWITCH& sw) {
+        SWITCH(sw.name, sw.state, sw.disabled);
+    }
+    
+    void DATE(GP_DATE& d) {
+        DATE(d.name, d.date, d.disabled);
+    }
+    void TIME(GP_TIME& t) {
+        TIME(t.name, t.time, t.disabled);
+    }
+    void COLOR(GP_COLOR& c) {
+        COLOR(c.name, c.color, c.disabled);
+    }
+    
+    void SPINNER(GP_SPINNER& s) {
+        SPINNER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.width);
+    }
+    void SLIDER(GP_SLIDER& s) {
+        SLIDER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled);
+    }
+    
+    void SELECT(GP_SELECT& s) {
+        SELECT(s.name, s.list, s.selected, s.disabled);
     }
 };
