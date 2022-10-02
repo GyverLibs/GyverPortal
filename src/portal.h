@@ -81,7 +81,7 @@ public:
                 server.send(200, "text/html", F("<meta http-equiv='refresh' content='0; url=/'/>"));
                 return;
                 #if defined(FS_H) && !defined(GP_NO_DOWNLOAD)
-            } else if (!server.args() && _uri[0] == '/' && _uri.indexOf('.') > 0) {   // файл
+            } else if (downOn && !server.args() && _uri[0] == '/' && _uri.indexOf('.') > 0) {   // файл
                 if (_autoD && _fs) sendFile(_fs->open(_uri, "r"));  // авто скачивание
                 else _fileDF = 1;                                   // ручное скачивание (в action)
                 #endif
@@ -113,6 +113,7 @@ public:
             //server.send(200);
             server.send(200, "text/html", F("<script>setInterval(function(){if(history.length>0)window.history.back();else window.location.href='/';},500);</script>"));
         }, [this]() {
+            if (!uplOn) return;
             if (!_autoU && !_action && !_actionR) return;
             HTTPUpload& upl = server.upload();
             _filePtr = &upl.filename;
@@ -297,6 +298,16 @@ public:
     
     
     // ======================== FILE ========================
+    // вкл/выкл поддержку скачивания файлов (по умолч. вкл)
+    void downloadMode(bool m) {
+        downOn = m;
+    }
+    
+    // вкл/выкл поддержку загрузки файлов (по умолч. вкл)
+    void uploadMode(bool m) {
+        uplOn = m;
+    }
+    
     // вернёт true, если был запрос на скачивание файла
     bool download() {
         return _fileDF;
@@ -371,6 +382,11 @@ public:
         return _formF ? _uri : String("");
     }
     
+    // вернёт часть имени формы, находящейся под номером idx после разделителя /
+    String formNameSub(int idx) {
+        return _formF ? (GPlistIdx(idx, _uri, '/')) : String("");
+    }
+    
     // вернёт true, если был submit с форм, имя которых начинмется с name
     bool formSub(const String& name) {
         return _formF ? _uri.startsWith(name) : 0;
@@ -388,19 +404,37 @@ public:
         return _clickF ? (server.argName(0).equals(name) && server.args() == 1) : 0;
     }
     
+    // вернёт true, если имя кликнутого компонента начинается с name
+    bool clickSub(const String& name) {
+        return _clickF ? (server.argName(0).startsWith(name) && server.args() == 1) : 0;
+    }
+    
     // вернёт имя теукщего кликнутого компонента
     String clickName() {
-        return (_clickF && server.args() == 1) ? server.argName(0) : String("");
+        return _clickF ? server.argName(0) : String("");
+    }
+    
+    // вернёт часть имени кликнутого компонента, находящейся под номером idx после разделителя /
+    String clickNameSub(int idx) {
+        return _clickF ? (GPlistIdx(idx, server.argName(0), '/')) : String("");
     }
     
     // вернёт true, если кнопка была нажата
     bool clickDown(const String& name) {
         return _clickF ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
     }
+    // вернёт true, если кнопка была нажата и имя компонента начинается с указанного
+    bool clickDownSub(const String& name) {
+        return _clickF ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
+    }
     
     // вернёт true, если кнопка была отпущена
     bool clickUp(const String& name) {
         return _clickF ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
+    }
+    // вернёт true, если кнопка была отпущена и имя компонента начинается с указанного
+    bool clickUpSub(const String& name) {
+        return _clickF ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
     }
     
     
@@ -514,9 +548,19 @@ public:
         return _updateF ? server.argName(0).equals(name) : 0;
     }
     
+    // вернёт true, если имя обновляемого компонента НАЧИНАЕТСЯ с указанного
+    bool updateSub(const String& name) {
+        return _updateF ? server.argName(0).startsWith(name) : 0;
+    }
+    
     // вернёт имя обновлённого компонента
     String updateName() {
         return String(server.argName(0));
+    }
+    
+    // вернёт часть имени обновляемого компонента, находящейся под номером idx после разделителя /
+    String updateNameSub(int idx) {
+        return _updateF ? (GPlistIdx(idx, server.argName(0), '/')) : String("");
     }
     
     
@@ -1060,6 +1104,7 @@ private:
     bool _mdnsF = 0, _dns = 0, _active = 0, _showPage = 0;
     bool _formF = 0, _updateF = 0, _clickF = 0, _answerF = 0, _reqF = 0;
     bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 0, _autoU = 0;
+    bool downOn = 1, uplOn = 1;
     
     void (*_build)() = nullptr;
     void (*_buildR)(GyverPortal& p) = nullptr;

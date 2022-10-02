@@ -41,9 +41,13 @@ enableOTA	KEYWORD2
 tick	KEYWORD2
 
 click	KEYWORD2
+clickSub	KEYWORD2
 clickDown	KEYWORD2
 clickUp	KEYWORD2
+clickDownSub	KEYWORD2
+clickUpSub	KEYWORD2
 clickName	KEYWORD2
+clickNameSub	KEYWORD2
 clickObj	KEYWORD2
 
 clickStr	KEYWORD2
@@ -58,9 +62,12 @@ clickColor	KEYWORD2
 form	KEYWORD2
 formSub	KEYWORD2
 formName	KEYWORD2
+formNameSub	KEYWORD2
 
 update	KEYWORD2
+updateSub	KEYWORD2
 updateName	KEYWORD2
+updateNameSub	KEYWORD2
 updateObj	KEYWORD2
 
 answer	KEYWORD2
@@ -70,7 +77,9 @@ request	KEYWORD2
 download	KEYWORD2
 downloadAuto	KEYWORD2
 sendFile	KEYWORD2
+downloadMode	KEYWORD2
 
+uploadMode	KEYWORD2
 upload	KEYWORD2
 uploadEnd	KEYWORD2
 uploadAbort	KEYWORD2

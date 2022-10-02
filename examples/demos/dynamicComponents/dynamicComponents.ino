@@ -10,12 +10,32 @@ void build() {
   GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
+  // ОБНОВЛЕНИЯ
+  String s;
+  // формируем список для UPDATE
+  // вида "lbl/0,lbl/1..."
   for (int i = 0; i < 5; i++) {
-    GP.SLIDER(String("sld-") + i);
+    s += "lbl/";
+    s += i;
+    s += ',';
+  }
+  GP.UPDATE(s);
+
+  // создаём лейблы с именами lbl/0,lbl/1...
+  for (int i = 0; i < 5; i++) {
+    GP.LABEL_BLOCK("", String("lbl/") + i);
+    GP.BREAK();
   }
 
+  // КЛИКИ
+  // создём слайдеры с именами sld/0, sld/1 ...
   for (int i = 0; i < 5; i++) {
-    GP.BUTTON(String("btn-") + i, String("Button ") + i);
+    GP.SLIDER(String("sld/") + i);
+  }
+
+  // создём кнопки с именами btn/0, btn/1 ...
+  for (int i = 0; i < 5; i++) {
+    GP.BUTTON(String("btn/") + i, String("Button ") + i);
   }
 
   GP.BUILD_END();
@@ -23,15 +43,28 @@ void build() {
 
 void action() {
   if (portal.click()) {
-    if (portal.clickName().startsWith("sld")) {
+    if (portal.clickSub("sld")) {   // начинается с sld
       Serial.print("Slider ");
-      Serial.print(portal.clickName());
+      Serial.print(portal.clickNameSub(1)); // получаем цифру
       Serial.print(": ");
       Serial.println(portal.getInt());
 
-    } else if (portal.clickName().startsWith("btn")) {
+    }
+    if (portal.clickSub("btn")) {   // начинается с btn
       Serial.print("Click: ");
-      Serial.println(portal.clickName());
+      Serial.println(portal.clickNameSub(1)); // получаем цифру
+    }
+  }
+
+  if (portal.update()) {
+    if (portal.updateSub("lbl")) {   // начинается с lbl
+      // формируем ответ вида "lbl #0: 123"
+      String s;
+      s += "lbl #";
+      s += portal.updateNameSub(1);
+      s += ":";
+      s += random(10);
+      portal.answer(s);
     }
   }
 }

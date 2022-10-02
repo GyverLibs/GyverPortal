@@ -60,7 +60,7 @@ struct GP_parser {
 int GPinList(const String& s, const String& list);
 
 // получить строку, которая входит в список list "val1,val2,val3" под номером idx
-String GPlistIdx(int idx, const String& li);
+String GPlistIdx(int idx, const String& li, char div = ',');
 
 // получить тип файла (вида image/png) по его пути uri
 String GPfileType(const String& uri);

@@ -227,7 +227,7 @@ button {
 input[type=submit]:active,
 input[type=button]:active,
 button:active {
-  box-shadow: inset 0px 3px 6px #0007;
+  box-shadow: inset 0px 1px 6px #0007;
 }
 
 input:focus,

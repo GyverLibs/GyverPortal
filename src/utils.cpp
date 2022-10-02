@@ -85,10 +85,10 @@ int GPinList(const String& s, const String& li) {
     for (int i = 0; i < t; i++) if (li[i] == ',') cnt++;
     return cnt;
 }
-String GPlistIdx(int idx, const String& li) {
+String GPlistIdx(int idx, const String& li, char div) {
     int cnt = 0, p = 0, i = 0;
     while (1) {
-        if (li[i] == ',' || !li[i]) {
+        if (li[i] == div || !li[i]) {
             if (cnt == idx) return li.substring(p, i);
             if (!li[i]) return String();
             cnt++;
