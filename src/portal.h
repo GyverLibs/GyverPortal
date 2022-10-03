@@ -374,22 +374,22 @@ public:
     
     // вернёт true, если был submit с указанной формы
     bool form(const String& name) {
-        return _formF ? _uri.equals(name) : 0;
+        return form() ? _uri.equals(name) : 0;
     }
     
     // вернёт имя теукщей submit формы
     String formName() {
-        return _formF ? _uri : String("");
+        return form() ? _uri : String("");
     }
     
     // вернёт часть имени формы, находящейся под номером idx после разделителя /
     String formNameSub(int idx = 1) {
-        return _formF ? (GPlistIdx(idx, _uri, '/')) : String("");
+        return form() ? (GPlistIdx(idx + 1, _uri, '/')) : String("");
     }
     
     // вернёт true, если был submit с форм, имя которых начинмется с name
     bool formSub(const String& name) {
-        return _formF ? _uri.startsWith(name) : 0;
+        return form() ? _uri.startsWith(name) : 0;
     }
     
 
@@ -833,6 +833,16 @@ public:
     // true если uri совпадает
     bool uri(const String& s) {
         return _uri.equals(s);
+    }
+    
+    // true если uri начинается с
+    bool uriSub(const String& s) {
+        return _uri.startsWith(s);
+    }
+    
+    // вернёт часть uri, находящейся под номером idx после разделителя /
+    String uriNameSub(int idx = 1) {
+        return GPlistIdx(idx, _uri, '/');
     }
     
     // длина текста в полученном значении

@@ -28,6 +28,8 @@ attach	KEYWORD2
 detach	KEYWORD2
 
 uri	KEYWORD2
+uriSub	KEYWORD2
+uriNameSub	KEYWORD2
 root	KEYWORD2
 
 list	KEYWORD2
