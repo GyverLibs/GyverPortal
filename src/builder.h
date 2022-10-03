@@ -74,8 +74,8 @@ struct Builder {
         SEND_P(PSTR("<script>\n"
         "function GP_hint(id,txt){document.getElementById(id).title=txt;}\n"
         "function GP_send(req){var xhttp=new XMLHttpRequest();xhttp.open('POST',req,true);xhttp.send();}\n"
-        "function GP_clickUD(arg,dir){GP_send('/GP_click?'+arg.name+'=1&_dir='+dir);}\n"
-        "function GP_click(arg,r=0){var v;if(arg.type=='number'){\n"
+        "function GP_clickUD(arg,dir){if(arg.name)GP_send('/GP_click?'+arg.name+'=1&_dir='+dir);}\n"
+        "function GP_click(arg,r=0){if(!arg.name)return;var v;if(arg.type=='number'){\n"
         "if(arg.hasAttribute('min')&&Number(arg.value)<=Number(arg.min))arg.value=arg.min;\n"
         "if(arg.hasAttribute('max')&&Number(arg.value)>=Number(arg.max))arg.value=arg.max;}\n"
         "if(arg.type=='checkbox')v=arg.checked?'1':'0';else v=arg.value;\n"
@@ -543,6 +543,52 @@ struct Builder {
         send();
     }
     
+    void NAV_TABS_M(const String& name, const String& list, PGM_P st = GP_GREEN) {
+        _gp_nav_pos = 0;
+        *_gp_page += F("<div class='navtab'><ul ");
+        if (st != GP_GREEN) {
+            *_gp_page += F("style='background:");
+            *_gp_page += FPSTR(st);
+            *_gp_page += "' ";
+        }
+        *_gp_page += F(">\n");
+        GP_parser p;
+        while (p.parse(list)) {
+            *_gp_page += F("<li ");
+            if (!p.count) *_gp_page += F("style='background:#2a2d35' ");
+            *_gp_page += F("' class='");
+            *_gp_page += name;
+            *_gp_page += F("' onclick='openTab(\"");
+            *_gp_page += name;
+            *_gp_page += '/';
+            *_gp_page += p.count;
+            *_gp_page += F("\",this,\"block_");
+            *_gp_page += name;
+            *_gp_page += F("\");GP_send(\"/GP_click?");
+            *_gp_page += name;
+            *_gp_page += '/';
+            *_gp_page += p.count;
+            *_gp_page += F("=\");'>");
+            *_gp_page += p.str;
+            *_gp_page += F("</li>\n");
+        }
+        *_gp_page += F("</ul></div>\n");
+        send();
+    }
+    
+    void NAV_BLOCK_BEGIN(const String& name, int pos) {
+        *_gp_page += F("<div class='navblock block_");
+        *_gp_page += name;
+        *_gp_page += F("' id='");
+        *_gp_page += name;
+        *_gp_page += '/';
+        *_gp_page += pos;
+        *_gp_page += "' ";
+        if (!pos) *_gp_page += F("style='display:block'");
+        *_gp_page += F(">\n");
+        send();
+    }
+    
     void NAV_TABS(const String& list, PGM_P st = GP_GREEN) {
         _gp_nav_id++;
         _gp_nav_pos = 0;
@@ -561,7 +607,7 @@ struct Builder {
             *_gp_page += _gp_nav_id;
             *_gp_page += F("' onclick='openTab(\"ntab-");
             *_gp_page += _gp_nav_id;
-            *_gp_page += "-";
+            *_gp_page += '/';
             *_gp_page += p.count;
             *_gp_page += F("\",this,\"nb-");
             *_gp_page += _gp_nav_id;
@@ -578,7 +624,7 @@ struct Builder {
         *_gp_page += _gp_nav_id;
         *_gp_page += F("' id='ntab-");
         *_gp_page += _gp_nav_id;
-        *_gp_page += "-";
+        *_gp_page += '/';
         *_gp_page += _gp_nav_pos;
         *_gp_page += "' ";
         if (!_gp_nav_pos) *_gp_page += F("style='display:block'");
@@ -586,6 +632,7 @@ struct Builder {
         send();
         _gp_nav_pos++;
     }
+    
     void NAV_BLOCK_END() {
         SEND(F("</div>\n"));
     }

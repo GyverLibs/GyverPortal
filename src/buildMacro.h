@@ -48,7 +48,9 @@
 #define GP_MAKE_JQ_UPDATE2(prd, args) GP.JQ_UPDATE_BEGIN(prd); args; GP.JQ_UPDATE_END();
 #define GP_MAKE_JQ_UPDATE3(prd, del, args) GP.JQ_UPDATE_BEGIN(prd, del); args; GP.JQ_UPDATE_END();
 
-#define GP_MAKE_NAV_BLOCK(args) GP.NAV_BLOCK_BEGIN(); args; GP.NAV_BLOCK_END();
+#define GP_MAKE_NAV_BLOCK(...) OVR_MACRO(GP_MAKE_NAV_BLOCK, __VA_ARGS__)
+#define GP_MAKE_NAV_BLOCK1(args) GP.NAV_BLOCK_BEGIN(); args; GP.NAV_BLOCK_END();
+#define GP_MAKE_NAV_BLOCK3(name, pos, args) GP.NAV_BLOCK_BEGIN(name, pos); args; GP.NAV_BLOCK_END();
 
 #define GP_MAKE_SPOILER(...) OVR_MACRO(GP_MAKE_SPOILER, __VA_ARGS__)
 #define GP_MAKE_SPOILER2(txt, args) GP.SPOILER_BEGIN(txt); args; GP.SPOILER_END();

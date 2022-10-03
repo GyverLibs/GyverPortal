@@ -9,10 +9,11 @@ function GP_send(req) {
 }
 
 function GP_clickUD(arg, dir) {
-  GP_send('/GP_click?' + arg.name + '=1&_dir=' + dir);
+  if (arg.name) GP_send('/GP_click?' + arg.name + '=1&_dir=' + dir);
 }
 
 function GP_click(arg, r = 0) {
+  if (!arg.name) return;
   var v;
   if (arg.type == 'number') {
     if (arg.hasAttribute('min') && Number(arg.value) <= Number(arg.min)) arg.value = arg.min;

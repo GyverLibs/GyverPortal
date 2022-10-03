@@ -383,7 +383,7 @@ public:
     }
     
     // вернёт часть имени формы, находящейся под номером idx после разделителя /
-    String formNameSub(int idx) {
+    String formNameSub(int idx = 1) {
         return _formF ? (GPlistIdx(idx, _uri, '/')) : String("");
     }
     
@@ -396,72 +396,72 @@ public:
     // ======================= CLICK =======================
     // вернёт true, если был клик по (кнопка, чекбокс, свитч, слайдер, селектор)
     bool click() {
-        return _clickF;
+        return _clickF && server.args();
     }
     
     // вернёт true, если был клик по указанному элементу (кнопка, чекбокс, свитч, слайдер, селектор)
     bool click(const String& name) {
-        return _clickF ? (server.argName(0).equals(name) && server.args() == 1) : 0;
+        return click() ? (server.argName(0).equals(name) && server.args() == 1) : 0;
     }
     
     // вернёт true, если имя кликнутого компонента начинается с name
     bool clickSub(const String& name) {
-        return _clickF ? (server.argName(0).startsWith(name) && server.args() == 1) : 0;
+        return click() ? (server.argName(0).startsWith(name) && server.args() == 1) : 0;
     }
     
     // вернёт имя теукщего кликнутого компонента
     String clickName() {
-        return _clickF ? server.argName(0) : String("");
+        return click() ? server.argName(0) : String();
     }
     
     // вернёт часть имени кликнутого компонента, находящейся под номером idx после разделителя /
-    String clickNameSub(int idx) {
-        return _clickF ? (GPlistIdx(idx, server.argName(0), '/')) : String("");
+    String clickNameSub(int idx = 1) {
+        return click() ? (GPlistIdx(idx, server.argName(0), '/')) : String();
     }
     
     // вернёт true, если кнопка была нажата
     bool clickDown(const String& name) {
-        return _clickF ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
+        return click() ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
     }
     // вернёт true, если кнопка была нажата и имя компонента начинается с указанного
     bool clickDownSub(const String& name) {
-        return _clickF ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
+        return click() ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
     }
     
     // вернёт true, если кнопка была отпущена
     bool clickUp(const String& name) {
-        return _clickF ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
+        return click() ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
     }
     // вернёт true, если кнопка была отпущена и имя компонента начинается с указанного
     bool clickUpSub(const String& name) {
-        return _clickF ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
+        return click() ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
     }
     
     
     // ===================== CLICK AUTO =====================
     bool clickStr(const String& n, char* t, int len = 0) {
-        return _clickF ? copyStr(n, t, len) : 0;
+        return click() ? copyStr(n, t, len) : 0;
     }
     bool clickString(const String& n, String& t) {
-        return _clickF ? copyString(n, t) : 0;
+        return click() ? copyString(n, t) : 0;
     }
     bool clickInt(const String& n, int& t) {
-        return _clickF ? copyInt(n, t) : 0;
+        return click() ? copyInt(n, t) : 0;
     }
     bool clickFloat(const String& n, float& t) {
-        return _clickF ? copyFloat(n, t) : 0;
+        return click() ? copyFloat(n, t) : 0;
     }
     bool clickBool(const String& n, bool& t) {
-        return _clickF ? copyBool(n, t) : 0;
+        return click() ? copyBool(n, t) : 0;
     }
     bool clickDate(const String& n, GPdate& t) {
-        return _clickF ? copyDate(n, t) : 0;
+        return click() ? copyDate(n, t) : 0;
     }
     bool clickTime(const String& n, GPtime& t) {
-        return _clickF ? copyTime(n, t) : 0;
+        return click() ? copyTime(n, t) : 0;
     }
     bool clickColor(const String& n, GPcolor& t) {
-        return _clickF ? copyColor(n, t) : 0;
+        return click() ? copyColor(n, t) : 0;
     }
 
     
@@ -491,49 +491,49 @@ public:
     }
     
     bool clickObj(GP_NUMBER& num) {
-        return _clickF ? copyObj(num) : 0;
+        return click() ? copyObj(num) : 0;
     }
     bool clickObj(GP_NUMBER_F& num) {
-        return _clickF ? copyObj(num) : 0;
+        return click() ? copyObj(num) : 0;
     }
     
     bool clickObj(GP_TEXT& txt) {
-        return _clickF ? copyObj(txt) : 0;
+        return click() ? copyObj(txt) : 0;
     }
     bool clickObj(GP_PASS& pas) {
-        return _clickF ? copyObj(pas) : 0;
+        return click() ? copyObj(pas) : 0;
     }
     
     bool clickObj(GP_AREA& ar) {
-        return _clickF ? copyObj(ar) : 0;
+        return click() ? copyObj(ar) : 0;
     }
     
     bool clickObj(GP_CHECK& ch) {
-        return _clickF ? copyObj(ch) : 0;
+        return click() ? copyObj(ch) : 0;
     }
     bool clickObj(GP_SWITCH& sw) {
-        return _clickF ? copyObj(sw) : 0;
+        return click() ? copyObj(sw) : 0;
     }
     
     bool clickObj(GP_DATE& d) {
-        return _clickF ? copyObj(d) : 0;
+        return click() ? copyObj(d) : 0;
     }
     bool clickObj(GP_TIME& t) {
-        return _clickF ? copyObj(t) : 0;
+        return click() ? copyObj(t) : 0;
     }
     bool clickObj(GP_COLOR& c) {
-        return _clickF ? copyObj(c) : 0;
+        return click() ? copyObj(c) : 0;
     }
     
     bool clickObj(GP_SPINNER& s) {
-        return _clickF ? copyObj(s) : 0;
+        return click() ? copyObj(s) : 0;
     }
     bool clickObj(GP_SLIDER& s) {
-        return _clickF ? copyObj(s) : 0;
+        return click() ? copyObj(s) : 0;
     }
     
     bool clickObj(GP_SELECT& s) {
-        return _clickF ? copyObj(s) : 0;
+        return click() ? copyObj(s) : 0;
     }
     
     
@@ -545,22 +545,22 @@ public:
     
     // вернёт true, если было update с указанного компонента
     bool update(const String& name) {
-        return _updateF ? server.argName(0).equals(name) : 0;
+        return update() ? server.argName(0).equals(name) : 0;
     }
     
     // вернёт true, если имя обновляемого компонента НАЧИНАЕТСЯ с указанного
     bool updateSub(const String& name) {
-        return _updateF ? server.argName(0).startsWith(name) : 0;
+        return update() ? server.argName(0).startsWith(name) : 0;
     }
     
     // вернёт имя обновлённого компонента
     String updateName() {
-        return String(server.argName(0));
+        return update() ? server.argName(0) : String();
     }
     
     // вернёт часть имени обновляемого компонента, находящейся под номером idx после разделителя /
-    String updateNameSub(int idx) {
-        return _updateF ? (GPlistIdx(idx, server.argName(0), '/')) : String("");
+    String updateNameSub(int idx = 1) {
+        return update() ? (GPlistIdx(idx, server.argName(0), '/')) : String();
     }
     
     
