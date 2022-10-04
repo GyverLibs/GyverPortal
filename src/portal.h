@@ -842,7 +842,7 @@ public:
     
     // вернёт часть uri, находящейся под номером idx после разделителя /
     String uriNameSub(int idx = 1) {
-        return GPlistIdx(idx, _uri, '/');
+        return GPlistIdx(idx + 1, _uri, '/');
     }
     
     // длина текста в полученном значении
