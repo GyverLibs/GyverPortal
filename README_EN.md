@@ -6,7 +6,7 @@ There are changes in the logic of work and partial incompatibility with previous
 
 ## Documentation
 Filed in [Repository Wiki](https://github.com/GyverLibs/GyverPortal/wiki)
-> [English docs](https://github-com.translate.goog/GyverLibs/GyverPortal/wiki?_x_tr_sl=en&_x_tr_tl=en)
+> [English docs](https://github-com.translate.goog/GyverLibs/GyverPortal/wiki?_x_tr_sl=ru&_x_tr_tl=en)
 
 ![demo](/docs/GyverPortal.jpg)
 
