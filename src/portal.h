@@ -883,10 +883,10 @@ public:
 
     // получить состояние чекбокса
     bool getBool(const String& n) {
-        return (server.arg(n)[0] != '0' || server.arg(n)[0] == 'o');
+        return (server.arg(n)[0] == '1' || server.arg(n)[0] == 'o');
     }
     bool getBool() {
-        return (server.arg(0)[0] != '0' || server.arg(0)[0] == 'o');
+        return (server.arg(0)[0] == '1' || server.arg(0)[0] == 'o');
     }
     
     // получить дату с компонента
