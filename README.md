@@ -10,7 +10,7 @@
 Есть изменения в логике работы и частичная несовместимость с предыдущими версиями. Читайте документацию, смотрите примеры.
 
 ## Документация
-Оформлена в [Wiki репозитория](https://github.com/GyverLibs/GyverPortal/wiki)
+Теперь находится в [Wiki репозитория](https://github.com/GyverLibs/GyverPortal/wiki). Документация на данный момент неполная, на стадии написания!
 > [English docs](https://github-com.translate.goog/GyverLibs/GyverPortal/wiki?_x_tr_sl=ru&_x_tr_tl=en)
 
 ![demo](/docs/GyverPortal.jpg)  
