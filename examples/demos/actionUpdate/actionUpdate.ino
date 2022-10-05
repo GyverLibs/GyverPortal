@@ -88,6 +88,7 @@ void action() {
     portal.updateInt("sld", valSlider);
     portal.updateDate("date", valDate);
     portal.updateTime("time", valTime);
+    portal.updateColor("col", valCol);
     portal.updateInt("sel", valSelect);
   }
 }

@@ -72,7 +72,22 @@ public:
                 return;
             #endif
             } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
-                _updateF = _answerF = 1;
+                String name = server.argName(0);    // тут будет список имён
+                GP_parser n;                        // парсер
+                _updPtr = &n.str;                   // указатель на имя (в парсинге)
+                String answ;                        // строка с ответом
+                _answPtr = &answ;                   // указатель на неё
+                while (n.parse(name)) {             // парсим
+                    if (_action) _action();         // внутри answer() прибавляет к answ
+                    else if (_actionR) _actionR(*this);
+                    answ += ',';
+                    yield();
+                }
+                answ.remove(answ.length() - 1);     // удаляем последнюю запятую
+                server.send(200, "text/plane", answ);
+                _answPtr = nullptr;
+                _updPtr = nullptr;
+                return;
             } else if (_uri.startsWith(F("/GP_log"))) {         // лог
                 if (log.available()) server.send(200, "text/plane", log.read());
                 else server.send(200);
@@ -104,8 +119,8 @@ public:
                 #endif
             }
             
-            if (_answerF || _fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
-            _reqF = _fileDF = _answerF = _updateF = _clickF = _formF = 0;  // скидываем флаги
+            if (_fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
+            _reqF = _fileDF = _clickF = _formF = 0;  // скидываем флаги
         });
         
         #if defined(FS_H) && !defined(GP_NO_UPLOAD)
@@ -268,8 +283,8 @@ public:
         #ifdef ESP8266
         if (!_action && !_actionR) {
             if (_showPage) {_showPage = 0; show();}
-            if (_updateF) server.send(200, "text/plane");
-            _updateF = _clickF = _formF = 0;
+            //if (_updateF) server.send(200, "text/plane");
+            _clickF = _formF = 0;
         }
         #endif
         // deprecated
@@ -287,7 +302,7 @@ public:
         if (!_action && !_actionR) {
             if (_formF && _form) _form(this);
             if (_clickF && _click) _click(this);
-            if (_updateF && _update) _update(this);
+            //if (_updateF && _update) _update(this);
         }
         #endif
         // deprecated
@@ -540,27 +555,27 @@ public:
     // ======================= UPDATE =======================
     // вернёт true, если было обновление
     bool update() {
-        return _updateF;
+        return (bool)_updPtr;
     }
     
     // вернёт true, если было update с указанного компонента
     bool update(const String& name) {
-        return update() ? server.argName(0).equals(name) : 0;
+        return update() ? _updPtr->equals(name) : 0;
     }
     
     // вернёт true, если имя обновляемого компонента НАЧИНАЕТСЯ с указанного
     bool updateSub(const String& name) {
-        return update() ? server.argName(0).startsWith(name) : 0;
+        return update() ? _updPtr->startsWith(name) : 0;
     }
     
     // вернёт имя обновлённого компонента
     String updateName() {
-        return update() ? server.argName(0) : String();
+        return update() ? String(*_updPtr) : String();
     }
     
     // вернёт часть имени обновляемого компонента, находящейся под номером idx после разделителя /
     String updateNameSub(int idx = 1) {
-        return update() ? (GPlistIdx(idx, server.argName(0), '/')) : String();
+        return update() ? (GPlistIdx(idx, *_updPtr, '/')) : String();
     }
     
     
@@ -627,13 +642,13 @@ public:
         return update(s.name);
     }
     
+    
+    
     // ======================= ANSWER =======================
     // отправить ответ на обновление
     bool answer(const String& s) {
-        _updateF = 0;
-        _answerF = 0;
-        server.send(200, "text/plane", s);
-        return 1;
+        if (_answPtr) *_answPtr += s;
+        return (bool)_answPtr;
     }
     bool answer(int v) {
         return answer(String(v));
@@ -1102,6 +1117,8 @@ private:
     String _uri;
     String *_namePtr = nullptr;
     String *_filePtr = nullptr;
+    String *_answPtr = nullptr;
+    String *_updPtr = nullptr;
     
     int _bufsize = 1000;
     
@@ -1112,7 +1129,7 @@ private:
     const char* _pass;
     
     bool _mdnsF = 0, _dns = 0, _active = 0, _showPage = 0;
-    bool _formF = 0, _updateF = 0, _clickF = 0, _answerF = 0, _reqF = 0;
+    bool _formF = 0, _clickF = 0, _reqF = 0;
     bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 0, _autoU = 0;
     bool downOn = 1, uplOn = 1;
     

@@ -94,7 +94,33 @@ struct Builder {
         "for(var i=0;i<x.length;i++)x[i].style.background='';\n"
         "btn.style.background='#2a2d35';}\n"
         "function GP_spin(id,stp,dec){var num=document.getElementById(id);num.value=(Number(num.value)+stp).toFixed(dec);var e=new Event('change');num.dispatchEvent(e);}\n"
+        "function GP_update(ids){\n"
+        "var xhttp=new XMLHttpRequest();xhttp.open('GET','/GP_update?'+ids+'=',true);xhttp.send();\n"
+        "xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){\n"
+        "var resp=this.responseText.split(',');ids=ids.split(',');if(ids.length!=resp.length)return;\n"
+        "for(let i=0;i<ids.length;i++){\n"
+        "var item=document.getElementById(ids[i]);if(!item||!resp[i])continue;\n"
+        "if(item.type=='hidden'&&item.value=='_reload'){if(resp[i]=='1')location.reload();}\n"
+        "else if(item.type=='checkbox'||item.type=='radio')item.checked=Number(resp[i]);\n"
+        "else if(item.type=='select-one')document.querySelector('#'+ids[i]).value=resp[i];\n"
+        "else if(item.type==undefined)item.innerHTML=resp[i];\n"
+        "else item.value=resp[i];\n"
+        "if(item.type=='range')GP_change(item);}}};}\n"
         "</script>\n"));
+        
+        /*"function GP_update(ids){ids.split(',').forEach(function(id){\n"
+        "var xhttp=new XMLHttpRequest();\n"
+        "xhttp.onreadystatechange=function(){\n"
+        "if(this.readyState==4&&this.status==200){\n"
+        "var resp=this.responseText;\n"
+        "var item=document.getElementById(id);if(item==null)return;\n"
+        "if(item.type=='hidden'&&item.value=='_reload'){if(resp=='1')location.reload();}\n"
+        "else if(item.type=='checkbox'||item.type=='radio')item.checked=Number(resp);\n"
+        "else if(item.type=='select-one')document.querySelector('#'+id).value=resp;\n"
+        "else if(item.type==undefined)item.innerHTML=resp;\n"
+        "else item.value=resp;\n"
+        "if(item.type=='range')GP_change(item);}};\n"
+        "xhttp.open('GET','/GP_update?'+id+'=',true);xhttp.send();});}\n"*/
     }
     void JS_BOTTOM() {
         SEND(F("<script>document.querySelectorAll('input[type=range]').forEach(x=>{GP_change(x)})</script>\n"));
@@ -156,23 +182,9 @@ struct Builder {
     
     // ======================= UPDATE =======================
     void UPDATE(const String& list, int prd = 1000) {
-        *_gp_page += F("<script>setInterval(function(){\n");
-        *_gp_page += "var ids='";
+        *_gp_page += F("<script>setInterval(function(){GP_update('");
         *_gp_page += list;
-        *_gp_page += F("'.split(',');\n"
-        "ids.forEach(function(id){\n"
-        "var xhttp=new XMLHttpRequest();\n"
-        "xhttp.onreadystatechange=function(){\n"
-        "if(this.readyState==4&&this.status==200){\n"
-        "var resp=this.responseText;\n"
-        "var item=document.getElementById(id);if(item==null)return;\n"
-        "if(item.type=='hidden'&&item.value=='reload'&&resp=='1')location.reload();\n"
-        "else if(item.type=='checkbox'||item.type=='radio')item.checked=Number(resp);\n"
-        "else if(item.type=='select-one')document.querySelector('#'+id).value=resp;\n"
-        "else if(item.type==undefined)item.innerHTML=resp;\n"
-        "else item.value=resp;\n"
-        "if(item.type=='range')GP_change(item);\n"
-        "}};xhttp.open('GET','/GP_update?'+id+'=',true);xhttp.send();});},");
+        *_gp_page += "')},";
         *_gp_page += prd;
         *_gp_page += F(");</script>\n");
         send();
@@ -202,7 +214,7 @@ struct Builder {
     
     // 
     void RELOAD(const String& name) {
-        HIDDEN(name, F("reload"));
+        HIDDEN(name, F("_reload"));
     }
     
     
@@ -972,6 +984,9 @@ struct Builder {
         if (state) *_gp_page += F("checked ");
         if (dis) *_gp_page += F("disabled ");
         *_gp_page += F("onclick='GP_click(this)'>\n");
+        *_gp_page += F("<input type='hidden' value='0' name='");
+        *_gp_page += name;
+        *_gp_page += "'>";
         send();
     }
     void SWITCH(const String& name, bool state = 0, bool dis = false) {
@@ -984,6 +999,9 @@ struct Builder {
         if (dis) *_gp_page += F("disabled ");
         *_gp_page += F("onclick='GP_click(this)'>\n");
         *_gp_page += F("<span class='slider'></span></label>");
+        *_gp_page += F("<input type='hidden' value='0' name='");
+        *_gp_page += name;
+        *_gp_page += "'>";
         send();
     }
     

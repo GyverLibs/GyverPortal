@@ -66,3 +66,27 @@ function GP_spin(id, stp, dec) {
   var e = new Event('change');
   num.dispatchEvent(e);
 }
+
+function GP_update(ids) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open('GET', '/GP_update?' + ids + '=', true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var resp = this.responseText.split(',');
+      ids = ids.split(',');
+      if (ids.length != resp.length) return;
+      for (let i = 0; i < ids.length; i++) {
+        var item = document.getElementById(ids[i]);
+        if (!item || !resp[i]) continue;
+        if (item.type == 'hidden' && item.value == '_reload') {
+          if (resp[i] == '1') location.reload();
+        } else if (item.type == 'checkbox' || item.type == 'radio') item.checked = Number(resp[i]);
+        else if (item.type == 'select-one') document.querySelector('#' + ids[i]).value = resp[i];
+        else if (item.type == undefined) item.innerHTML = resp[i];
+        else item.value = resp[i];
+        if (item.type == 'range') GP_change(item);
+      }
+    }
+  };
+}
