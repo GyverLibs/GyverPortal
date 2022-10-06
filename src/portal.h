@@ -65,10 +65,10 @@ public:
             if (_uri.startsWith(F("/GP_click"))) {              // клик
                 _clickF = 1;
                 checkList();
-                server.send(200, "text/plane");
+                server.send(200, "text/plain");
             #ifdef GP_NO_DOWNLOAD
             } else if (_uri.startsWith(F("/favicon.ico"))) {    // иконка
-                server.send(200, "text/plane");
+                server.send(200, "text/plain");
                 return;
             #endif
             } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
@@ -84,12 +84,12 @@ public:
                     yield();
                 }
                 answ.remove(answ.length() - 1);     // удаляем последнюю запятую
-                server.send(200, "text/plane", answ);
+                server.send(200, "text/plain", answ);
                 _answPtr = nullptr;
                 _updPtr = nullptr;
                 return;
             } else if (_uri.startsWith(F("/GP_log"))) {         // лог
-                if (log.available()) server.send(200, "text/plane", log.read());
+                if (log.available()) server.send(200, "text/plain", log.read());
                 else server.send(200);
                 return;
             } else if (_uri.startsWith(F("/GP_upload"))) {
@@ -283,7 +283,7 @@ public:
         #ifdef ESP8266
         if (!_action && !_actionR) {
             if (_showPage) {_showPage = 0; show();}
-            //if (_updateF) server.send(200, "text/plane");
+            //if (_updateF) server.send(200, "text/plain");
             _clickF = _formF = 0;
         }
         #endif
