@@ -81,7 +81,7 @@
 ![demo](/docs/demoBig.png)  
 
 ### Совместимость
-esp8266, esp32
+esp8266 (SDK v2.7+), esp32 (SDK v3+)
 
 ### Известные баги
 Некоторые элементы могут некрасиво отображаться на Firefox, т.к. сделаны под Chrome, Safari, Edge, Opera
