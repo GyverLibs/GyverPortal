@@ -13,6 +13,9 @@
 Теперь находится в [Wiki репозитория](https://github.com/GyverLibs/GyverPortal/wiki). Документация на данный момент неполная, на стадии написания!
 > [English docs](https://github-com.translate.goog/GyverLibs/GyverPortal/wiki?_x_tr_sl=ru&_x_tr_tl=en)
 
+### Идеи/проблемы/что будет в следующем обновлении
+https://github.com/GyverLibs/GyverPortal/issues/46
+
 ![demo](/docs/GyverPortal.jpg)  
 
 Простой конструктор веб интерфейса для ESP8266 и ESP32
