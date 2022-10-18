@@ -15,6 +15,7 @@
 
 ## Идеи/проблемы/что будет в следующем обновлении
 Читать/предлагать в issue https://github.com/GyverLibs/GyverPortal/issues/46
+- Также можно [обсудить на форуме](https://community.alexgyver.ru/threads/gyverportal.6632/)
 
 ![demo](/docs/GyverPortal.jpg)  
 
