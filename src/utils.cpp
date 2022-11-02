@@ -37,10 +37,17 @@ GP_PGM(_gp_al0, "center");
 GP_PGM(_gp_al1, "flex-start");
 GP_PGM(_gp_al2, "flex-end");
 GP_PGM(_gp_al3, "space-between");
-const char* const _gp_al[] PROGMEM = {_gp_al0, _gp_al1, _gp_al2, _gp_al3};
+//GP_PGM(_gp_al4, "center");
+GP_PGM(_gp_al5, "left");
+GP_PGM(_gp_al6, "right");
+GP_PGM(_gp_al7, "justify");
+const char* const _gp_al[] PROGMEM = {_gp_al0, _gp_al1, _gp_al2, _gp_al3, _gp_al0, _gp_al5, _gp_al6, _gp_al7};
 
-PGM_P GPgetAlign(GPalign a) {
+PGM_P GPgetAlignFlex(GPalign a) {
     return _gp_al[a];
+}
+PGM_P GPgetAlign(GPalign a) {
+    return _gp_al[a + 4];
 }
 
 // ===================== DATE-TIME UNIX =====================

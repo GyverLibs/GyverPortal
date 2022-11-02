@@ -8,18 +8,21 @@ extern ESP8266WebServer *_gp_s;
 extern WebServer *_gp_s;
 #endif
 
+#include <FS.h>
 #include "utils.h"
 #include "list.h"
 #include "log.h"
 #include "objects.h"
 #include "CustomOTA.h"
+#include "TimeTicker.h"
 
 extern int _gp_bufsize;
 extern String* _gp_page;
 extern String* _gp_uri;
+extern bool _gp_synced;
 
 // ============================= CLASS ===========================
-class GyverPortal {
+class GyverPortal : public TimeTicker {
 public:
     // ======================= КОНСТРУКТОР =======================
     GyverPortal() {
@@ -61,7 +64,6 @@ public:
             if (_auth && !server.authenticate(_login, _pass)) return server.requestAuthentication();
             _showPage = 0;
             _uri = server.uri();
-            
             if (_uri.startsWith(F("/GP_click"))) {              // клик
                 _clickF = 1;
                 checkList();
@@ -73,11 +75,11 @@ public:
             #endif
             } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
                 String name = server.argName(0);    // тут будет список имён
-                GP_parser n;                        // парсер
+                GP_parser n(name);                  // парсер
                 _updPtr = &n.str;                   // указатель на имя (в парсинге)
                 String answ;                        // строка с ответом
                 _answPtr = &answ;                   // указатель на неё
-                while (n.parse(name)) {             // парсим
+                while (n.parse()) {                 // парсим
                     if (_action) _action();         // внутри answer() прибавляет к answ
                     else if (_actionR) _actionR(*this);
                     answ += ',';
@@ -87,6 +89,11 @@ public:
                 server.send(200, "text/plain", answ);
                 _answPtr = nullptr;
                 _updPtr = nullptr;
+                return;
+            } else if (_uri.startsWith(F("/GP_time"))) {        // время
+                setUnix(server.arg(0).toInt());
+                setGMT(server.arg(1).toInt());
+                _gp_synced = 1;
                 return;
             } else if (_uri.startsWith(F("/GP_log"))) {         // лог
                 if (log.available()) server.send(200, "text/plain", log.read());
@@ -311,6 +318,15 @@ public:
         return 1;
     }
     
+    // ======================= ВРЕМЯ ========================
+    GPdate getSystemDate() {
+        return timeSynced() ? GPdate(getUnix(), getGMT()) : GPdate();
+    }
+    
+    GPtime getSystemTime() {
+        return timeSynced() ? GPtime(getUnix(), getGMT()) : GPtime();
+    }
+    
     
     // ======================== FILE ========================
     // вкл/выкл поддержку скачивания файлов (по умолч. вкл)
@@ -460,10 +476,12 @@ public:
     bool clickString(const String& n, String& t) {
         return click() ? copyString(n, t) : 0;
     }
-    bool clickInt(const String& n, int& t) {
+    template <typename T>
+    bool clickInt(const String& n, T& t) {
         return click() ? copyInt(n, t) : 0;
     }
-    bool clickFloat(const String& n, float& t) {
+    template <typename T>
+    bool clickFloat(const String& n, T& t) {
         return click() ? copyFloat(n, t) : 0;
     }
     bool clickBool(const String& n, bool& t) {
@@ -651,9 +669,13 @@ public:
         return (bool)_answPtr;
     }
     bool answer(int v) {
-        return answer(String(v));
+        if (_answPtr) *_answPtr += v;
+        return (bool)_answPtr;
     }
     bool answer(float v, uint8_t dec) {
+        return answer(String(v, (uint16_t)dec));
+    }
+    bool answer(double v, uint8_t dec) {
         return answer(String(v, (uint16_t)dec));
     }
     bool answer(int* v, int am, int dec = 0) {
@@ -683,10 +705,12 @@ public:
     bool updateString(const String& n, String& f) {
         return update(n) ? (answer(f), 1) : 0;
     }
-    bool updateInt(const String& n, int f) {
-        return update(n) ? (answer(f), 1) : 0;
+    template <typename T>
+    bool updateInt(const String& n, T f) {
+        return update(n) ? (answer((int)f), 1) : 0;
     }
-    bool updateFloat(const String& n, float f, int dec = 2) {
+    template <typename T>
+    bool updateFloat(const String& n, T f, int dec = 2) {
         return update(n) ? (answer(f, dec), 1) : 0;
     }
     bool updateBool(const String& n, bool f) {
@@ -937,10 +961,12 @@ public:
     bool copyString(const String& n, String& t) {
         return server.hasArg(n) ? (t = server.arg(n), 1) : 0;
     }
-    bool copyInt(const String& n, int& t) {
+    template <typename T>
+    bool copyInt(const String& n, T& t) {
         return server.hasArg(n) ? (t = getInt(n), 1) : 0;
     }
-    bool copyFloat(const String& n, float& t) {
+    template <typename T>
+    bool copyFloat(const String& n, T& t) {
         return server.hasArg(n) ? (t = getFloat(n), 1) : 0;
     }
     bool copyBool(const String& n, bool& t) {

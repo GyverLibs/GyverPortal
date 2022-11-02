@@ -27,9 +27,22 @@ enum GPalign {
     GP_LEFT,
     GP_RIGHT,
     GP_EDGES,
+    GP_JUSTIFY = 3,
+    
+    GP_CENTER2,
+    GP_LEFT2,
+    GP_RIGHT2,
+    GP_JUSTIFY2,
 };
 
-// получить align для flex
+enum GPblock {
+    GP_DIV,
+    GP_TAB,
+    GP_THIN,
+};
+
+// получить align
+PGM_P GPgetAlignFlex(GPalign a);
 PGM_P GPgetAlign(GPalign a);
 
 // ================ STRING UTILS ==================
@@ -37,15 +50,23 @@ struct GP_parser {
     GP_parser() {
         str.reserve(20);
     }
+    GP_parser(const String& s) {
+        strp = &s;
+    }
     
     bool parse(const String& s) {
-        if (i >= (int)s.length() - 1) return 0;
-        i = s.indexOf(',', from);
-        if (i < 0) i = s.length();
+        strp = &s;
+        return parse();
+    }
+    bool parse() {
+        int slen = strp->length();
+        if (i > slen - 1) return 0;
+        i = strp->indexOf(',', from);
+        if (i < 0) i = slen;
         int to = i;
-        if (s[to - 1] == ' ') to--;
-        if (s[from] == ' ') from++;
-        str = s.substring(from, to);
+        if (strp->charAt(to - 1) == ' ') to--;
+        if (strp->charAt(from) == ' ') from++;
+        str = strp->substring(from, to);
         from = i + 1;
         count++;
         return 1;
@@ -54,6 +75,7 @@ struct GP_parser {
     int i = 0, from = 0;
     int count = -1;
     String str;
+    const String* strp;
 };
 
 // получить номер, под которым name входит в list вида "val1,val2,val3"
@@ -128,6 +150,18 @@ struct GPdate {
     uint8_t month = 1, day = 1;
     
     GPdate() {}
+    GPdate(uint32_t unix, int16_t gmt = 0) {
+        unix = (unix + gmt * 60L) / (60 * 60 * 24) + 719468;
+        uint8_t era = unix / 146097ul;
+        uint16_t doe = unix - era * 146097ul;
+        uint16_t yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+        year = yoe + era * 400;
+        uint16_t doy = doe - (yoe * 365 + yoe / 4 - yoe / 100);
+        uint16_t mp = (doy * 5 + 2) / 153;
+        day = doy - (mp * 153 + 2) / 5 + 1;
+        month = mp + (mp < 10 ? 3 : -9);
+        year += (month <= 2);
+    }
     GPdate(int nyear, int nmonth, int nday) {
         set(nyear, nmonth, nday);
     }
@@ -167,6 +201,14 @@ struct GPtime {
     uint8_t hour = 0, minute = 0, second = 0;
     
     GPtime() {}
+    GPtime(uint32_t unix, int16_t gmt = 0) {
+        unix += gmt * 60L;
+        second = unix % 60ul;
+        unix /= 60ul;
+        minute = unix % 60ul;
+        unix /= 60ul;
+        hour = unix % 24ul;
+    }
     GPtime(int nhour, int nminute, int nsecond = 0) {
         set(nhour, nminute, nsecond);
     }

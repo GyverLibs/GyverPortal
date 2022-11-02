@@ -116,7 +116,7 @@
 #define _GyverPortal_h
 #include <Arduino.h>
 
-#define GP_CACHE_PRD "max-age=86400"     // таймаут кеширования (умолч. 86400 - сутки)
+#define GP_CACHE_PRD "max-age=86400"        // таймаут кеширования (умолч. 86400 - сутки)
 
 #ifndef GP_NO_DNS
 #include <DNSServer.h>
@@ -150,6 +150,7 @@ WebServer* _gp_s;
 String* _gp_page;
 String* _gp_uri;
 int _gp_bufsize;
+bool _gp_synced = 0;
 Builder add;    // legacy
 Builder GP;
 
