@@ -810,12 +810,12 @@ struct Builder {
         FILE_UPLOAD_RAW(name, "📁 " + text, "", F("multiple webkitdirectory allowdirs "));
     }
     
-    void OTA_FIRMWARE(const String& text = "OTA firmware") {
-        FILE_UPLOAD_RAW(F("firmware"), "🧱 " + text, F(".bin,.bin.gz"), "", F("/GP_OTAupload"));
+    void OTA_FIRMWARE(const String& text = "OTA firmware", bool page = 0) {
+        FILE_UPLOAD_RAW(F("firmware"), "🧱 " + text, F(".bin,.bin.gz"), "", page ? F("/ota_update") : F("/GP_OTAupload"));
     }
-    
-    void OTA_FILESYSTEM(const String& text = "OTA filesystem") {
-        FILE_UPLOAD_RAW(F("filesystem"), "💽 " + text, F(".bin,.bin.gz"), "", F("/GP_OTAupload"));
+	
+	void OTA_FILESYSTEM(const String& text = "OTA filesystem", bool page = 0) {
+        FILE_UPLOAD_RAW(F("filesystem"), "💽 " + text, F(".bin,.bin.gz"), "", page ? F("/ota_update") : F("/GP_OTAupload"));
     }
     
     void IMAGE(const String& uri, const String& w = "") {
