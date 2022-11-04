@@ -17,9 +17,16 @@ extern WebServer *_gp_s;
 #include "TimeTicker.h"
 
 extern int _gp_bufsize;
-extern String* _gp_page;
+extern String* _GPP;
 extern String* _gp_uri;
 extern bool _gp_synced;
+
+#define GP_DEBUG_EN
+#ifdef GP_DEBUG_EN
+#define GP_DEBUG(x) Serial.println(x)
+#else
+#define GP_DEBUG(x)
+#endif
 
 // ============================= CLASS ===========================
 class GyverPortal : public TimeTicker {
@@ -74,18 +81,24 @@ public:
                 return;
             #endif
             } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
-                String name = server.argName(0);    // тут будет список имён
-                GP_parser n(name);                  // парсер
-                _updPtr = &n.str;                   // указатель на имя (в парсинге)
-                String answ;                        // строка с ответом
-                _answPtr = &answ;                   // указатель на неё
-                while (n.parse()) {                 // парсим
-                    if (_action) _action();         // внутри answer() прибавляет к answ
+                String name = server.argName(0);        // тут будет список имён
+                String answ;                            // строка с ответом
+                _answPtr = &answ;                       // указатель на неё
+                if (name.indexOf(',') < 0) {            // один компонент
+                    _updPtr = &name;
+                    if (_action) _action();             // внутри answer() прибавляет к answ
                     else if (_actionR) _actionR(*this);
-                    answ += ',';
-                    yield();
+                } else {
+                    GP_parser n(name);                  // парсер
+                    _updPtr = &n.str;                   // указатель на имя (в парсинге)
+                    while (n.parse()) {                 // парсим
+                        if (_action) _action();         // внутри answer() прибавляет к answ
+                        else if (_actionR) _actionR(*this);
+                        answ += ',';
+                        yield();
+                    }
+                    answ.remove(answ.length() - 1);     // удаляем последнюю запятую
                 }
-                answ.remove(answ.length() - 1);     // удаляем последнюю запятую
                 server.send(200, "text/plain", answ);
                 _answPtr = nullptr;
                 _updPtr = nullptr;
@@ -1047,10 +1060,10 @@ public:
             String page;
             page.reserve(_bufsize);
             _gp_bufsize = _bufsize;
-            _gp_page = &page;
+            _GPP = &page;
             if (_build) _build();
             else _buildR(*this);
-            _gp_page = nullptr;
+            _GPP = nullptr;
             server.sendContent(page);
             
             server.sendContent("");

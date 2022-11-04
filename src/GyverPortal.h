@@ -147,7 +147,7 @@ WebServer* _gp_s;
 #include "legacy.h"
 #include "buildMacro.h"
 
-String* _gp_page;
+String* _GPP;
 String* _gp_uri;
 int _gp_bufsize;
 bool _gp_synced = 0;
