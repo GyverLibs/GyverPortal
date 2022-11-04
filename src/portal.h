@@ -19,7 +19,7 @@ extern WebServer *_gp_s;
 extern int _gp_bufsize;
 extern String* _GPP;
 extern String* _gp_uri;
-extern bool _gp_synced;
+extern uint32_t _gp_unix_tmr;
 
 #define GP_DEBUG_EN
 #ifdef GP_DEBUG_EN
@@ -46,6 +46,7 @@ public:
     // ========================= СИСТЕМА =========================
     // запустить портал. Можно передать имя MDNS (оставь пустым "" если MDNS не нужен) и порт
     void start(__attribute__((unused)) const String& mdns, uint16_t port = 80) {
+        _gp_unix_tmr = 0;
         _active = 1;
         _dns = (WiFi.getMode() == WIFI_AP);
         
@@ -74,10 +75,10 @@ public:
             if (_uri.startsWith(F("/GP_click"))) {              // клик
                 _clickF = 1;
                 checkList();
-                server.send(200, "text/plain");
+                server.send(200);
             #ifdef GP_NO_DOWNLOAD
             } else if (_uri.startsWith(F("/favicon.ico"))) {    // иконка
-                server.send(200, "text/plain");
+                server.send(200);
                 return;
             #endif
             } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
@@ -106,7 +107,8 @@ public:
             } else if (_uri.startsWith(F("/GP_time"))) {        // время
                 setUnix(server.arg(0).toInt());
                 setGMT(server.arg(1).toInt());
-                _gp_synced = 1;
+                _gp_unix_tmr = millis();
+                server.send(200);
                 return;
             } else if (_uri.startsWith(F("/GP_log"))) {         // лог
                 if (log.available()) server.send(200, "text/plain", log.read());
@@ -151,6 +153,7 @@ public:
             if (!uplOn) return;
             if (!_autoU && !_action && !_actionR) return;
             HTTPUpload& upl = server.upload();
+            if (!upl.filename.length()) return;
             _filePtr = &upl.filename;
             _namePtr = &upl.name;
             

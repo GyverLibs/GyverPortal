@@ -15,7 +15,7 @@ extern WebServer* _gp_s;
 extern int _gp_bufsize;
 extern String* _gp_uri;
 extern String* _GPP;
-extern bool _gp_synced;
+extern uint32_t _gp_unix_tmr;
 
 struct Builder {
     int reloadTimeout = 150;
@@ -127,14 +127,12 @@ struct Builder {
     
     // время
     uint32_t _timeUpdPrd = 10*60*1000ul;
-    uint32_t _unix_tmr = 0;
     void setTimeUpdatePeriod(uint32_t t) {
         _timeUpdPrd = t;
     }
     void updateTime() {
-        if (!_gp_synced || !_unix_tmr || millis() - _unix_tmr >= _timeUpdPrd) {
-            _unix_tmr = millis();
-            SEND(F("<script>GP_send('GP_time?unix='+Math.round(new Date().getTime()/1000)+'&gmt='+(-new Date().getTimezoneOffset()));</script>\n"));
+        if (!_gp_unix_tmr || millis() - _gp_unix_tmr >= _timeUpdPrd) {
+            SEND(F("<script>GP_send('/GP_time?unix='+Math.round(new Date().getTime()/1000)+'&gmt='+(-new Date().getTimezoneOffset()));</script>\n"));
         }
     }
     
@@ -857,76 +855,50 @@ struct Builder {
         *_GPP += text;
         *_GPP += F("</a>");
     }
-
-#ifdef ESP8266
-    void _showFiles(Dir& dir, const String& path) {
-        while (dir.next()) {
-            if (dir.isFile()) {
-                String fpath = path + dir.fileName();
-                *_GPP += "<tr>";
-                *_GPP += "<td>";
-                *_GPP += fpath;
-                *_GPP += "<td>";
-                _href(fpath, "🔗");
-                *_GPP += "<td>";
-                fpath = "?delete=" + fpath;
-                _href(fpath, "❌");
-            }
-        }
-        *_GPP += "<tr>";
-    }
-#else   // ESP32
-    void _showFiles(File& dir, const String& path) {
-        File file;
-        while (file = dir.openNextFile()) {
-            if (!file.isDirectory()) {
-                String fpath = path + file.name();
-                *_GPP += "<tr>";
-                *_GPP += "<td>";
-                *_GPP += fpath;
-                *_GPP += "<td>";
-                _href(fpath, "🔗");
-                *_GPP += "<td>";
-                fpath = "?delete=" + fpath;
-                _href(fpath, "❌");
-            }
-        }
-        *_GPP += "<tr>";
-    }
-#endif
     
-    void SHOW_FS(fs::FS *fs) {
-        *_GPP += F("<table>");
-        String path = "";
+    void _fileRow(const String& fpath, int size) {
+        *_GPP += "<tr>";
+        *_GPP += F("<td align='left'>");
+        _href(fpath, '/' + fpath);
+        *_GPP += "<td>";
+        *_GPP += '[';
+        *_GPP += String(size / 1000.0, 1);
+        *_GPP += F(" kB]");
+        *_GPP += "<td>";
+        _href(String("?delete=") + fpath, "❌");
+    }
 
+    void _showFiles(fs::FS *fs, __attribute__((unused)) const String& path) {
 #ifdef ESP8266
-        Dir dir = fs->openDir("/");
-        _showFiles(dir, path);
-        dir.rewind();
+        yield();
+        Dir dir = fs->openDir(path);
         while (dir.next()) {
+            if (dir.isFile() && dir.fileName().length()) {
+                String fpath = path + dir.fileName();
+                _fileRow(fpath, dir.fileSize());
+            }
             if (dir.isDirectory()) {
-                path = dir.fileName();
-                Dir sdir = fs->openDir(path);
-                path += '/';
-                _showFiles(sdir, path);
+                String p = path;
+                p += dir.fileName();
+                p += '/';
+                Dir sdir = fs->openDir(p);
+                _showFiles(fs, p);
             }
         }
 
 #else   // ESP32
         File dir = fs->open("/");
-        _showFiles(dir, path);
-        dir = fs->open("/");
         File file;
         while (file = dir.openNextFile()) {
-            if (file.isDirectory()) {
-                path = file.name();
-                File sdir = fs->open(path);
-                path += '/';
-                _showFiles(sdir, path);
-            }
+            _fileRow(file.name(), file.size());
+            yield();
         }
 #endif
-
+    }
+    
+    void SHOW_FS(fs::FS *fs) {
+        *_GPP += F("<table>");
+        _showFiles(fs, "");
         *_GPP += F("</table>");
         send();
     }

@@ -14,29 +14,29 @@ void build() {
   GP.TITLE("Mobile App Style");
   GP.HR();
 
-  GP_MAKE_BLOCK(
-    GP_MAKE_BOX(GP.LABEL("Some check 1"); GP.CHECK("");   );
-    GP_MAKE_BOX(GP.LABEL("Some check 2"); GP.CHECK("");   );
-    GP_MAKE_BOX(GP.LABEL("Some Switch 1"); GP.SWITCH(""); );
-    GP_MAKE_BOX(GP.LABEL("Some Switch 2"); GP.SWITCH(""); );
+  M_BLOCK(
+    M_BOX(GP.LABEL("Some check 1"); GP.CHECK("");   );
+    M_BOX(GP.LABEL("Some check 2"); GP.CHECK("");   );
+    M_BOX(GP.LABEL("Some Switch 1"); GP.SWITCH(""); );
+    M_BOX(GP.LABEL("Some Switch 2"); GP.SWITCH(""); );
   );
 
-  GP_MAKE_BLOCK(
-    GP_MAKE_BOX(GP.LABEL("SSID");     GP.TEXT("");  );
-    GP_MAKE_BOX(GP.LABEL("Password"); GP.TEXT("");  );
-    GP_MAKE_BOX(GP.LABEL("Host");     GP.TEXT("");  );
+  M_BLOCK(
+    M_BOX(GP.LABEL("SSID");     GP.TEXT("");  );
+    M_BOX(GP.LABEL("Password"); GP.TEXT("");  );
+    M_BOX(GP.LABEL("Host");     GP.TEXT("");  );
   );
 
-  GP_MAKE_BLOCK(
-    GP_MAKE_BOX(GP.LABEL("Upload settings");  GP.FILE_UPLOAD(""); );
-    GP_MAKE_BOX(GP.LABEL("Upload photo");     GP.FILE_UPLOAD(""); );
-    GP_MAKE_BOX(GP.LABEL("Upload data");      GP.FILE_UPLOAD(""); );
+  M_BLOCK(
+    M_BOX(GP.LABEL("Upload settings");  GP.FILE_UPLOAD(""); );
+    M_BOX(GP.LABEL("Upload photo");     GP.FILE_UPLOAD(""); );
+    M_BOX(GP.LABEL("Upload data");      GP.FILE_UPLOAD(""); );
   );
 
-  GP_MAKE_BLOCK(
-    GP_MAKE_BOX(GP.LABEL("Color 1");  GP.SLIDER("");  );
-    GP_MAKE_BOX(GP.LABEL("Color 2");  GP.SLIDER("");  );
-    GP_MAKE_BOX(GP.LABEL("Color 3");  GP.SLIDER("");  );
+  M_BLOCK(
+    M_BOX(GP.LABEL("Color 1");  GP.SLIDER("");  );
+    M_BOX(GP.LABEL("Color 2");  GP.SLIDER("");  );
+    M_BOX(GP.LABEL("Color 3");  GP.SLIDER("");  );
   );
 
   GP.BUILD_END();

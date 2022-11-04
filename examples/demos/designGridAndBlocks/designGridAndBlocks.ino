@@ -13,40 +13,40 @@ void build() {
   // позволяет "отключить" таблицу при ширине экрана меньше 700px
   GP.GRID_RESPONSIVE(700);
   
-  GP_MAKE_GRID(
-    GP_MAKE_BLOCK_TAB(
+  M_GRID(
+    M_BLOCK_TAB(
       "MOTOR CONFIG",
-      GP_MAKE_BOX(GP.LABEL("Velocity"); GP.SLIDER("vel"););
-      GP_MAKE_BOX(GP.LABEL("Accel."); GP.SLIDER("acc"););
+      M_BOX(GP.LABEL("Velocity"); GP.SLIDER("vel"););
+      M_BOX(GP.LABEL("Accel."); GP.SLIDER("acc"););
     );
-    GP_MAKE_BLOCK_TAB(
+    M_BLOCK_TAB(
       "MANUAL",
-      GP_MAKE_BOX(GP.LABEL("Duty"); GP.SLIDER("spd"););
-      GP_MAKE_BOX(GP.BUTTON("bkw", "◄"); GP.BUTTON("frw", "►"););
+      M_BOX(GP.LABEL("Duty"); GP.SLIDER("spd"););
+      M_BOX(GP.BUTTON("bkw", "◄"); GP.BUTTON("frw", "►"););
     );
   );
 
-  GP_MAKE_GRID(
-    GP_MAKE_BLOCK_TAB(
+  M_GRID(
+    M_BLOCK_TAB(
       "PID CONFIG",
-      GP_MAKE_BOX(GP.LABEL("Kp"); GP.SPINNER("kp"););
-      GP_MAKE_BOX(GP.LABEL("Ki"); GP.SPINNER("ki"););
-      GP_MAKE_BOX(GP.LABEL("Kd"); GP.SPINNER("kd"););
+      M_BOX(GP.LABEL("Kp"); GP.SPINNER("kp"););
+      M_BOX(GP.LABEL("Ki"); GP.SPINNER("ki"););
+      M_BOX(GP.LABEL("Kd"); GP.SPINNER("kd"););
     );
 
-    GP_MAKE_BLOCK_TAB(
+    M_BLOCK_TAB(
       "SPEED",
       GP.SWITCH("spdOn"); GP.BREAK();
-      GP_MAKE_BOX(GP.LABEL("Speed"); GP.SLIDER("spdPid"); );
-      GP_MAKE_BOX(GP.BUTTON("bkwPid", "◄"); GP.BUTTON("frwPid", "►"););
+      M_BOX(GP.LABEL("Speed"); GP.SLIDER("spdPid"); );
+      M_BOX(GP.BUTTON("bkwPid", "◄"); GP.BUTTON("frwPid", "►"););
     );
   );
 
-  GP_MAKE_BLOCK_TAB(
+  M_BLOCK_TAB(
     "PLANNER",
     GP.SWITCH("planOn"); GP.BREAK();
-    GP_MAKE_BOX(GP.LABEL("Target"); GP.SLIDER("tar"););
-    GP_MAKE_BOX(GP.LABEL("Stop zone"); GP.SLIDER("deadz"););
+    M_BOX(GP.LABEL("Target"); GP.SLIDER("tar"););
+    M_BOX(GP.LABEL("Stop zone"); GP.SLIDER("deadz"););
   );
 
   GP.BUILD_END();

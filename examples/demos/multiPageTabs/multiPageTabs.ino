@@ -34,17 +34,17 @@ void build() {
   GP.NAV_TABS("KEK,PUK,4EBUREK", GP_RED);
 
   // эти блоки сделаем макросами
-  GP_MAKE_NAV_BLOCK(
+  M_NAV_BLOCK(
     GP.LABEL("block1");
     GP.BUTTON("", "Btn");
   );
 
-  GP_MAKE_NAV_BLOCK(
+  M_NAV_BLOCK(
     GP.LABEL("block2");
     GP.LED("");
   );
 
-  GP_MAKE_NAV_BLOCK(
+  M_NAV_BLOCK(
     GP.LABEL("block3");
     GP.BREAK();
     GP.TEXT("");

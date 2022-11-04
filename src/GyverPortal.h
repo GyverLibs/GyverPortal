@@ -150,7 +150,7 @@ WebServer* _gp_s;
 String* _GPP;
 String* _gp_uri;
 int _gp_bufsize;
-bool _gp_synced = 0;
+uint32_t _gp_unix_tmr = 0;
 Builder add;    // legacy
 Builder GP;
 

@@ -10,19 +10,19 @@ void build() {
   GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
-  GP_MAKE_BLOCK(
-    GP_MAKE_BOX(
+  M_BLOCK(
+    M_BOX(
       GP.LABEL("Velocity");
-      GP_MAKE_BOX(
+      M_BOX(
         GP_RIGHT,
         "220px",
         GP.SLIDER("vel");
       );
     );
 
-    GP_MAKE_BOX(
+    M_BOX(
       GP.LABEL("Accel.");
-      GP_MAKE_BOX(
+      M_BOX(
         GP_RIGHT,
         "220px",
         GP.SLIDER("acc");

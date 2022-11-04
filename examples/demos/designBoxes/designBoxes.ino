@@ -10,7 +10,7 @@ void build() {
   GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
-  GP.BOX_BEGIN(GP_EDGES);
+  GP.BOX_BEGIN(GP_JUSTIFY);
   GP.LABEL("Switch");
   GP.BOX_BEGIN(GP_RIGHT);
   GP.LED("");
@@ -28,14 +28,14 @@ void build() {
 
   GP.HR();
 
-  GP.BOX_BEGIN(GP_EDGES);
+  GP.BOX_BEGIN(GP_JUSTIFY);
   GP.LABEL("Slider");
   GP.SLIDER("sld");
   GP.BOX_END();
 
   GP.HR();
 
-  GP.BOX_BEGIN(GP_EDGES);
+  GP.BOX_BEGIN(GP_JUSTIFY);
   GP.LABEL("Setting");
   GP.BOX_BEGIN(GP_RIGHT);
   GP.CHECK("ch1");
@@ -46,7 +46,7 @@ void build() {
   
   GP.HR();
 
-  GP.BOX_BEGIN(GP_EDGES);
+  GP.BOX_BEGIN(GP_JUSTIFY);
   GP.LABEL("Buttons");
   GP.BOX_BEGIN(GP_RIGHT);
   GP.BUTTON_MINI("b1", "Kek", "", GP_RED);
@@ -56,7 +56,7 @@ void build() {
 
   GP.HR();
 
-  GP.BOX_BEGIN(GP_EDGES);
+  GP.BOX_BEGIN(GP_JUSTIFY);
   GP.LABEL("Upload settings");
   GP.FILE_UPLOAD("file");
   GP.BOX_END();
