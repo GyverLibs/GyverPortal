@@ -7,6 +7,7 @@
 
 # GyverPortal v3
 Простой конструктор веб интерфейсов для ESP8266 и ESP32
+![img](/docs/feature.png)
 
 ## Совместимость
 - esp8266 (SDK v2.7+)
