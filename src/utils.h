@@ -2,6 +2,7 @@
 #include <Arduino.h>
 
 #define GP_PGM(name, val) static const char name[] PROGMEM = val
+#define GP_PGM_LIST(name, ...) const char* const name[] PROGMEM = {__VA_ARGS__};
 
 // ==================== COLORS =====================
 GP_PGM(GP_RED, "#bf1e1e");
@@ -20,7 +21,9 @@ GP_PGM(GP_YELLOW, "#b4b700");
 GP_PGM(GP_ORANGE, "#b37f0d");
 GP_PGM(GP_ORANGE_B, "#ff4500");
 GP_PGM(GP_GRAY, "#5e5e5e");
+GP_PGM(GP_GRAY_B, "#9c9ea1");
 GP_PGM(GP_BLACK, "#13161a");
+GP_PGM(GP_DEFAULT, "#fff");
 
 enum GPalign {
     GP_CENTER,

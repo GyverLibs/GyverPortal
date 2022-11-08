@@ -7,41 +7,20 @@ a:hover {
   color: #3d9941
 }
 
-#blockBack input[type=password] {
-  background: #13161a
-}
-
-#blockBack input[type=text] {
-    background: #13161a
-}
-
-#blockBack input[type=date] {
-  background: #13161a
-}
-
-#blockBack input[type=time] {
-  background: #13161a
-}
-
-#blockBack input[type=number] {
-  background: #13161a
-}
-
-#blockBack textarea {
+#blockBack input[type=password],
+#blockBack input[type=text],
+#blockBack input[type=date],
+#blockBack input[type=time],
+#blockBack input[type=number],
+#blockBack textarea,
+#blockBack select,
+#blockBack .slider {
   background: #13161a
 }
 
 #blockBack input[type=range] {
   background: #13161a;
   background-repeat: no-repeat;
-}
-
-#blockBack select {
-  background: #13161a
-}
-
-#blockBack .slider {
-  background: #13161a
 }
 
 #blockBack input:checked+.slider {
@@ -92,11 +71,14 @@ label {
   margin: 10px;
 }
 
+.blockBase {
+  padding: 15px 11px;
+  margin: 20px 10px;
+}
+
 .block {
   border-radius: 10px;
   background-color: #2a2d35;
-  padding: 15px 11px;
-  margin: 20px 10px;
   box-shadow: #111 0px 0px 20px;
 }
 
@@ -121,7 +103,7 @@ label {
 .thinText {
   padding: 0px 10px;
   background: #13161a;
-  font-size:20px;
+  font-size: 20px;
 }
 
 .thinTab {
@@ -301,7 +283,7 @@ select {
 }
 
 .switch {
-  margin: 10px 0 5px;
+  margin: 10px 2px 5px 2px;
   position: relative;
   display: inline-block;
   width: 60px;
@@ -408,6 +390,10 @@ input[type=range]:hover {
   vertical-align: middle;
 }
 
+#ubtn:hover {
+  filter: brightness(0.9);
+}
+
 #ubtnclr {
   height: 0px;
   width: 0px;
@@ -466,12 +452,26 @@ input::-webkit-inner-spin-button {
 
 .spinBtn {
   height: 40px !important;
-  width: 40px !important;
-  font-size: 35px !important;
+  width: 22px !important;
+  font-size: 30px !important;
+  position: relative;
+  z-index: 1;
+  font-family: monospace;
+}
+
+.spinL {
+  border-radius: 8px 0 0 8px !important;
+  left: 10px;
+}
+
+.spinR {
+  border-radius: 0 8px 8px 0 !important;
+  right: 10px;
 }
 
 #spinner input[type=number] {
-  width: 80px
+  width: 70px;
+  border-radius: 0px
 }
 
 details>summary {
@@ -522,4 +522,44 @@ body::-webkit-scrollbar-track {
 body::-webkit-scrollbar-thumb {
   background-color: #556;
   border-radius: 4px;
+}
+
+input[type=button]:disabled,
+input[type=checkbox]:disabled+.slider:before,
+input[type=text]:disabled,
+input[type=number]:disabled,
+input[type=password]:disabled,
+input[type=date]:disabled,
+input[type=time]:disabled,
+input[type=color]:disabled {
+  filter: brightness(0.6);
+}
+
+.dsbl {
+  filter: brightness(0.6);
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type=text]:focus,
+input[type=number]:focus,
+input[type=password]:focus,
+input[type=date]:focus,
+input[type=time]:focus {
+  border: 2px solid #666
+}
+
+.eyepass {
+  position: absolute;
+  margin-left: -35px;
+  margin-top: 7px;
+  cursor: pointer;
+  font-size: 25px;
+  color: #13161a;
+}
+
+table {
+  border-collapse: collapse;
 }

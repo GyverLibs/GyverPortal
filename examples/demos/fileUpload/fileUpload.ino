@@ -11,12 +11,12 @@ GyverPortal portal(&LittleFS);  // передать ссылку на fs (SPIFFS
 
 // конструктор страницы
 void build() {
-  GP.BUILD_BEGIN(1000);
+  GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
   GP.FILE_UPLOAD("my_file.txt"); // кнопка загрузки
   GP.FILE_UPLOAD("file_upl");    // кнопка загрузки
-  GP.SHOW_FS(&LittleFS);         // файловый менеджер
+  GP.FILE_MANAGER(&LittleFS);    // файловый менеджер
 
   GP.BUILD_END();
 }
@@ -60,14 +60,8 @@ void action() {
   // обработчик скачивания файлов (для открытия в браузере)
   if (portal.download()) portal.sendFile(LittleFS.open(portal.uri(), "r"));
 
-  // обработчик удаления файлов по запросу ?delete=filename
-  if (portal.request()) {
-    if (portal.server.argName(0).equals("delete")) {
-      Serial.print("Delete file: ");
-      Serial.println(portal.server.arg(0));
-      LittleFS.remove('/' + portal.server.arg(0));
-    }
-  }
+  // обработчик удаления файлов
+  if (portal.deleteFile()) LittleFS.remove(portal.deletePath());
 }
 
 // вывести содержимое SPIFFS ссылками

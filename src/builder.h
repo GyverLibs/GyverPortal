@@ -3,6 +3,8 @@
 #include "objects.h"
 #include "log.h"
 #include <FS.h>
+#include "version.h"
+#include "buildMacro.h"
 
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
@@ -16,6 +18,7 @@ extern int _gp_bufsize;
 extern String* _gp_uri;
 extern String* _GPP;
 extern uint32_t _gp_unix_tmr;
+extern uint32_t _gp_local_unix;
 
 struct Builder {
     int reloadTimeout = 150;
@@ -118,6 +121,9 @@ struct Builder {
         "if(elm.type=='checkbox')v=elm.checked?1:0;\n"
         "qs+=elm.name+'='+encodeURIComponent(v)+'&';}\n"
         "}GP_send(id+'?'+qs.slice(0,-1));}\n"
+        "function GP_eye(arg){var p=arg.previousElementSibling;\n"
+        "p.type=p.type=='text'?'password':'text';\n"
+        "arg.style.color=p.type=='text'?'#bbb':'#13161a';}\n"
         "</script>\n"));
         updateTime();
     }
@@ -245,14 +251,18 @@ struct Builder {
         _als = als;
         *_GPP += F("<table width='");
         *_GPP += w;
-        *_GPP += F("' border=0>\n");
+        *_GPP += F("'>\n");
         send();
         
         if (tdw.length()) {
             TR();
             GP_parser p(tdw);
             while (p.parse()) {
-                if (p.str.length()) TD(p.str);
+                if (p.str.length()) {
+                    *_GPP += F("<td width='");
+                    *_GPP += p.str;
+                    *_GPP += F("'>\n");
+                }
             }
         }
     }
@@ -262,16 +272,11 @@ struct Builder {
         *_GPP += FPSTR(GPgetAlign(al));
         *_GPP += F("'>\n");
     }
-    void TD(const String& w = "", GPalign al = GP_CENTER, uint8_t cs = 1, uint8_t rs = 1) {
+    void TD(GPalign al = GP_CENTER, uint8_t cs = 1, uint8_t rs = 1) {
         *_GPP += F("<td");
-        if (w.length()) {
-            *_GPP += F(" width='");
-            *_GPP += w;
-            *_GPP += "'";
-        }
         if (al != GP_CENTER || _als) {
             *_GPP += F(" align=");
-            if (_als && _als[_alsCount] >= 0 && _als[_alsCount] <= 3) *_GPP += FPSTR(GPgetAlign(_als[_alsCount++]));
+            if (al == GP_CENTER && _als && _als[_alsCount] >= 0 && _als[_alsCount] <= 3) *_GPP += FPSTR(GPgetAlign(_als[_alsCount++]));
             else *_GPP += FPSTR(GPgetAlign(al));
         }
         if (cs > 1) {
@@ -456,56 +461,70 @@ struct Builder {
         send();
     }
     
-    void BLOCK_BEGIN(const String& width = "") {
-        *_GPP += F("<div class='block' id='blockBack'");
+    void BLOCK_BEGIN(GPblock type, const String& width = "", const String& text = "", PGM_P st = GP_DEFAULT) {
+        *_GPP += F("<div class='blockBase");
+        if (type != GP_DIV) {
+            *_GPP += F(" block");
+            if (text.length()) *_GPP += F(" blockTab");
+            if (type == GP_THIN) *_GPP += F(" thinBlock");
+        }
+        *_GPP += "'";
+        if (type == GP_TAB) *_GPP += F(" id='blockBack'");
+
         if (width.length()) {
             *_GPP += F(" style='max-width:");
             *_GPP += width;
             *_GPP += "'";
         }
-        *_GPP += F(">\n");
-        send();
-    }
-    
-    void BLOCK_TAB_BEGIN(const String& label, const String& width = "", PGM_P st = GP_GREEN) {
-        *_GPP += F("<div class='block blockTab' id='blockBack'");
-        if (width.length()) {
-            *_GPP += F(" style='max-width:");
-            *_GPP += width;
-            *_GPP += "'";
-        }
-        *_GPP += F("><div class='blockHeader'");
-        if (st != GP_GREEN) {
-            *_GPP += F(" style='background:");
+        if (type == GP_THIN && st != GP_DEFAULT) {
+            *_GPP += F(" style='border:2px solid");
             *_GPP += FPSTR(st);
             *_GPP += "'";
         }
-        *_GPP += F(">");
-        *_GPP += label;
-        *_GPP += F("</div>\n");
+        *_GPP += F(">\n");
+        
+        if (text.length()) {
+            if (type == GP_DIV) {
+                LABEL(text);
+                HR();
+            } else if (type == GP_TAB) {
+                *_GPP += F("<div class='blockHeader'");
+                if (st != GP_DEFAULT) {
+                    *_GPP += F(" style='background:");
+                    *_GPP += FPSTR(st);
+                    *_GPP += "'";
+                }
+                *_GPP += ">";
+                *_GPP += text;
+                *_GPP += F("</div>\n");
+            } else if (type == GP_THIN) {
+                *_GPP += F("<div class='blockHeader thinTab'>");
+                *_GPP += F("<span class='thinText'");
+                if (st != GP_DEFAULT) {
+                    *_GPP += F(" style='color:");
+                    *_GPP += FPSTR(st);
+                    *_GPP += "'";
+                }
+                *_GPP += ">";
+                *_GPP += text;
+                *_GPP += F("</span></div>\n");
+            }
+        }
         send();
+    }
+    
+    void BLOCK_BEGIN(const String& width = "") {
+        BLOCK_BEGIN(GP_TAB, width);
+    }
+    
+    void BLOCK_TAB_BEGIN(const String& label, const String& width = "", PGM_P st = GP_DEFAULT) {
+        BLOCK_BEGIN(GP_TAB, width, label, st);
     }
     void BLOCK_THIN_BEGIN(const String& width = "") {
-        *_GPP += F("<div class='block thinBlock'");
-        if (width.length()) {
-            *_GPP += F(" style='max-width:");
-            *_GPP += width;
-            *_GPP += "'";
-        }
-        *_GPP += F(">\n");
-        send();
+        BLOCK_BEGIN(GP_THIN, width);
     }
     void BLOCK_THIN_TAB_BEGIN(const String& label, const String& width = "") {
-        *_GPP += F("<div class='block blockTab thinBlock'");
-        if (width.length()) {
-            *_GPP += F(" style='max-width:");
-            *_GPP += width;
-            *_GPP += "'";
-        }
-        *_GPP += F("><div class='blockHeader thinTab'><span class='thinText'>");
-        *_GPP += label;
-        *_GPP += F("</span></div>\n");
-        send();
+        BLOCK_BEGIN(GP_THIN, width, label);
     }
     void BLOCK_END() {
         SEND(F("</div>\n"));
@@ -531,7 +550,7 @@ struct Builder {
     }
     
     // ======================= ТЕКСТ =======================
-    void TAG_RAW(const String& tag, const String& val, const String& name) {
+    void TAG_RAW(const String& tag, const String& val, const String& name = "") {
         *_GPP += F("<");
         *_GPP += tag;
         if (name.length()) {
@@ -574,6 +593,14 @@ struct Builder {
         } else *_GPP += F("<div>");
         TAG_RAW(F("span"), val, name);
         *_GPP += F("</div>\n");
+        send();
+    }
+    void PLAIN(const String& text) {
+        *_GPP += text;
+        send();
+    }
+    void BOLD(const String& text) {
+        TAG_RAW(F("strong"), text);
         send();
     }
     void LABEL_BLOCK(const String& val, const String& name = "", PGM_P st = GP_GREEN) {
@@ -849,7 +876,7 @@ struct Builder {
     
     // ======================= ФАЙЛОВЫЙ МЕНЕДЖЕР =======================
     void _href(const String& url, const String& text) {
-        *_GPP += F("<a style='text-decoration:none' href='/");
+        *_GPP += F("<a style='text-decoration:none' href='");
         *_GPP += url;
         *_GPP += F("'>");
         *_GPP += text;
@@ -858,23 +885,23 @@ struct Builder {
     
     void _fileRow(const String& fpath, int size) {
         *_GPP += "<tr>";
-        *_GPP += F("<td align='left'>");
-        _href(fpath, '/' + fpath);
-        *_GPP += "<td>";
+        *_GPP += F("<td align='left' style='padding-right:5px'>");
+        _href(fpath, fpath);
+        *_GPP += F("<td>");
         *_GPP += '[';
         *_GPP += String(size / 1000.0, 1);
         *_GPP += F(" kB]");
         *_GPP += "<td>";
-        _href(String("?delete=") + fpath, "❌");
+        _href(String("?GP_delete=") + fpath, "❌");
     }
 
-    void _showFiles(fs::FS *fs, __attribute__((unused)) const String& path) {
+    void _showFiles(fs::FS *fs, const String& path, __attribute__((unused)) uint8_t levels = 0) {
 #ifdef ESP8266
         yield();
         Dir dir = fs->openDir(path);
         while (dir.next()) {
             if (dir.isFile() && dir.fileName().length()) {
-                String fpath = path + dir.fileName();
+                String fpath = '/' + path + dir.fileName();
                 _fileRow(fpath, dir.fileSize());
             }
             if (dir.isDirectory()) {
@@ -887,20 +914,174 @@ struct Builder {
         }
 
 #else   // ESP32
-        File dir = fs->open("/");
+        File root = fs->open(path.length() ? path.c_str() : ("/"));
+        if (!root || !root.isDirectory()) return;
         File file;
-        while (file = dir.openNextFile()) {
-            _fileRow(file.name(), file.size());
-            yield();
+        while (file = root.openNextFile()) {
+            if (file.isDirectory()) {
+                if (levels) _showFiles(fs, file.path(), levels - 1);
+            } else {
+                _fileRow(path + '/' + file.name(), file.size());
+            }
         }
 #endif
     }
     
-    void SHOW_FS(fs::FS *fs) {
+    void FILE_MANAGER(fs::FS *fs) {
         *_GPP += F("<table>");
-        _showFiles(fs, "");
+        _showFiles(fs, "", 5);
+
+#ifdef ESP8266
+        FSInfo fsi;
+        fs->info(fsi);
+        *_GPP += F("<tr><td colspan=3 align=center><hr><strong>Used ");
+        *_GPP += String(fsi.usedBytes / 1000.0, 2);
+        *_GPP += F(" kB from ");
+        *_GPP += String(fsi.totalBytes / 1000.0, 2);
+        *_GPP += F(" (");
+        *_GPP += (fsi.usedBytes * 100 / fsi.totalBytes);
+        *_GPP += F("%)</strong>");
+#endif
         *_GPP += F("</table>");
         send();
+    }
+    
+    // ================ СИСТЕМНАЯ ИНФОРМАЦИЯ ================
+    void SYSTEM_INFO() {
+        TABLE_BEGIN("300px");
+        // ===========
+        TR();
+        TD(GP_CENTER, 3);
+        LABEL(F("Network"));
+        HR();
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("WiFi Mode"));
+        TD(GP_RIGHT); BOLD(WiFi.getMode() == WIFI_AP ? F("AP") : (WiFi.getMode() == WIFI_STA ? F("STA") : F("AP_STA")));
+        
+        if (WiFi.getMode() != WIFI_AP) {
+            TR();
+            TD(GP_LEFT); PLAIN(F("SSID"));
+            TD(GP_RIGHT); BOLD(WiFi.SSID());
+            
+            TR();
+            TD(GP_LEFT); PLAIN(F("Local IP"));
+            TD(GP_RIGHT); BOLD(WiFi.localIP().toString());
+        }
+        if (WiFi.getMode() != WIFI_STA) {
+            TR();
+            TD(GP_LEFT); PLAIN(F("AP IP"));
+            TD(GP_RIGHT); BOLD(WiFi.softAPIP().toString());
+        }
+        TR();
+        TD(GP_LEFT); PLAIN(F("Subnet"));
+        TD(GP_RIGHT); BOLD(WiFi.subnetMask().toString());
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Gateway"));
+        TD(GP_RIGHT); BOLD(WiFi.gatewayIP().toString());
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("MAC Address"));
+        TD(GP_RIGHT); BOLD(WiFi.macAddress());
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("RSSI"));
+        TD(GP_RIGHT); BOLD("📶 " + String(constrain(2 * (WiFi.RSSI() + 100), 0, 100)) + '%');
+        
+        // ===========
+        TR();
+        TD(GP_CENTER, 3);
+        LABEL(F("Memory"));
+        HR();
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Free Heap"));
+        TD(GP_RIGHT); BOLD(String(ESP.getFreeHeap() / 1000.0, 3) + " kB");
+        
+    #ifdef ESP8266
+        TR();
+        TD(GP_LEFT); PLAIN(F("Heap Fragmentation"));
+        TD(GP_RIGHT); BOLD(String(ESP.getHeapFragmentation()) + '%');
+    #endif
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Sketch Size"));
+        TD(GP_RIGHT); BOLD(String(ESP.getSketchSize() / 1000.0, 1) + " kB (" + String(ESP.getFreeSketchSpace() / 1000.0, 1) + ")");
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Flash Size"));
+        TD(GP_RIGHT); BOLD(String(ESP.getFlashChipSize() / 1000.0, 1) + " kB");
+        
+        // ===========
+        TR();
+        TD(GP_CENTER, 3);
+        LABEL(F("System"));
+        HR();
+        
+    #ifdef ESP8266
+        TR();
+        TD(GP_LEFT); PLAIN(F("Chip ID"));
+        TD(GP_RIGHT); BOLD("0x" + String(ESP.getChipId(), HEX));
+    #endif
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Cycle Count"));
+        TD(GP_RIGHT); BOLD(String(ESP.getCycleCount()));
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Cpu Freq."));
+        TD(GP_RIGHT); BOLD(String(ESP.getCpuFreqMHz()));
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Date"));
+        GPdate date(_gp_local_unix);
+        TD(GP_RIGHT); BOLD(date.encode());
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Time"));
+        GPtime time(_gp_local_unix);
+        TD(GP_RIGHT); BOLD(time.encode());
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("Uptime"));
+        uint32_t sec = millis() / 1000ul;
+        uint8_t second = sec % 60ul;
+        sec /= 60ul;
+        uint8_t minute = sec % 60ul;
+        sec /= 60ul;
+        uint16_t hour = sec % 24ul;
+        String s;
+        s += hour;
+        s += ':';
+        s += minute / 10;
+        s += minute % 10;
+        s += ':';
+        s += second / 10;
+        s += second % 10;
+        TD(GP_RIGHT); BOLD(s);
+        
+        // ===========
+        TR();
+        TD(GP_CENTER, 3);
+        LABEL(F("Version"));
+        HR();
+        
+        TR();
+        TD(GP_LEFT); PLAIN(F("SDK"));
+        TD(GP_RIGHT); BOLD(ESP.getSdkVersion());
+        
+    #ifdef ESP8266
+        TR();
+        TD(GP_LEFT); PLAIN(F("Core"));
+        TD(GP_RIGHT); BOLD(ESP.getCoreVersion());
+    #endif
+    
+        TR();
+        TD(GP_LEFT); PLAIN(F("GyverPortal"));
+        TD(GP_RIGHT); BOLD(GP_VERSION);
+
+        TABLE_END();
     }
     
     // ======================= КНОПКА =======================
@@ -1118,6 +1299,7 @@ struct Builder {
             *_GPP += pattern;
         }
         *_GPP += ">\n";
+        *_GPP += F("<span class='eyepass' onclick='GP_eye(this)'>👁</span>\n");
         send();
     }
     

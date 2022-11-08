@@ -20,6 +20,7 @@ extern int _gp_bufsize;
 extern String* _GPP;
 extern String* _gp_uri;
 extern uint32_t _gp_unix_tmr;
+extern uint32_t _gp_local_unix;
 
 #define GP_DEBUG_EN
 #ifdef GP_DEBUG_EN
@@ -41,6 +42,7 @@ public:
 
     ~GyverPortal() {
         stop();
+        _gp_unix_tmr = 0;
     }
 
     // ========================= СИСТЕМА =========================
@@ -76,11 +78,11 @@ public:
                 _clickF = 1;
                 checkList();
                 server.send(200);
-            #ifdef GP_NO_DOWNLOAD
+                #ifdef GP_NO_DOWNLOAD
             } else if (_uri.startsWith(F("/favicon.ico"))) {    // иконка
                 server.send(200);
                 return;
-            #endif
+                #endif
             } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
                 String name = server.argName(0);        // тут будет список имён
                 String answ;                            // строка с ответом
@@ -114,6 +116,13 @@ public:
                 if (log.available()) server.send(200, "text/plain", log.read());
                 else server.send(200);
                 return;
+            } else if (server.argName(0).equals(F("GP_delete"))) {
+                if (_autoDel && _fs) {
+                    #if defined(FS_H)
+                    _fs->remove(server.arg(0));
+                    #endif
+                } else _delF = 1;
+                _showPage = 1;
             } else if (_uri.startsWith(F("/GP_upload"))) {
                 server.send(200, "text/html", F("<meta http-equiv='refresh' content='0; url=/'/>"));
                 return;
@@ -130,6 +139,8 @@ public:
                 _showPage = 1;
                 _reqF = 1;
             }
+            
+            _gp_local_unix = getUnix() + getGMT() * 60;
 
             if (_action || _actionR) {                  // подключен новый обработчик действия
                 if (_action) _action();                 // вызов обычного
@@ -140,9 +151,8 @@ public:
                 if (_showPage) show();                  // затычка для esp32, отправляем страницу даже без обработчика
                 #endif
             }
-            
             if (_fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
-            _reqF = _fileDF = _clickF = _formF = 0;  // скидываем флаги
+            _reqF = _fileDF = _clickF = _formF = _delF = 0;     // скидываем флаги
         });
         
         #if defined(FS_H) && !defined(GP_NO_UPLOAD)
@@ -160,6 +170,27 @@ public:
             switch (upl.status) {
             case UPLOAD_FILE_START:
                 if (file) file.close();
+                #ifdef ESP32
+                {
+                    char path[upl.filename.length() + 2] = "/";
+                    strcpy(path + 1, upl.filename.c_str());
+                    if (!_fs->exists(path)) {
+                        if (strchr(path, '/')) {
+                            char *pathStr = strdup(path);
+                            if (pathStr) {
+                                char *ptr = strchr(pathStr, '/');
+                                while (ptr) {
+                                    *ptr = 0;
+                                    _fs->mkdir(pathStr);
+                                    *ptr = '/';
+                                    ptr = strchr(ptr + 1, '/');
+                                }
+                            }
+                            free(pathStr);
+                        }
+                    }
+                }
+                #endif
                 if (_autoU && _fs) {
                     file = _fs->open('/' + upl.filename, "w");
                 } else if (_action || _actionR) {
@@ -220,21 +251,21 @@ public:
     
     // ================== IP REMOTE CLIENT ==================
     // вернёт IP адрес клиента
-	IPAddress clientIP() {
-		return server.client().remoteIP();
-	}
+    IPAddress clientIP() {
+        return server.client().remoteIP();
+    }
     
     // вернёт true, если IP адрес клиента принадлежит указанной сети
     bool clientFromNet(IPAddress NetIP, uint8_t mask) {
-		IPAddress RclIP = clientIP();                   // адрес клинета
-		uint8_t netmask[4] = {255, 255, 255, 255};      // Делаем маску /32
-		for (int r = 0; r < (32 - mask); r++) bitClear(netmask[3 - r / 8],r % 8);    // Конвертируем формат маски
-		for (int r = 0; r < 4; r++) {       // Вычисляем адреса сетей относительно маски
-			RclIP[r] &= netmask[r];         // сперва клиента
-			NetIP[r] &= netmask[r];         // потом адрес сети IP переданного в функцию
-		}
-		return (NetIP == RclIP);            // Если адреса сетей совпадают, значит они из одной сети
-	}
+        IPAddress RclIP = clientIP();                   // адрес клинета
+        uint8_t netmask[4] = {255, 255, 255, 255};      // Делаем маску /32
+        for (int r = 0; r < (32 - mask); r++) bitClear(netmask[3 - r / 8],r % 8);    // Конвертируем формат маски
+        for (int r = 0; r < 4; r++) {       // Вычисляем адреса сетей относительно маски
+            RclIP[r] &= netmask[r];         // сперва клиента
+            NetIP[r] &= netmask[r];         // потом адрес сети IP переданного в функцию
+        }
+        return (NetIP == RclIP);            // Если адреса сетей совпадают, значит они из одной сети
+    }
     
     
     // ========================= AUTH =========================
@@ -265,7 +296,7 @@ public:
     
     // включить OTA обновление
     void enableOTA() {
-       enableOTA("","");
+        enableOTA("","");
     }
     
     // ======================= АТТАЧИ =======================
@@ -345,6 +376,21 @@ public:
     
     
     // ======================== FILE ========================
+    // вернёт true при запросе на удаление файла
+    bool deleteFile() {
+        return _delF;
+    }
+    
+    // автоматическое удаление файла по uri (по умолч. выкл, false)
+    void deleteAuto(bool m) {
+        _autoDel = m;
+    }
+    
+    // имя (путь) файла для удаления. Начинается с '/'
+    String deletePath() {
+        return deleteFile() ? server.arg(0) : String();
+    }
+    
     // вкл/выкл поддержку скачивания файлов (по умолч. вкл)
     void downloadMode(bool m) {
         downOn = m;
@@ -1087,7 +1133,7 @@ public:
 #else
     WebServer server;
 #endif
-/*
+    /*
 #ifndef GP_NO_OTA
 #ifdef ESP8266
     ESP8266HTTPUpdateServer httpUpdater;
@@ -1171,8 +1217,8 @@ private:
     const char* _pass;
     
     bool _mdnsF = 0, _dns = 0, _active = 0, _showPage = 0;
-    bool _formF = 0, _clickF = 0, _reqF = 0;
-    bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 0, _autoU = 0;
+    bool _formF = 0, _clickF = 0, _reqF = 0, _delF = 0;
+    bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 0, _autoU = 0, _autoDel = 0;
     bool downOn = 1, uplOn = 1;
     
     void (*_build)() = nullptr;

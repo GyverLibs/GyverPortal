@@ -47,11 +47,14 @@ label {
   margin: 10px;
 }
 
+.blockBase {
+  padding: 15px 11px;
+  margin: 20px 10px;
+}
+
 .block {
   border-radius: 10px;
   background-color: #f2f2f2;
-  padding: 15px 11px;
-  margin: 20px 10px;
   box-shadow: #aaa 0px 0px 10px;
 }
 
@@ -78,7 +81,7 @@ label {
   padding: 0px 10px;
   background: #ffffff;
   color: #3c4048;
-  font-size:20px;
+  font-size: 20px;
 }
 
 .thinTab {
@@ -248,7 +251,7 @@ select {
 }
 
 .switch {
-  margin: 10px 0 5px;
+  margin: 10px 2px 5px 2px;
   position: relative;
   display: inline-block;
   width: 60px;
@@ -356,6 +359,10 @@ input[type=range]:hover {
   vertical-align: middle;
 }
 
+#ubtn:hover {
+  filter: brightness(0.9);
+}
+
 #ubtnclr {
   height: 0px;
   width: 0px;
@@ -414,12 +421,26 @@ input::-webkit-inner-spin-button {
 
 .spinBtn {
   height: 40px !important;
-  width: 40px !important;
-  font-size: 35px !important;
+  width: 22px !important;
+  font-size: 30px !important;
+  position: relative;
+  z-index: 1;
+  font-family: monospace;
+}
+
+.spinL {
+  border-radius: 8px 0 0 8px !important;
+  left: 10px;
+}
+
+.spinR {
+  border-radius: 0 8px 8px 0 !important;
+  right: 10px;
 }
 
 #spinner input[type=number] {
-  width: 80px
+  width: 70px;
+  border-radius: 0px
 }
 
 details>summary {
@@ -470,4 +491,36 @@ body::-webkit-scrollbar-track {
 body::-webkit-scrollbar-thumb {
   background-color: #888;
   border-radius: 4px;
+}
+
+input[type=button]:disabled,
+input[type=checkbox]:disabled+.slider:before,
+input[type=text]:disabled,
+input[type=number]:disabled,
+input[type=password]:disabled,
+input[type=date]:disabled,
+input[type=time]:disabled,
+input[type=color]:disabled {
+  filter: brightness(0.6);
+}
+
+.dsbl {
+  filter: brightness(0.6);
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.eyepass {
+  position: absolute;
+  margin-left: -35px;
+  margin-top: 7px;
+  cursor: pointer;
+  font-size: 25px;
+  color: #13161a;
+}
+
+table {
+  border-collapse: collapse;
 }

@@ -1,3 +1,13 @@
+var _clkRelList = '',
+  _redirTout = 150,
+  _touch = 0;
+
+function GP_redirect(url) {
+  setTimeout(function() {
+    location.href = url;
+  }, _redirTout);
+}
+
 function GP_hint(id, txt) {
   document.getElementById(id).title = txt;
 }
@@ -9,7 +19,7 @@ function GP_send(req) {
 }
 
 function GP_clickUD(arg, dir) {
-  if (arg.name) GP_send('/GP_click?' + arg.name + '=1&_dir=' + dir);
+  if (arg.name) GP_send('/GP_click?' + arg.name + '=&_dir=' + dir);
 }
 
 function GP_click(arg, r = 0) {
@@ -20,16 +30,17 @@ function GP_click(arg, r = 0) {
     if (arg.hasAttribute('max') && Number(arg.value) >= Number(arg.max)) arg.value = arg.max;
   }
   if (arg.type == 'checkbox') v = arg.checked ? '1' : '0';
+  else if (arg.type == 'button') v = '';
   else v = arg.value;
   if (v.charAt(0) == '#') v = v.substring(1);
-  GP_send('/GP_click?' + arg.name + '=' + v);
-  if (r != 0) setTimeout(function() {
+  GP_send('/GP_click?' + arg.name + '=' + encodeURIComponent(v));
+  if (r != 0 || _clkRelList.split(',').includes(arg.name)) setTimeout(function() {
     location.reload();
-  }, r);
+  }, (r ? r : _redirTout));
 }
 
 function GP_clickid(btn, tar) {
-  GP_send('/GP_click?' + btn + '=' + document.getElementById(tar).value);
+  GP_send('/GP_click?' + btn + '=' + encodeURIComponent(document.getElementById(tar).value));
 }
 
 function GP_change(arg) {
@@ -46,7 +57,7 @@ function saveFile(id) {
   document.getElementById(id).click();
 }
 
-function GP_subm(id) {
+function GP_submId(id) {
   document.getElementById(id).submit();
   event.preventDefault();
 }
@@ -89,4 +100,24 @@ function GP_update(ids) {
       }
     }
   };
+}
+
+function GP_sendForm(id) {
+  var elms = document.getElementById(id).elements;
+  var qs = '';
+  for (var i = 0, elm; elm = elms[i++];) {
+    if (elm.name) {
+      var v = elm.value;
+      if (v.charAt(0) == '#') v = v.substring(1);
+      if (elm.type == 'checkbox') v = elm.checked ? 1 : 0;
+      qs += elm.name + '=' + encodeURIComponent(v) + '&';
+    }
+  }
+  GP_send(id + '?' + qs.slice(0, -1));
+}
+
+function GP_eye(arg) {
+  var p = arg.previousElementSibling;
+  p.type = p.type == 'text' ? 'password' : 'text';
+  arg.style.color = p.type == 'text' ? '#bbb' : '#13161a';
 }

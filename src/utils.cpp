@@ -12,8 +12,9 @@ GP_PGM(_gp__txt, "html,html,css,csv");
 GP_PGM(_gp__au, "aac,mpeg,wav,webm");
 GP_PGM(_gp__vid, "x-msvideo,mpeg,mp4,webm,3gpp");
 GP_PGM(_gp__app, "javascript,octet-stream,gzip,json,pdf,x-httpd-php,x-tar,xml");
-const char* const _gp_ext[] PROGMEM = {_gp_img, _gp_txt, _gp_au, _gp_vid, _gp_app};
-const char* const _gp_val[] PROGMEM = {_gp__img, _gp__txt, _gp__au, _gp__vid, _gp__app};
+
+GP_PGM_LIST(_gp_ext, _gp_img, _gp_txt, _gp_au, _gp_vid, _gp_app);
+GP_PGM_LIST(_gp_val, _gp__img, _gp__txt, _gp__au, _gp__vid, _gp__app);
 
 String GPfileType(const String& uri) {
     int div = uri.indexOf('.');
@@ -41,7 +42,7 @@ GP_PGM(_gp_al3, "space-between");
 GP_PGM(_gp_al5, "left");
 GP_PGM(_gp_al6, "right");
 GP_PGM(_gp_al7, "justify");
-const char* const _gp_al[] PROGMEM = {_gp_al0, _gp_al1, _gp_al2, _gp_al3, _gp_al0, _gp_al5, _gp_al6, _gp_al7};
+GP_PGM_LIST(_gp_al, _gp_al0, _gp_al1, _gp_al2, _gp_al3, _gp_al0, _gp_al5, _gp_al6, _gp_al7);
 
 PGM_P GPgetAlignFlex(GPalign a) {
     return _gp_al[a];

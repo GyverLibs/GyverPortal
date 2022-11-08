@@ -33,10 +33,9 @@
 
 #define M_TD(...) OVR_MACRO(M_TD, __VA_ARGS__)
 #define M_TD1(args) GP.TD(); args;
-#define M_TD2(w, args) GP.TD(w); args;
-#define M_TD3(w, al, args) GP.TD(w, al); args;
-#define M_TD4(w, al, cs, args) GP.TD(w, al, cs); args;
-#define M_TD5(w, al, cs, rs, args) GP.TD(w, al, cs, rs); args;
+#define M_TD2(al, args) GP.TD(w, al); args;
+#define M_TD3(al, cs, args) GP.TD(w, al, cs); args;
+#define M_TD4(al, cs, rs, args) GP.TD(w, al, cs, rs); args;
 
 #define M_TR(...) OVR_MACRO(M_TR, __VA_ARGS__)
 #define M_TR1(a1) GP.TR(); GP.TD(); a1;
@@ -57,20 +56,10 @@
 
 #define M_BLOCK(...) OVR_MACRO(M_BLOCK, __VA_ARGS__)
 #define M_BLOCK1(args) GP.BLOCK_BEGIN(); args; GP.BLOCK_END();
-#define M_BLOCK2(width, args) GP.BLOCK_BEGIN(width); args; GP.BLOCK_END();
-
-#define M_BLOCK_TAB(...) OVR_MACRO(M_BLOCK_TAB, __VA_ARGS__)
-#define M_BLOCK_TAB2(text, args) GP.BLOCK_TAB_BEGIN(text); args; GP.BLOCK_END();
-#define M_BLOCK_TAB3(text, width, args) GP.BLOCK_TAB_BEGIN(text, width); args; GP.BLOCK_END();
-#define M_BLOCK_TAB4(text, width, style, args) GP.BLOCK_TAB_BEGIN(text, width, style); args; GP.BLOCK_END();
-
-#define M_BLOCK_THIN(...) OVR_MACRO(M_BLOCK_THIN, __VA_ARGS__)
-#define M_BLOCK_THIN1(args) GP.BLOCK_THIN_BEGIN(); args; GP.BLOCK_END();
-#define M_BLOCK_THIN2(width, args) GP.BLOCK_THIN_BEGIN(width); args; GP.BLOCK_END();
-
-#define M_BLOCK_THIN_TAB(...) OVR_MACRO(M_BLOCK_THIN_TAB, __VA_ARGS__)
-#define M_BLOCK_THIN_TAB2(text, args) GP.BLOCK_THIN_TAB_BEGIN(text); args; GP.BLOCK_END();
-#define M_BLOCK_THIN_TAB3(text, width, args) GP.BLOCK_THIN_TAB_BEGIN(text, width); args; GP.BLOCK_END();
+#define M_BLOCK2(type, args) GP.BLOCK_BEGIN(type); args; GP.BLOCK_END();
+#define M_BLOCK3(type, width, args) GP.BLOCK_BEGIN(type, width); args; GP.BLOCK_END();
+#define M_BLOCK4(type, width, text, args) GP.BLOCK_BEGIN(type, width, text); args; GP.BLOCK_END();
+#define M_BLOCK5(type, width, text, st, args) GP.BLOCK_BEGIN(type, width, text, st); args; GP.BLOCK_END();
 
 #define M_JQ_UPDATE(...) OVR_MACRO(M_JQ_UPDATE, __VA_ARGS__)
 #define M_JQ_UPDATE1(args) GP.JQ_UPDATE_BEGIN(); args; GP.JQ_UPDATE_END();
@@ -87,6 +76,20 @@
 
 
 // legacy
+#define M_BLOCK_TAB(...) OVR_MACRO(M_BLOCK_TAB, __VA_ARGS__)
+#define M_BLOCK_TAB2(text, args) GP.BLOCK_TAB_BEGIN(text); args; GP.BLOCK_END();
+#define M_BLOCK_TAB3(text, width, args) GP.BLOCK_TAB_BEGIN(text, width); args; GP.BLOCK_END();
+#define M_BLOCK_TAB4(text, width, style, args) GP.BLOCK_TAB_BEGIN(text, width, style); args; GP.BLOCK_END();
+
+#define M_BLOCK_THIN(...) OVR_MACRO(M_BLOCK_THIN, __VA_ARGS__)
+#define M_BLOCK_THIN1(args) GP.BLOCK_THIN_BEGIN(); args; GP.BLOCK_END();
+#define M_BLOCK_THIN2(width, args) GP.BLOCK_THIN_BEGIN(width); args; GP.BLOCK_END();
+
+#define M_BLOCK_THIN_TAB(...) OVR_MACRO(M_BLOCK_THIN_TAB, __VA_ARGS__)
+#define M_BLOCK_THIN_TAB2(text, args) GP.BLOCK_THIN_TAB_BEGIN(text); args; GP.BLOCK_END();
+#define M_BLOCK_THIN_TAB3(text, width, args) GP.BLOCK_THIN_TAB_BEGIN(text, width); args; GP.BLOCK_END();
+
+
 #define GP_MAKE_FORM(...) M_FORM(__VA_ARGS__)
 #define GP_MAKE_GRID(...) M_GRID(__VA_ARGS__)
 #define GP_MAKE_TABLE(...) M_TABLE(__VA_ARGS__)
