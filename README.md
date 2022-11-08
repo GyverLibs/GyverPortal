@@ -18,7 +18,7 @@
 > [English docs](https://github-com.translate.goog/GyverLibs/GyverPortal/wiki?_x_tr_sl=ru&_x_tr_tl=en)
 
 ## Идеи/проблемы/что будет в следующем обновлении
-Читать/предлагать в issue https://github.com/GyverLibs/GyverPortal/issues/46
+Читать/предлагать в issue https://github.com/GyverLibs/GyverPortal/issues/52
 - Также можно [обсудить на форуме](https://community.alexgyver.ru/threads/gyverportal.6632/)
 
 ### Известные баги
