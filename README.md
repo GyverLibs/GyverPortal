@@ -78,7 +78,6 @@
 
 <a id="versions"></a>
 ## Версии
-# Changelog
 <details>
 <summary>Старые</summary>
 
