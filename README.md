@@ -6,6 +6,7 @@
 [![Foo](https://img.shields.io/badge/ПОДПИСАТЬСЯ-НА%20ОБНОВЛЕНИЯ-brightgreen.svg?style=social&logo=telegram&color=blue)](https://t.me/GyverLibs)
 
 # GyverPortal
+### v3.4 (15.12.2022)
 Простой конструктор веб интерфейсов для ESP8266 и ESP32
 ![img](/docs/feature.png)
 
