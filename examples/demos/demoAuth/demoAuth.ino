@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 // конструктор страницы
 void build() {
@@ -25,13 +25,13 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.start();
+  ui.attachBuild(build);
+  ui.start();
   
   // включить авторизацию
-  portal.enableAuth("admin", "pass");
+  ui.enableAuth("admin", "pass");
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 }

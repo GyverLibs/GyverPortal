@@ -1,5 +1,7 @@
-// модуль разработан DenysChuhlib
 #pragma once
+
+// GP OTA Update Module
+// разработано DenysChuhlib
 
 #include "builder.h"
 extern Builder GP;
@@ -140,8 +142,8 @@ public:
         
         GP.BLOCK_TAB_BEGIN(F("OTA Update"));
         if (!UpdateEnd) {
-            GP.OTA_FIRMWARE(F("OTA firmware"), true);
-            GP.OTA_FILESYSTEM(F("OTA filesystem"), true);
+            GP.OTA_FIRMWARE(F("OTA firmware"), GP_GREEN, true);
+            GP.OTA_FILESYSTEM(F("OTA filesystem"), GP_GREEN, true);
         } else if (UpdateError.length()) {
             GP.TITLE(String(F("Update error: ")) + UpdateError);
             GP.BUTTON_LINK(F("/ota_update"), F("Refresh"));
@@ -154,7 +156,13 @@ public:
         GP.BLOCK_END();
         GP.BUILD_END();
     }
-
+    
+    String error() {
+        if (!_errorReady && _error.length()) _error.clear();
+        _errorReady = 0;
+        return _error;
+    }
+    
 private:
 #ifdef ESP8266
     ESP8266WebServer* _server;
@@ -163,22 +171,26 @@ private:
 #endif
     String _OTAlogin;
     String _OTApass;
-    String _UpdateError;
-    bool _UpdateEnd;
+    String _error;
+    bool _UpdateEnd = 0;
+    bool _UpdateError = 0;
+    bool _errorReady = 0;
+    
     void (*_OTAbuild)(bool UpdateEnd, const String& UpdateError) = nullptr;
     void (*_OTAbeforeRestart)() = nullptr;
     void (*_OTAabort)() = nullptr;
     void (*_OTAerror)(const String& UpdateError) = nullptr;
     
     void _UpdateReload() {
-        if (_UpdateEnd && !_UpdateError.length()) {
+        if (!_UpdateEnd) return;
+        if (_UpdateError) {
+            _UpdateError = 0;
+            _UpdateEnd = false;
+            if (_OTAerror) _OTAerror(_error);
+        } else {
             if (_OTAbeforeRestart) _OTAbeforeRestart();
             delay(100);
             ESP.restart();
-        } else if (_UpdateEnd && _UpdateError.length()) {
-            _UpdateEnd = false;
-            if (_OTAerror) _OTAerror(_UpdateError);
-            _UpdateError.clear();
         }
     }
     
@@ -197,8 +209,8 @@ private:
         _gp_bufsize = 500;
         page.reserve(_gp_bufsize);
         _GPP = &page;
-        if (_OTAbuild) _OTAbuild(_UpdateEnd, _UpdateError);
-        else defBuild(_UpdateEnd, _UpdateError);
+        if (_OTAbuild) _OTAbuild(_UpdateEnd, _error);
+        else defBuild(_UpdateEnd, _error);
         _GPP = nullptr;
         _server->sendContent(page);
         _server->sendContent("");
@@ -206,11 +218,13 @@ private:
     }
     
     void _UploadBin(HTTPUpload& upload) {
+        _errorReady = 1;
         if (_UpdateEnd) return;
         if (_OTAlogin.length() && _OTApass.length() && !_server->authenticate(_OTAlogin.c_str(), _OTApass.c_str())) return _server->requestAuthentication();
         if (!(upload.name == F("filesystem") || upload.name == F("firmware"))) return;
         if (!(upload.filename.endsWith(F(".bin")) || upload.filename.endsWith(F(".bin.gz")))) {
-            _UpdateError = F("file is not .bin or .bin.gz");
+            _error = F("file is not .bin or .bin.gz");
+            _UpdateError = 1;
             _UpdateEnd = true;
             return;
         }
@@ -226,14 +240,16 @@ private:
                 {
                     StreamString str;
                     Update.printError(str);
-                    _UpdateError = str.c_str();
+                    _error = str;
+                    _UpdateError = 1;
                     _UpdateEnd = true;
                     return;
                 }
             } else /* upload.name == "firmware" */ {
                 #ifdef GP_OTA_NAME
                 if (!upload.filename.startsWith(GP_OTA_NAME)) {
-                    _UpdateError = F("File name error");
+                    _error = F("File name error");
+                    _UpdateError = 1;
                     _UpdateEnd = true;
                     return;
                 }
@@ -242,7 +258,8 @@ private:
                 if (!Update.begin(maxSketchSpace, U_FLASH)) { //start with max available size
                     StreamString str;
                     Update.printError(str);
-                    _UpdateError = str.c_str();
+                    _error = str;
+                    _UpdateError = 1;
                     _UpdateEnd = true;
                     return;
                 }
@@ -254,21 +271,24 @@ private:
             if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
                 StreamString str;
                 Update.printError(str);
-                _UpdateError = str.c_str();
+                _error = str;
+                _UpdateError = 1;
                 _UpdateEnd = true;
                 return;
             }
         } else if (upload.status == UPLOAD_FILE_END) {
-            if (!Update.end(true)) { //true to set the size to the current progress
+            if (!Update.end(true)) {
                 StreamString str;
                 Update.printError(str);
-                _UpdateError = str.c_str();
+                _error = str;
+                _UpdateError = 1;
             }
             _UpdateEnd = true;
             return;
         } else if (upload.status == UPLOAD_FILE_ABORTED) {
             Update.end();
-            _UpdateError = F("Upload aborted");
+            _error = F("Upload aborted");
+            _UpdateError = 1;
             _UpdateEnd = true;
             if (_OTAabort) _OTAabort();
             return;

@@ -1,4 +1,7 @@
 #pragma once
+
+// GP Macro
+
 #include "builder.h"
 
 // https://stackoverflow.com/a/30566098
@@ -23,7 +26,9 @@
 #define M_FORM2(act, args) GP.FORM_BEGIN(act); args; GP.FORM_END();
 #define M_FORM3(act, subm, args) GP.FORM_BEGIN(act); args; GP.SUBMIT(subm); GP.FORM_END();
 
-#define M_GRID(args) GP.GRID_BEGIN(); args; GP.GRID_END();
+#define M_GRID(...) OVR_MACRO(M_GRID, __VA_ARGS__)
+#define M_GRID1(args) GP.GRID_BEGIN(); args; GP.GRID_END();
+#define M_GRID2(w, args) GP.GRID_BEGIN(w); args; GP.GRID_END();
 
 #define M_TABLE(...) OVR_MACRO(M_TABLE, __VA_ARGS__)
 #define M_TABLE1(args) GP.TABLE_BEGIN(); args; GP.TABLE_END();
@@ -59,7 +64,7 @@
 #define M_BLOCK2(type, args) GP.BLOCK_BEGIN(type); args; GP.BLOCK_END();
 #define M_BLOCK3(type, width, args) GP.BLOCK_BEGIN(type, width); args; GP.BLOCK_END();
 #define M_BLOCK4(type, width, text, args) GP.BLOCK_BEGIN(type, width, text); args; GP.BLOCK_END();
-#define M_BLOCK5(type, width, text, st, args) GP.BLOCK_BEGIN(type, width, text, st); args; GP.BLOCK_END();
+#define M_BLOCK5(type, width, text, style, args) GP.BLOCK_BEGIN(type, width, text, style); args; GP.BLOCK_END();
 
 #define M_JQ_UPDATE(...) OVR_MACRO(M_JQ_UPDATE, __VA_ARGS__)
 #define M_JQ_UPDATE1(args) GP.JQ_UPDATE_BEGIN(); args; GP.JQ_UPDATE_END();

@@ -1,5 +1,7 @@
 #pragma once
 
+// GP Portal
+
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
 extern ESP8266WebServer *_gp_s;
@@ -15,12 +17,16 @@ extern WebServer *_gp_s;
 #include "objects.h"
 #include "CustomOTA.h"
 #include "TimeTicker.h"
+#include "canvas.h"
+#include "scripts.h"
 
 extern int _gp_bufsize;
 extern String* _GPP;
 extern String* _gp_uri;
 extern uint32_t _gp_unix_tmr;
 extern uint32_t _gp_local_unix;
+extern const char* _gp_style;
+extern uint8_t _gp_seed;
 
 #define GP_DEBUG_EN
 #ifdef GP_DEBUG_EN
@@ -35,14 +41,30 @@ public:
     // ======================= КОНСТРУКТОР =======================
     GyverPortal() {
         _uri.reserve(15);
+        _hold.reserve(10);
     }
     GyverPortal(fs::FS *useFS) : _fs(useFS) {
         _uri.reserve(15);
+        _hold.reserve(10);
     }
 
     ~GyverPortal() {
         stop();
         _gp_unix_tmr = 0;
+    }
+    
+    void setFS(fs::FS *useFS) {
+        _fs = useFS;
+    }
+    
+    // кеширование встроенных стилей/скриптов (умолч. вкл)
+    void caching(bool v) {
+        _cache = v;
+    }
+    
+    // сбросить кеш встроенных стилей/скриптов в браузере (для разработчиков)
+    void clearCache() {
+        _gp_seed = random(0xff);
     }
 
     // ========================= СИСТЕМА =========================
@@ -78,12 +100,36 @@ public:
                 _clickF = 1;
                 checkList();
                 server.send(200);
+            } else if (_uri.startsWith(F("/GP_press"))) {       // нажатие
+                _holdF = server.arg(0)[0] - '0';
+                //_clickF = 1;
+                if (_holdF == 1) _hold = server.argName(0);
+                else _hold = "";
+                server.send(200);
+                
                 #ifdef GP_NO_DOWNLOAD
             } else if (_uri.startsWith(F("/favicon.ico"))) {    // иконка
                 server.send(200);
                 return;
                 #endif
-            } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
+            } else if (_uri.startsWith(F("/GP_ping"))) {      	// пинг
+				server.send(200);
+				return;
+            } else if (_uri.startsWith(F("/GP_SCRIPT.js"))) {   // скрипты
+				sendFile_P(GP_JS_TOP, "text/javascript");
+				return;
+            } else if (_uri.startsWith(F("/GP_STYLE.css"))) {   // стили
+				sendFile_P(_gp_style, "text/css");
+				return;
+            } else if (_uri.startsWith(F("/GP_CANVAS.js"))) {   // канвас
+				sendFile_P(GP_JS_CANVAS, "text/javascript");
+				return;
+			} else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
+                if (server.argName(0) == "GP_log") {            // лог
+                    if (log.available()) server.send(200, "text/plain", log.read());
+                    else server.send(200);
+                    return;
+                }
                 String name = server.argName(0);        // тут будет список имён
                 String answ;                            // строка с ответом
                 _answPtr = &answ;                       // указатель на неё
@@ -97,31 +143,34 @@ public:
                     while (n.parse()) {                 // парсим
                         if (_action) _action();         // внутри answer() прибавляет к answ
                         else if (_actionR) _actionR(*this);
-                        answ += ',';
+                        answ += '\1';
                         yield();
                     }
-                    answ.remove(answ.length() - 1);     // удаляем последнюю запятую
+                    answ.remove(answ.length() - 1);     // удаляем последний разделитель
                 }
                 server.send(200, "text/plain", answ);
                 _answPtr = nullptr;
                 _updPtr = nullptr;
                 return;
-            } else if (_uri.startsWith(F("/GP_time"))) {        // время
+            } else if (_uri.startsWith(F("/GP_time"))) {    // время
                 setUnix(server.arg(0).toInt());
                 setGMT(server.arg(1).toInt());
                 _gp_unix_tmr = millis();
                 server.send(200);
                 return;
-            } else if (_uri.startsWith(F("/GP_log"))) {         // лог
-                if (log.available()) server.send(200, "text/plain", log.read());
-                else server.send(200);
-                return;
-            } else if (server.argName(0).equals(F("GP_delete"))) {
+            } else if (_uri.startsWith(F("/GP_delete"))) {  // удаление
                 if (_autoDel && _fs) {
                     #if defined(FS_H)
-                    _fs->remove(server.arg(0));
+                    _fs->remove(server.argName(0));
                     #endif
                 } else _delF = 1;
+                _showPage = 1;
+            } else if (_uri.startsWith(F("/GP_rename"))) {  // переименовать
+                if (_autoRen && _fs) {
+                    #if defined(FS_H)
+                    _fs->rename(server.argName(0), server.arg(0));
+                    #endif
+                } else _renF = 1;
                 _showPage = 1;
             } else if (_uri.startsWith(F("/GP_upload"))) {
                 server.send(200, "text/html", F("<meta http-equiv='refresh' content='0; url=/'/>"));
@@ -152,7 +201,7 @@ public:
                 #endif
             }
             if (_fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
-            _reqF = _fileDF = _clickF = _formF = _delF = 0;     // скидываем флаги
+            _reqF = _fileDF = _clickF = _formF = _delF = _renF = _holdF = 0;     // скидываем флаги
         });
         
         #if defined(FS_H) && !defined(GP_NO_UPLOAD)
@@ -257,9 +306,13 @@ public:
     
     // вернёт true, если IP адрес клиента принадлежит указанной сети
     bool clientFromNet(IPAddress NetIP, uint8_t mask) {
-        IPAddress RclIP = clientIP();                   // адрес клинета
-        uint8_t netmask[4] = {255, 255, 255, 255};      // Делаем маску /32
-        for (int r = 0; r < (32 - mask); r++) bitClear(netmask[3 - r / 8],r % 8);    // Конвертируем формат маски
+        uint8_t netmask[4] = {255, 255, 255, 255};      // делаем маску /32
+        for (int r = 0; r < (32 - mask); r++) bitClear(netmask[3 - r / 8], r % 8);    // Конвертируем формат маски
+        return clientFromNet(NetIP, IPAddress(netmask));
+    }
+    
+    bool clientFromNet(IPAddress NetIP, IPAddress netmask = IPAddress(255, 255, 255, 0)) {
+        IPAddress RclIP = clientIP();       // адрес клинета
         for (int r = 0; r < 4; r++) {       // Вычисляем адреса сетей относительно маски
             RclIP[r] &= netmask[r];         // сперва клиента
             NetIP[r] &= netmask[r];         // потом адрес сети IP переданного в функцию
@@ -376,21 +429,46 @@ public:
     
     
     // ======================== FILE ========================
+    // DELETE
     // вернёт true при запросе на удаление файла
     bool deleteFile() {
         return _delF;
     }
     
-    // автоматическое удаление файла по uri (по умолч. выкл, false)
+    // автоматическое удаление файла по uri (по умолч. вкл, true)
     void deleteAuto(bool m) {
         _autoDel = m;
     }
     
     // имя (путь) файла для удаления. Начинается с '/'
     String deletePath() {
-        return deleteFile() ? server.arg(0) : String();
+        return deleteFile() ? server.argName(0) : String();
     }
     
+    
+    // RENAME
+    // вернёт true при запросе на переименование файла
+    bool renameFile() {
+        return _renF;
+    }
+    
+    // автоматическое переименование файла по uri (по умолч. вкл, true)
+    void renameAuto(bool m) {
+        _autoRen = m;
+    }
+    
+    // имя (путь) файла для переименования. Начинается с '/'
+    String renamePath() {
+        return renameFile() ? server.argName(0) : String();
+    }
+    
+    // новое имя (путь) файла
+    String renamePathTo() {
+        return renameFile() ? server.arg(0) : String();
+    }
+    
+    
+    // DOWNLOAD
     // вкл/выкл поддержку скачивания файлов (по умолч. вкл)
     void downloadMode(bool m) {
         downOn = m;
@@ -406,6 +484,13 @@ public:
         return _fileDF;
     }
     
+    // автоматическое скачивание файла по uri (по умолч. вкл, true)
+    void downloadAuto(bool mode) {
+        _autoD = mode;
+    }
+    
+    
+    // UPLOAD
     // вернёт true, если был запрос на загрузку файла
     bool upload() {
         return _uplF;
@@ -426,12 +511,7 @@ public:
         return _abortF;
     }
     
-    // автоматическое скачивание файла по uri (по умолч. выкл, false)
-    void downloadAuto(bool mode) {
-        _autoD = mode;
-    }
-    
-    // автоматическая загрузка файла по uri (по умолч. выкл, false)
+    // автоматическая загрузка файла по uri (по умолч. вкл, true)
     void uploadAuto(bool mode) {
         _autoU = mode;
     }
@@ -512,22 +592,49 @@ public:
         return click() ? (GPlistIdx(idx, server.argName(0), '/')) : String();
     }
     
+    
+    // HOLD
+    // вернёт true, если статус удержания кнопки изменился (нажата/отпущена)
+    bool hold() {
+        return _holdF && server.args();
+    }
+    
+    // вернёт true, если кнопка удерживается
+    bool hold(const String& name) {
+        return _hold.length() ? _hold.equals(name) : 0;
+    }
+    
+    // вернёт имя удерживаемой кнопки
+    String holdName() {
+        return _hold.length() ? _hold : String();
+    }
+    
+    // вернёт часть имени hold компонента, находящейся под номером idx после разделителя /
+    String holdNameSub(int idx = 1) {
+        return _hold.length() ? (GPlistIdx(idx, _hold, '/')) : String();
+    }
+    
+    // вернёт true, если кнопка удерживается и имя компонента начинается с указанного
+    bool holdSub(const String& name) {
+        return _hold.length() ? _hold.startsWith(name) : 0;
+    }
+    
     // вернёт true, если кнопка была нажата
     bool clickDown(const String& name) {
-        return click() ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
+        return hold() ? (_holdF == 1 && server.argName(0).equals(name)) : 0;
     }
     // вернёт true, если кнопка была нажата и имя компонента начинается с указанного
     bool clickDownSub(const String& name) {
-        return click() ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '0') : 0;
+        return hold() ? (_holdF == 1 && server.argName(0).startsWith(name)) : 0;
     }
     
     // вернёт true, если кнопка была отпущена
     bool clickUp(const String& name) {
-        return click() ? (server.argName(0).equals(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
+        return hold() ? (_holdF == 2 && server.argName(0).equals(name)) : 0;
     }
     // вернёт true, если кнопка была отпущена и имя компонента начинается с указанного
     bool clickUpSub(const String& name) {
-        return click() ? (server.argName(0).startsWith(name) && server.args() == 2 && server.arg(1)[0] == '1') : 0;
+        return hold() ? (_holdF == 2 && server.argName(0).startsWith(name)) : 0;
     }
     
     
@@ -723,7 +830,6 @@ public:
     }
     
     
-    
     // ======================= ANSWER =======================
     // отправить ответ на обновление
     bool answer(const String& s) {
@@ -759,6 +865,9 @@ public:
     }
     bool answer(GPtime& time) {
         return answer(time.encode());
+    }
+    bool answer(GPcanvas& cv) {
+        return answer(cv.s);
     }
     
     // ==================== UPDATE AUTO =====================
@@ -968,10 +1077,10 @@ public:
 
     // получить число с компонента
     int getInt(const String& n) {
-        return server.arg(n).toInt();
+        return getIntUniv(server.arg(n));
     }
     int getInt() {
-        return server.arg(0).toInt();
+        return getIntUniv(server.arg(0));
     }
     
     // получить float с компонента
@@ -1120,6 +1229,11 @@ public:
         }
     }
     
+    void sendFile_P(PGM_P file_P, const char* type) {
+        if (_cache) server.sendHeader(F("Cache-Control"), GP_CACHE_PRD);
+        server.send_P(200, type, file_P, strlen_P(file_P));
+    }
+    
     // задать размер буфера страницы, байт (умолч. 1000)
     void setBufferSize(int sz) {
         _bufsize = sz;
@@ -1181,6 +1295,13 @@ public:
     
     // ======================= PRIVATE =======================
 private:
+    int getIntUniv(const String& s) {
+        if (s[0] == '#') {
+            GPcolor col(s);
+            return col.getHEX();
+        } else return s.toInt();
+    }
+    
     void checkList() {
         if (!list.idx) return;
         for (int i = 0; i < list.idx; i++) {
@@ -1203,23 +1324,23 @@ private:
     fs::FS *_fs = nullptr;
     
     String _uri;
+    String _hold;
     String *_namePtr = nullptr;
     String *_filePtr = nullptr;
     String *_answPtr = nullptr;
     String *_updPtr = nullptr;
     
     int _bufsize = 1000;
-    
-    int _cache = 60 * 60;   // 1 hour
-    
+    bool _cache = 1;
     bool _auth = 0;
     const char* _login;
     const char* _pass;
     
     bool _mdnsF = 0, _dns = 0, _active = 0, _showPage = 0;
-    bool _formF = 0, _clickF = 0, _reqF = 0, _delF = 0;
-    bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 0, _autoU = 0, _autoDel = 0;
+    bool _formF = 0, _clickF = 0, _reqF = 0, _delF = 0, _renF = 0;
+    bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 1, _autoU = 1, _autoDel = 1, _autoRen = 1;
     bool downOn = 1, uplOn = 1;
+    uint8_t _holdF = 0;
     
     void (*_build)() = nullptr;
     void (*_buildR)(GyverPortal& p) = nullptr;

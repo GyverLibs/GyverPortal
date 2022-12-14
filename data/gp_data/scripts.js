@@ -1,6 +1,30 @@
-var _clkRelList = '',
-  _redirTout = 150,
-  _touch = 0;
+var _docTitle = 'GyverPortal',
+  _clkRelList = [],
+  _redirTout = 200,
+  _touch = 0,
+  _clkRedrList = {},
+  _clkUpdList = {},
+  _pressId = null,
+  _spinInt = null,
+  _spinF = 0;
+document.title = _docTitle;
+
+function GP_delete(url) {
+  if (!confirm('Delete ' + url + '?')) return;
+  GP_send('/GP_delete?' + url);
+  setTimeout(function() {
+    location.reload();
+  }, _redirTout);
+}
+
+function GP_rename(url) {
+  res = prompt('Rename File', url);
+  if (!res) return;
+  GP_send('/GP_rename?' + url + '=' + res);
+  setTimeout(function() {
+    location.reload();
+  }, _redirTout);
+}
 
 function GP_redirect(url) {
   setTimeout(function() {
@@ -9,7 +33,10 @@ function GP_redirect(url) {
 }
 
 function GP_hint(id, txt) {
-  document.getElementById(id).title = txt;
+  el = getEl(id);
+  if (el.className == '_sw_c');
+  el = getEl('_' + id);
+  el.title = txt;
 }
 
 function GP_send(req) {
@@ -18,34 +45,44 @@ function GP_send(req) {
   xhttp.send();
 }
 
-function GP_clickUD(arg, dir) {
-  if (arg.name) GP_send('/GP_click?' + arg.name + '=&_dir=' + dir);
+function GP_press(arg, dir) {
+  _pressId = (dir == 1) ? arg.name : null;
+  if (arg.name) GP_send('/GP_press?' + arg.name + '=' + dir);
 }
 
 function GP_click(arg, r = 0) {
-  if (!arg.name) return;
+  if (!arg.name) arg.name = arg.id;
   var v;
   if (arg.type == 'number') {
     if (arg.hasAttribute('min') && Number(arg.value) <= Number(arg.min)) arg.value = arg.min;
     if (arg.hasAttribute('max') && Number(arg.value) >= Number(arg.max)) arg.value = arg.max;
   }
   if (arg.type == 'checkbox') v = arg.checked ? '1' : '0';
-  else if (arg.type == 'button') v = '';
+  else if (arg.type == 'button' || arg.value == undefined) v = '';
   else v = arg.value;
-  if (v.charAt(0) == '#') v = v.substring(1);
   GP_send('/GP_click?' + arg.name + '=' + encodeURIComponent(v));
-  if (r != 0 || _clkRelList.split(',').includes(arg.name)) setTimeout(function() {
+  if (_clkUpdList) {
+    for (var key in _clkUpdList) {
+      if (key.includes(arg.name)) GP_update(_clkUpdList[key]);
+    }
+  }
+  if (_clkRedrList) {
+    for (var key in _clkRedrList) {
+      if (_clkRedrList[key].includes(arg.name)) GP_update(key);
+    }
+  }
+  if (r != 0 || _clkRelList.includes(arg.name)) setTimeout(function() {
     location.reload();
   }, (r ? r : _redirTout));
 }
 
 function GP_clickid(btn, tar) {
-  GP_send('/GP_click?' + btn + '=' + encodeURIComponent(document.getElementById(tar).value));
+  GP_send('/GP_click?' + btn + '=' + encodeURIComponent(getEl(tar).value));
 }
 
 function GP_change(arg) {
   arg.style.backgroundSize = (arg.value - arg.min) * 100 / (arg.max - arg.min) + '% 100%';
-  document.getElementById(arg.id + '_val').value = arg.value
+  getEl(arg.id + '_val').value = arg.value
 }
 
 function GP_wheel(arg) {
@@ -54,61 +91,99 @@ function GP_wheel(arg) {
 }
 
 function saveFile(id) {
-  document.getElementById(id).click();
+  getEl(id).click();
 }
 
 function GP_submId(id) {
-  document.getElementById(id).submit();
+  getEl(id).submit();
   event.preventDefault();
 }
 
 function openTab(tab, btn, blk) {
   var x = document.getElementsByClassName(blk);
   for (var i = 0; i < x.length; i++) x[i].style.display = 'none';
-  document.getElementById(tab).style.display = 'block';
+  getEl(tab).style.display = 'block';
   x = document.getElementsByClassName(btn.className);
   for (var i = 0; i < x.length; i++) x[i].style.background = '';
   btn.style.background = '#2a2d35';
 }
 
-function GP_spin(id, stp, dec) {
-  var num = document.getElementById(id);
-  num.value = (Number(num.value) + stp).toFixed(dec);
+function GP_spinw(arg) {
+  arg.style.width = ((arg.value.length + 2) * 12) + 'px';
+}
+
+function GP_spin(arg) {
+  var num = getEl(arg.name);
+  num.value = (Number(num.value) + Number(arg.min)).toFixed(Number(arg.max));
   var e = new Event('change');
   num.dispatchEvent(e);
 }
 
 function GP_update(ids) {
   var xhttp = new XMLHttpRequest();
+  xhttp.timeout = 700;
   xhttp.open('GET', '/GP_update?' + ids + '=', true);
   xhttp.send();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      var resp = this.responseText.split(',');
+      var resps = this.responseText.split('\1');
       ids = ids.split(',');
-      if (ids.length != resp.length) return;
-      for (let i = 0; i < ids.length; i++) {
-        var item = document.getElementById(ids[i]);
-        if (!item || !resp[i]) continue;
-        if (item.type == 'hidden' && item.value == '_reload') {
-          if (resp[i] == '1') location.reload();
-        } else if (item.type == 'checkbox' || item.type == 'radio') item.checked = Number(resp[i]);
-        else if (item.type == 'select-one') document.querySelector('#' + ids[i]).value = resp[i];
-        else if (item.type == undefined) item.innerHTML = resp[i];
-        else item.value = resp[i];
-        if (item.type == 'range') GP_change(item);
-      }
+      if (ids.length != resps.length) return;
+      for (let i = 0; i < ids.length; i++) GP_apply(getEl(ids[i]), resps[i]);
     }
   };
 }
 
+function GP_apply(item, resp) {
+  if (!item || !resp) return;
+  if (item.type == 'hidden') {
+    var val = item.value ? item.value : resp;
+    switch (item.name) {
+      case '_reload':
+        if (resp == '1') location.reload();
+        break;
+      case '_alert':
+        alert(val);
+        break;
+      case '_prompt': {
+        let res = prompt(item.value, resp);
+        if (res) GP_send('/GP_click?' + item.id + '=' + res);
+      }
+      break;
+      case '_confirm': {
+        let res = confirm(val);
+        GP_send('/GP_click?' + item.id + '=' + (res ? '1' : '0'));
+      }
+      break;
+      case '_eval':
+        eval(val);
+        break;
+      case '_title':
+        _docTitle = document.title = resp;
+        break;
+    }
+  } else if (item.type == 'checkbox' || item.type == 'radio') item.checked = Number(resp);
+  else if (item.type == 'select-one') document.querySelector('#' + item.id).value = resp;
+  else if (item.type == undefined) {
+    if (item.className == '_canvas') {
+      var begin = 'var cv=getEl(\"' + item.id + '\");var cx=cv.getContext(\"2d\");';
+      eval(begin + GP_canvas(resp));
+    } else item.innerHTML = resp;
+  } else {
+    if (item.name == '_gplog') {
+      item.innerHTML += resp;
+      item.scrollTop = item.scrollHeight;
+    } else item.value = resp;
+  }
+  if (item.type == 'range') GP_change(item);
+}
+
 function GP_sendForm(id) {
-  var elms = document.getElementById(id).elements;
+  var elms = getEl(id).elements;
   var qs = '';
   for (var i = 0, elm; elm = elms[i++];) {
     if (elm.name) {
       var v = elm.value;
-      if (v.charAt(0) == '#') v = v.substring(1);
       if (elm.type == 'checkbox') v = elm.checked ? 1 : 0;
       qs += elm.name + '=' + encodeURIComponent(v) + '&';
     }
@@ -120,4 +195,14 @@ function GP_eye(arg) {
   var p = arg.previousElementSibling;
   p.type = p.type == 'text' ? 'password' : 'text';
   arg.style.color = p.type == 'text' ? '#bbb' : '#13161a';
+}
+
+function getEl(id) {
+  return document.getElementById(id);
+}
+
+function sdbTgl() {
+  let flag = getEl('dashOver').style.display == 'block';
+  getEl('dashOver').style.display = flag ? 'none' : 'block';
+  getEl('dashSdb').style.left = flag ? '-280px' : '0';
 }

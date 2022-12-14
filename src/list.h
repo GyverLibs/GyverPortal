@@ -1,5 +1,6 @@
 #pragma once
-// список функций автообновления
+
+// GP Update List module
 
 enum GPtype {
     T_CSTR,

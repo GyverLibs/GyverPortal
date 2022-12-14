@@ -1,47 +1,47 @@
 // всплывающее окно confirm
-// активация по клику по кнопке
+// активация по событию из скетча и по кнопке в браузере
 
 #define AP_SSID ""
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
-
-// флаг для передачи действия
-bool confirmF, confirmFT;
+GyverPortal ui;
 
 void build() {
   GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
+  // запрос на обновление каждую секунду
+  GP.UPDATE("cfm");
   GP.CONFIRM("cfm");
-  GP.CONFIRM("cfmT", "Confirm Text");
 
+  // вызов по кнопке
+  GP.CONFIRM("cfmT", "Confirm Text");
   GP.BUTTON("btnC", "Confirm");
-  GP.BUTTON("btnCT", "Confirm Text");
+  GP.UPDATE_CLICK("cfmT", "btnC");
 
   GP.BUILD_END();
 }
 
+bool flag;
+
 void action() {
-  if (portal.update()) {
-    if (confirmF && portal.update("cfm")) {
-      confirmF = 0;
-      portal.answer(String("Confirm! millis(): ") + millis());
+  if (ui.update()) {
+    // вызов с таймера
+    if (flag && ui.update("cfm")) {
+      flag = 0;
+      ui.answer(String("Confirm! millis(): ") + millis());
     }
 
-    if (confirmFT && portal.update("cfmT")) {
-      confirmFT = 0;
-      portal.answer(1);
+    // вызов с кнопки
+    if (ui.update("cfmT")) {
+      ui.answer(1);
     }
   }
 
-  if (portal.click()) {
-    if (portal.click("btnC")) confirmF = 1;
-    if (portal.click("btnCT")) confirmFT = 1;
-    
-    if (portal.click("cfm")) Serial.println(portal.getInt());
-    if (portal.click("cfmT")) Serial.println(portal.getInt());
+  if (ui.click()) {
+    if (ui.click("cfm")) Serial.println(String("cfm: ") + ui.getBool());
+    if (ui.click("cfmT")) Serial.println(String("cfmT: ") + ui.getBool());
   }
 }
 
@@ -55,11 +55,18 @@ void setup() {
   }
   Serial.println(WiFi.localIP());
 
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
+
+  // "вызываем" раз в 5 секунд
+  static uint32_t tmr;
+  if (millis() - tmr >= 5000) {
+    tmr = millis();
+    flag = 1;
+  }
 }

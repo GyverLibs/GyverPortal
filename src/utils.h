@@ -1,4 +1,7 @@
 #pragma once
+
+// GP Utilities
+
 #include <Arduino.h>
 
 #define GP_PGM(name, val) static const char name[] PROGMEM = val
@@ -23,6 +26,7 @@ GP_PGM(GP_ORANGE_B, "#ff4500");
 GP_PGM(GP_GRAY, "#5e5e5e");
 GP_PGM(GP_GRAY_B, "#9c9ea1");
 GP_PGM(GP_BLACK, "#13161a");
+GP_PGM(GP_WHITE, "#fff");
 GP_PGM(GP_DEFAULT, "#fff");
 
 enum GPalign {
@@ -95,6 +99,9 @@ struct GPcolor {
     uint8_t r = 0, g = 0, b = 0;
     
     GPcolor() {}
+    GPcolor(const GPcolor& col) {
+        *this = col;
+    }
     GPcolor(uint32_t col) {
         setHEX(col);
     }
@@ -153,6 +160,9 @@ struct GPdate {
     uint8_t month = 1, day = 1;
     
     GPdate() {}
+    GPdate(const GPdate& dat) {
+        *this = dat;
+    }
     GPdate(uint32_t unix, int16_t gmt = 0) {
         unix = (unix + gmt * 60L) / (60 * 60 * 24) + 719468;
         uint8_t era = unix / 146097ul;
@@ -204,6 +214,9 @@ struct GPtime {
     uint8_t hour = 0, minute = 0, second = 0;
     
     GPtime() {}
+    GPtime(const GPtime& tim) {
+        *this = tim;
+    }
     GPtime(uint32_t unix, int16_t gmt = 0) {
         unix += gmt * 60L;
         second = unix % 60ul;

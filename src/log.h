@@ -1,4 +1,7 @@
 #pragma once
+
+// GP LOG module
+
 #include <Print.h>
 class GPlog : public Print {
 public:
@@ -26,13 +29,21 @@ public:
     // запись в буфер
     virtual size_t write(uint8_t n) {
         if (buffer && head <= size - 2) {
-            buffer[head] = n;
-            head++;
+            if (newline) {
+                newline = 0;
+                buffer[head++] = '\r';
+                buffer[head++] = '\n';
+            }
+            buffer[head++] = n;
         }
         return 1;
     }
     
     char* read() {
+        if (buffer[head - 2] == '\r') {
+            head -= 2;
+            newline = 1;
+        }
         buffer[head] = '\0';
         head = 0;
         return buffer;
@@ -55,6 +66,7 @@ public:
     char* buffer = nullptr;
     
 private:
+    bool newline = 0;
     int size;
     int head = 0;
 };

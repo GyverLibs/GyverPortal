@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 // переменные для получения данных с формы
 bool valCheck;
@@ -60,31 +60,31 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void action() {
   // одна из форм была submit
-  if (portal.form()) {
+  if (ui.form()) {
     // проверяем, была ли это форма "/update"
-    if (portal.form("/update")) {
+    if (ui.form("/update")) {
       // забираем значения и обновляем переменные
       // 1. получаем и присваиваем вручную
-      valCheck = portal.getBool("ch");
-      valSwitch = portal.getBool("sw");
-      valText = portal.getString("txt");
-      valNum = portal.getInt("num");
+      valCheck = ui.getBool("ch");
+      valSwitch = ui.getBool("sw");
+      valText = ui.getString("txt");
+      valNum = ui.getInt("num");
 
       // 2. также можно переписать через copyXX
-      portal.copyStr("pass", valPass);
-      portal.copyFloat("spn", valSpin);
-      portal.copyInt("sld", valSlider);
-      portal.copyDate("date", valDate);
-      portal.copyTime("time", valTime);
-      portal.copyColor("col", valCol);
-      portal.copyInt("sel", valSelect);
+      ui.copyStr("pass", valPass);
+      ui.copyFloat("spn", valSpin);
+      ui.copyInt("sld", valSlider);
+      ui.copyDate("date", valDate);
+      ui.copyTime("time", valTime);
+      ui.copyColor("col", valCol);
+      ui.copyInt("sel", valSelect);
       
       // выводим для отладки
       Serial.print(valCheck);
@@ -113,5 +113,5 @@ void action() {
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 }

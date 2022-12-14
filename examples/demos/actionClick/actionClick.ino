@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 // переменные
 bool valCheck;
@@ -57,80 +57,80 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void action() {
   // был клик по компоненту
-  if (portal.click()) {
+  if (ui.click()) {
     // проверяем компоненты и обновляем переменные
     
     // 1. переписали вручную
-    if (portal.click("ch")) {
-      valCheck = portal.getBool("ch");
+    if (ui.click("ch")) {
+      valCheck = ui.getBool("ch");
       Serial.print("Check: ");
       Serial.println(valCheck);
     }
 
     // 2. автоматическое обновление переменной
-    if (portal.clickBool("sw", valSwitch)) {
+    if (ui.clickBool("sw", valSwitch)) {
       Serial.print("Switch: ");
       Serial.println(valSwitch);
     }
 
-    if (portal.clickString("txt", valText)) {
+    if (ui.clickString("txt", valText)) {
       Serial.print("Text: ");
       Serial.println(valText);
     }
 
-    if (portal.clickInt("num", valNum)) {
+    if (ui.clickInt("num", valNum)) {
       Serial.print("Number: ");
       Serial.println(valNum);
     }
 
-    if (portal.clickStr("pass", valPass)) {
+    if (ui.clickStr("pass", valPass)) {
       Serial.print("Password: ");
       Serial.println(valPass);
     }
 
-    if (portal.clickFloat("spn", valSpin)) {
+    if (ui.clickFloat("spn", valSpin)) {
       Serial.print("Spinner: ");
       Serial.println(valSpin);
     }
 
-    if (portal.clickInt("sld", valSlider)) {
+    if (ui.clickInt("sld", valSlider)) {
       Serial.print("Slider: ");
       Serial.println(valSlider);
     }
 
-    if (portal.clickDate("date", valDate)) {
+    if (ui.clickDate("date", valDate)) {
       Serial.print("Date: ");
       Serial.println(valDate.encode());
     }
 
-    if (portal.clickTime("time", valTime)) {
+    if (ui.clickTime("time", valTime)) {
       Serial.print("Time: ");
       Serial.println(valTime.encode());
     }
 
-    if (portal.clickColor("col", valCol)) {
+    if (ui.clickColor("col", valCol)) {
       Serial.print("Color: ");
       Serial.println(valCol.encode());
     }
 
-    if (portal.clickInt("sel", valSelect)) {
+    if (ui.clickInt("sel", valSelect)) {
       Serial.print("Select: ");
       Serial.println(valSelect);
     }
 
-    if (portal.click("btn")) Serial.println("Button click");
-    if (portal.clickUp("btn")) Serial.println("Button up");
-    if (portal.clickDown("btn")) Serial.println("Button down");
+    if (ui.click("btn")) Serial.println("Button click");
+    if (ui.clickUp("btn")) Serial.println("Button up");
+    if (ui.clickDown("btn")) Serial.println("Button down");
   }
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 }

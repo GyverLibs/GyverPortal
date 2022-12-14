@@ -21,7 +21,7 @@ const char *names[] = {"Random", "Counter"};
 #include "time.h"
 #include <EEPROM.h>
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 // конструктор страницы
 void build() {
@@ -43,8 +43,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.start();
+  ui.attachBuild(build);
+  ui.start();
 
   // настраиваем получение времени
   configTime(GMT_OFF * 60ul * 60, 0, "pool.ntp.org");
@@ -55,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
   dataLog();
 }
 

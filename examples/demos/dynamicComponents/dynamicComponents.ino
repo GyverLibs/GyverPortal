@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 void build() {
   GP.BUILD_BEGIN();
@@ -42,29 +42,29 @@ void build() {
 }
 
 void action() {
-  if (portal.click()) {
-    if (portal.clickSub("sld")) {   // начинается с sld
+  if (ui.click()) {
+    if (ui.clickSub("sld")) {   // начинается с sld
       Serial.print("Slider ");
-      Serial.print(portal.clickNameSub(1)); // получаем цифру
+      Serial.print(ui.clickNameSub(1)); // получаем цифру
       Serial.print(": ");
-      Serial.println(portal.getInt());
+      Serial.println(ui.getInt());
 
     }
-    if (portal.clickSub("btn")) {   // начинается с btn
+    if (ui.clickSub("btn")) {   // начинается с btn
       Serial.print("Click: ");
-      Serial.println(portal.clickNameSub(1)); // получаем цифру
+      Serial.println(ui.clickNameSub(1)); // получаем цифру
     }
   }
 
-  if (portal.update()) {
-    if (portal.updateSub("lbl")) {   // начинается с lbl
+  if (ui.update()) {
+    if (ui.updateSub("lbl")) {   // начинается с lbl
       // формируем ответ вида "lbl #0: 123"
       String s;
       s += "lbl #";
-      s += portal.updateNameSub(1);
+      s += ui.updateNameSub(1);
       s += ":";
       s += random(10);
-      portal.answer(s);
+      ui.answer(s);
     }
   }
 }
@@ -79,11 +79,11 @@ void setup() {
   }
   Serial.println(WiFi.localIP());
 
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 }

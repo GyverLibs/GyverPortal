@@ -64,6 +64,7 @@
 #include "objects.h"
 #include "portal.h"
 #include "builder.h"
+#include "canvas.h"
 #include "legacy.h"
 #include "buildMacro.h"
 #include "version.h"

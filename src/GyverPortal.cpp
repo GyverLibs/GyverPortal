@@ -13,3 +13,5 @@ uint32_t _gp_unix_tmr = 0;
 uint32_t _gp_local_unix = 0;
 Builder add;    // legacy
 Builder GP;
+const char* _gp_style = nullptr;
+uint8_t _gp_seed;

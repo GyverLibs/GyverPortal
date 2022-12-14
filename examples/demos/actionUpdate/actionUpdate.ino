@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 // переменные
 int valNum;
@@ -63,38 +63,38 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void action() {
   // было обновление
-  if (portal.update()) {
+  if (ui.update()) {
     // 1. ищем, какой компонент запрашивает обновление
     // и вручную отправляем рандомное значение
-    if (portal.update("t1")) portal.answer(random(100));
-    if (portal.update("lb")) portal.answer(random(1000));
-    if (portal.update("lbb")) portal.answer(random(1000));
-    if (portal.update("ch")) portal.answer(random(2));
-    if (portal.update("led")) portal.answer(random(2));
-    if (portal.update("sw")) portal.answer(random(2));
-    if (portal.update("txt")) portal.answer(random(1000));
+    if (ui.update("t1")) ui.answer(random(100));
+    if (ui.update("lb")) ui.answer(random(1000));
+    if (ui.update("lbb")) ui.answer(random(1000));
+    if (ui.update("ch")) ui.answer(random(2));
+    if (ui.update("led")) ui.answer(random(2));
+    if (ui.update("sw")) ui.answer(random(2));
+    if (ui.update("txt")) ui.answer(random(1000));
 
     // 2. автоматическое обновление из переменной
-    portal.updateInt("num", valNum);
-    portal.updateString("pass", valPass);
-    portal.updateInt("spn", valSpin);
-    portal.updateInt("sld", valSlider);
-    portal.updateDate("date", valDate);
-    portal.updateTime("time", valTime);
-    portal.updateColor("col", valCol);
-    portal.updateInt("sel", valSelect);
+    ui.updateInt("num", valNum);
+    ui.updateString("pass", valPass);
+    ui.updateInt("spn", valSpin);
+    ui.updateInt("sld", valSlider);
+    ui.updateDate("date", valDate);
+    ui.updateTime("time", valTime);
+    ui.updateColor("col", valCol);
+    ui.updateInt("sel", valSelect);
   }
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 
   // имитируем изменение переменных "откуда то из программы"
   static uint32_t tmr;

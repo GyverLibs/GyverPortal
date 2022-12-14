@@ -63,13 +63,13 @@ void loginPortal() {
   WiFi.softAP("WiFi Config");
 
   // запускаем портал
-  GyverPortal portal;
-  portal.attachBuild(build);
-  portal.start(WIFI_AP);
-  portal.attach(action);
+  GyverPortal ui;
+  ui.attachBuild(build);
+  ui.start(WIFI_AP);
+  ui.attach(action);
 
   // работа портала
-  while (portal.tick());
+  while (ui.tick());
 }
 
 void action(GyverPortal& p) {

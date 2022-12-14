@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 void build() {
   GP.BUILD_BEGIN();
@@ -32,13 +32,13 @@ void build() {
 }
 
 void action() {
-  if (portal.click()) {
+  if (ui.click()) {
     // первый цвет, выведем в порт
-    if (portal.click("c1")) Serial.println(portal.getString());
+    if (ui.click("c1")) Serial.println(ui.getString());
 
     // второй перепишем в буфер и выведем каналами
     GPcolor buf;
-    if (portal.copyColor("c2", buf)) {
+    if (ui.copyColor("c2", buf)) {
       Serial.print(buf.r);
       Serial.print(',');
       Serial.print(buf.g);
@@ -59,11 +59,11 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 }

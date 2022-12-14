@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 GP_TITLE tit("t1");
 GP_LABEL lab("l1");
@@ -81,107 +81,107 @@ void build() {
 }
 
 void action() {
-  if (portal.form("/save")) {
-    portal.copyObj(num);
-    portal.copyObj(numf);
+  if (ui.form("/save")) {
+    ui.copyObj(num);
+    ui.copyObj(numf);
     Serial.println(num.value);
     Serial.println(numf.value);
 
-    portal.copyObj(txt);
-    portal.copyObj(pas);
+    ui.copyObj(txt);
+    ui.copyObj(pas);
     Serial.println(txt.text);
     Serial.println(pas.text);
 
-    portal.copyObj(ar);
+    ui.copyObj(ar);
     Serial.println(ar.text);
 
-    portal.copyObj(ch);
-    portal.copyObj(sw);
+    ui.copyObj(ch);
+    ui.copyObj(sw);
     Serial.println(ch.state);
     Serial.println(sw.state);
 
-    portal.copyObj(dat);
-    portal.copyObj(tm);
+    ui.copyObj(dat);
+    ui.copyObj(tm);
     Serial.println(dat.date.encode());
     Serial.println(tm.time.encode());
 
-    portal.copyObj(col);
+    ui.copyObj(col);
     Serial.println(col.color.encode());
 
-    portal.copyObj(sp);
+    ui.copyObj(sp);
     Serial.println(sp.value);
 
-    portal.copyObj(sl);
+    ui.copyObj(sl);
     Serial.println(sl.value);
 
-    portal.copyObj(sel);
+    ui.copyObj(sel);
     Serial.println(sel.selected);
     Serial.println(sel.getValue());
   }
 
-  if (portal.click()) {
-    if (portal.clickUp(btn)) Serial.println("down");
-    if (portal.clickDown(btn)) Serial.println("up");
+  if (ui.click()) {
+    if (ui.clickUp(btn)) Serial.println("down");
+    if (ui.clickDown(btn)) Serial.println("up");
     
-    if (portal.clickObj(btn)) Serial.println("btn");
-    if (portal.clickObj(btnm)) Serial.println("btn mini");
+    if (ui.clickObj(btn)) Serial.println("btn");
+    if (ui.clickObj(btnm)) Serial.println("btn mini");
 
-    if (portal.clickObj(num)) Serial.println(num.value);
-    if (portal.clickObj(numf)) Serial.println(numf.value);
+    if (ui.clickObj(num)) Serial.println(num.value);
+    if (ui.clickObj(numf)) Serial.println(numf.value);
 
-    if (portal.clickObj(txt)) Serial.println(txt.text);
-    if (portal.clickObj(pas)) Serial.println(pas.text);
+    if (ui.clickObj(txt)) Serial.println(txt.text);
+    if (ui.clickObj(pas)) Serial.println(pas.text);
 
-    if (portal.clickObj(ar)) Serial.println(ar.text);
+    if (ui.clickObj(ar)) Serial.println(ar.text);
 
-    if (portal.clickObj(ch)) Serial.println(ch.state);
-    if (portal.clickObj(sw)) Serial.println(sw.state);
+    if (ui.clickObj(ch)) Serial.println(ch.state);
+    if (ui.clickObj(sw)) Serial.println(sw.state);
 
-    if (portal.clickObj(dat)) Serial.println(dat.date.encode());
-    if (portal.clickObj(tm)) Serial.println(tm.time.encode());
-    if (portal.clickObj(col)) Serial.println(col.color.encode());
+    if (ui.clickObj(dat)) Serial.println(dat.date.encode());
+    if (ui.clickObj(tm)) Serial.println(tm.time.encode());
+    if (ui.clickObj(col)) Serial.println(col.color.encode());
 
-    if (portal.clickObj(sp)) Serial.println(sp.value);
-    if (portal.clickObj(sl)) Serial.println(sl.value);
+    if (ui.clickObj(sp)) Serial.println(sp.value);
+    if (ui.clickObj(sl)) Serial.println(sl.value);
 
-    if (portal.clickObj(sel)) {
+    if (ui.clickObj(sel)) {
       Serial.println(sel.selected);
       Serial.println(sel.getValue());
     }
   }
 
-  if (portal.update()) {
+  if (ui.update()) {
     tit.text = random(10);
     lab.text = random(10);
     labb.text = random(10);
-    portal.updateObj(tit);
-    portal.updateObj(lab);
-    portal.updateObj(labb);
+    ui.updateObj(tit);
+    ui.updateObj(lab);
+    ui.updateObj(labb);
 
     led1.state = random(2);
     led2.state = random(2);
     led3.state = random(2);
-    portal.updateObj(led1);
-    portal.updateObj(led2);
-    portal.updateObj(led3);
+    ui.updateObj(led1);
+    ui.updateObj(led2);
+    ui.updateObj(led3);
 
     num.value = random(10);
     numf.value = random(100) / 10.0;
-    portal.updateObj(num);
-    portal.updateObj(numf);
+    ui.updateObj(num);
+    ui.updateObj(numf);
 
     txt.text = random(100);
     pas.text = random(100);
-    portal.updateObj(txt);
-    portal.updateObj(pas);
+    ui.updateObj(txt);
+    ui.updateObj(pas);
 
     ar.text = random(10000);
-    portal.updateObj(ar);
+    ui.updateObj(ar);
 
     ch.state = random(2);
     sw.state = random(2);
-    portal.updateObj(ch);
-    portal.updateObj(sw);
+    ui.updateObj(ch);
+    ui.updateObj(sw);
 
     dat.date = (GPdate) {
       (uint16_t)random(2000, 2030), (uint8_t)random(13), (uint8_t)random(13)
@@ -189,17 +189,17 @@ void action() {
     tm.time = (GPtime) {
       (uint8_t)random(24), (uint8_t)random(60), (uint8_t)random(60)
     };
-    portal.updateObj(dat);
-    portal.updateObj(tm);
+    ui.updateObj(dat);
+    ui.updateObj(tm);
 
     col.color = random(0xffffff);
-    portal.updateObj(col);
+    ui.updateObj(col);
 
     sp.value = random(50);
-    portal.updateObj(sp);
+    ui.updateObj(sp);
 
     sl.value = random(10);
-    portal.updateObj(sl);
+    ui.updateObj(sl);
   }
 }
 
@@ -223,11 +223,11 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // подключаем конструктор и запускаем
-  portal.attachBuild(build);
-  portal.attach(action);
-  portal.start();
+  ui.attachBuild(build);
+  ui.attach(action);
+  ui.start();
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 }

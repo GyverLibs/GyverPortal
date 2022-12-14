@@ -1,4 +1,7 @@
 #pragma once
+
+// GP Objects
+
 #include "utils.h"
 
 #define GP_EMPTY_INT INT32_MAX

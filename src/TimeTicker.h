@@ -1,5 +1,7 @@
 #pragma once
 
+// GP Time module
+
 struct TimeTicker {
     void setUnix(uint32_t unix) {
         _unix = unix;

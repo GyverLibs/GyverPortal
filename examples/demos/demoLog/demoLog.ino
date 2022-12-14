@@ -4,7 +4,7 @@
 #define AP_PASS ""
 
 #include <GyverPortal.h>
-GyverPortal portal;
+GyverPortal ui;
 
 // конструктор страницы
 void build() {
@@ -25,18 +25,18 @@ void setup() {
   }
   Serial.println(WiFi.localIP());
 
-  portal.attachBuild(build);
-  portal.start();
-  portal.log.start(30);   // передали размер буфера
+  ui.attachBuild(build);
+  ui.start();
+  ui.log.start(30);   // передали размер буфера
 }
 
 void loop() {
-  portal.tick();
+  ui.tick();
 
   static uint32_t tmr;
   if (millis() - tmr > 2000) {
     tmr = millis();
-    portal.log.print("Hello: #");
-    portal.log.println(random(100));
+    ui.log.print("Hello: #");
+    ui.log.println(random(100));
   }
 }
