@@ -386,16 +386,6 @@ public:
     bool tick() {
         if (!_active) return 0;
         
-        // deprecated
-        #ifdef ESP8266
-        if (!_action && !_actionR) {
-            if (_showPage) {_showPage = 0; show();}
-            //if (_updateF) server.send(200, "text/plain");
-            _clickF = _formF = 0;
-        }
-        #endif
-        // deprecated
-        
         #ifndef GP_NO_DNS
         if (_dns) dnsServer.processNextRequest();
         #endif
@@ -403,16 +393,6 @@ public:
         if (_mdnsF) MDNS.update();
         #endif
         server.handleClient();
-        
-        // deprecated
-        #ifdef ESP8266
-        if (!_action && !_actionR) {
-            if (_formF && _form) _form(this);
-            if (_clickF && _click) _click(this);
-            //if (_updateF && _update) _update(this);
-        }
-        #endif
-        // deprecated
         
         yield();
         return 1;
@@ -1283,11 +1263,8 @@ public:
 #endif
     
     // ======================= LEGACY =======================
-    void attachClick(void (*handler)(GyverPortal* p)) {_click = *handler;}
-    void attachForm(void (*handler)(GyverPortal* p)) {_form = *handler;}
-    void attachUpdate(void (*handler)(GyverPortal* p)) {_update = *handler;}
-    int clickValue() {return server.arg(0).toInt();}
-    String clickText() {return String(server.arg(0));}
+    int clickValue() { return server.arg(0).toInt(); }
+    String clickText() { return String(server.arg(0)); }
     int getSelected(const String& n) { return server.arg(n).toInt(); }
     int getSelected() { return server.arg(0).toInt(); }
     bool getCheck(const String& n) { return getBool(n); }
@@ -1350,9 +1327,4 @@ private:
 #ifndef GP_NO_DNS
     DNSServer dnsServer;
 #endif
-
-    // ======================= DEPRECATED =======================
-    void (*_click)(GyverPortal* p) = nullptr;
-    void (*_form)(GyverPortal* p) = nullptr;
-    void (*_update)(GyverPortal* p) = nullptr;
 };

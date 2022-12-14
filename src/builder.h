@@ -697,18 +697,6 @@ struct Builder {
         TAG_RAW(F("label"), val, name, st);
     }
     
-    // legacy
-    /*void SPAN(const String& val, const String& align = "", const String& name = "") {
-        if (align.length()) {
-            *_GPP += F("<div style='text-align:");
-            *_GPP += align;
-            *_GPP += F("'>");
-        } else *_GPP += F("<div>");
-        TAG_RAW(F("span"), val, name);
-        *_GPP += F("</div>\n");
-        send();
-    }*/
-    
     void SPAN(const String& text, GPalign al = GP_CENTER, const String& name = "", PGM_P st = GP_DEFAULT) {
         if (al != GP_CENTER) {
             *_GPP += F("<div style='text-align:");
