@@ -454,7 +454,6 @@ input::-webkit-inner-spin-button {
 .spinner {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .spinBtn {
@@ -561,7 +560,7 @@ input[type=time]:focus {
 
 .eyepass {
   position: absolute;
-  margin-left: -35px;
+  margin-left: -40px;
   margin-top: 7px;
   cursor: pointer;
   font-size: 25px;

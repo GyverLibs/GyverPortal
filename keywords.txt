@@ -6,6 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 GyverPortal	KEYWORD1
+CamStream	KEYWORD1
 
 ################ CONFIG ###############
 GP_NO_MDNS	KEYWORD1
@@ -294,6 +295,7 @@ GP_ALS	LITERAL1
 
 ################ BUILDER ###############
 GP_VERSION	LITERAL1
+CAM_STREAM	LITERAL1
 
 JS_BEGIN	LITERAL1
 JS_END	LITERAL1

@@ -1635,7 +1635,7 @@ struct Builder {
         *_GPP += F(" onmousewheel='GP_wheel(this);GP_change(this);GP_click(this)' ");
         if (dis) *_GPP += F("disabled");
         *_GPP += ">\n";
-        *_GPP += F("<output id='");
+        *_GPP += F("<output align='center' id='");
         *_GPP += name;
         *_GPP += F("_val' ");
         if (st != GP_GREEN) {
@@ -1817,6 +1817,15 @@ struct Builder {
             idx++;
         }
         *_GPP += F("</select>\n");
+        send();
+    }
+    
+    void CAM_STREAM(int width = 500, int port = 90) {
+        *_GPP += F("<img id='_stream' style='max-height:100%;width:");
+        *_GPP += width;
+        *_GPP += F("px'>\n<script>window.onload=document.getElementById('_stream').src=window.location.href.slice(0,-1)+':");
+        *_GPP += port;
+        *_GPP += F("/';</script>\n");
         send();
     }
     

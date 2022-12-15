@@ -191,15 +191,10 @@ public:
             
             _gp_local_unix = getUnix() + getGMT() * 60;
 
-            if (_action || _actionR) {                  // подключен новый обработчик действия
-                if (_action) _action();                 // вызов обычного
-                else if (_actionR) _actionR(*this);     // вызов с объектом
-                if (_showPage) show();                  // отправляем страницу
-            } else {
-                #ifdef ESP32
-                if (_showPage) show();                  // затычка для esp32, отправляем страницу даже без обработчика
-                #endif
-            }
+            if (_action) _action();                 // вызов обычного обработчика действий
+            else if (_actionR) _actionR(*this);     // вызов обработчика действий с объектом
+            if (_showPage) show();                  // показать страницу            
+
             if (_fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
             _reqF = _fileDF = _clickF = _formF = _delF = _renF = _holdF = 0;     // скидываем флаги
         });
