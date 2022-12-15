@@ -243,7 +243,7 @@
   - Подписи к осям AJAX_PLOT
   - GyverPortal::caching(bool), GyverPortal::clearCache()
   - Обработка удержания кнопок, отдельный обработчик hold()
-  - Поддержка ESP32 CAM, вывод стрима с камеры
+  - Поддержка ESP32 CAM, вывод стрима с камеры (CamStream.h + GP.CAM_STREAM)
 - Исправлено
   - Мелкие баги
   - HINT() для BUTTON, SWITCH и UPLOAD
