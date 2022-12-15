@@ -734,3 +734,34 @@ input[type='number'] {
 .i_btn:hover {
   filter: brightness(0.8);
 }
+
+.check_c>input {
+  margin: 4px -27px 6px -2px;
+  opacity: 0;
+}
+
+.check_c>span::before {
+  content: '';
+  border-radius: 8px;
+  padding: 4px 12px;
+  color: #bbb;
+  background-color: #fff;
+  border: 1px solid #adb5bd;
+  border-radius: 0.25em;
+  transition: .2s;
+  cursor: pointer;
+}
+
+.check_c>input:checked+span::before {
+  border-color: #4CAF50;
+  background-color: #4CAF50;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='m12.82,3l-6.6,6.6l-3,-3-1.9,1.9l5,5.00687l8.5,-8.5-1.9,-1.9z' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+.check_c>input:disabled+span::before {
+  background-color: #e9ecef;
+}
+
+.check_c>input:hover+span::before {
+  filter: brightness(0.85);
+}

@@ -23,9 +23,9 @@ String GPfileType(const String& uri) {
         for (int i = 0; i < 5; i++) {
             int pos = GPinList(ext, FPSTR(pgm_read_dword(_gp_ext + i)));
             if (pos >= 0) {
-                ext = GPlistIdx(i, FPSTR(_gp_types));
+                ext = GPlistIdx(FPSTR(_gp_types), i);
                 ext += '/';
-                ext += GPlistIdx(pos, FPSTR(pgm_read_dword(_gp_val + i)));
+                ext += GPlistIdx(FPSTR(pgm_read_dword(_gp_val + i)), pos);
                 return ext;
             }
         }
@@ -93,7 +93,7 @@ int GPinList(const String& s, const String& li) {
     for (int i = 0; i < t; i++) if (li[i] == ',') cnt++;
     return cnt;
 }
-String GPlistIdx(int idx, const String& li, char div) {
+String GPlistIdx(const String& li, int idx, char div) {
     int cnt = 0, p = 0, i = 0;
     while (1) {
         if (li[i] == div || !li[i]) {

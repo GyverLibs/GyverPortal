@@ -77,11 +77,11 @@ struct Builder {
     void PAGE_TITLE(const String& text = "", const String& name = "") {
         if (name.length()) HIDDEN(name, F("_title"), text);
         if (text.length()) {
-			JS_BEGIN();
+            JS_BEGIN();
             *_GPP += F("_docTitle=document.title='");
             *_GPP += text;
             *_GPP += "'";
-			JS_END();
+            JS_END();
         }
     }
     
@@ -174,8 +174,8 @@ struct Builder {
     }
     void JS_BOTTOM() {
         SEND(F("<script>document.querySelectorAll('input[type=range]').forEach(x=>{GP_change(x)});\n"
-		"document.querySelectorAll('.spin_inp').forEach(x=>GP_spinw(x));"
-		"</script>\n"));
+        "document.querySelectorAll('.spin_inp').forEach(x=>GP_spinw(x));"
+        "</script>\n"));
     }
     
     // время
@@ -242,42 +242,42 @@ struct Builder {
     }
     
     void HINT(const String& name, const String& txt) {
-		JS_BEGIN();
+        JS_BEGIN();
         *_GPP += F("GP_hint('");
         *_GPP += name;
         *_GPP += F("','");
         *_GPP += txt;
         *_GPP += F("')");
-		JS_END();
+        JS_END();
         send();
     }
-	
-	void JS_BEGIN() {
-		*_GPP += F("<script>\n");
-	}
-	void JS_END() {
-		*_GPP += F("\n</script>\n");
-	}
-	
-	void ONLINE_CHECK(int prd = 5000) {
-		JS_BEGIN();
+    
+    void JS_BEGIN() {
+        *_GPP += F("<script>\n");
+    }
+    void JS_END() {
+        *_GPP += F("\n</script>\n");
+    }
+    
+    void ONLINE_CHECK(int prd = 5000) {
+        JS_BEGIN();
         *_GPP += F("setInterval(function(){var xhttp=new XMLHttpRequest();xhttp.timeout=300;xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
         "xhttp.onreadystatechange=function(){document.title=((!this.status)?'🚫':'')+_docTitle;}},");
         *_GPP += prd;
         *_GPP += F(");");
         JS_END();
-	}
+    }
     
     // ================== CANVAS ==================
     // обновить CANVAS с именем name при клике на компонент из списка list
     void REDRAW_CLICK(const String& name, const String& list) {
         JS_BEGIN();
-		*_GPP += F("_clkRedrList['");
+        *_GPP += F("_clkRedrList['");
         *_GPP += name;
         *_GPP += F("']='");
         *_GPP += list;
         *_GPP += F("';");
-		JS_END();
+        JS_END();
         send();
     }
     void CANVAS(const String& name, int w, int h) {
@@ -303,25 +303,25 @@ struct Builder {
     
     void CANVAS_BEGIN(const String& name, int w, int h) {
         CANVAS(name, w, h);
-		JS_BEGIN();
+        JS_BEGIN();
         *_GPP += F("var cv=getEl('");
         *_GPP += name;
         *_GPP += F("');\n var cx=cv.getContext('2d');eval(GP_canvas(\"");
     }
     void CANVAS_END() {
         *_GPP += F("\"))");
-		JS_END();
+        JS_END();
     }
     
     // ======================= UPDATE =======================
     void UPDATE(const String& list, int prd = 1000) {
-		JS_BEGIN();
+        JS_BEGIN();
         *_GPP += F("setInterval(function(){GP_update('");
         *_GPP += list;
         *_GPP += F("'.replace(' ',''))},");
         *_GPP += prd;
         *_GPP += F(");");
-		JS_END();
+        JS_END();
         send();
     }
     void AJAX_UPDATE(const String& list, int prd = 1000) {
@@ -336,14 +336,14 @@ struct Builder {
     }
     void JQ_UPDATE_BEGIN(int prd = 1000, int del = 100) {
         JS_BEGIN();
-		*_GPP += F("var globalupd=1;\n"
+        *_GPP += F("var globalupd=1;\n"
         "$(function(ev){$('#jqupd').click(function (ev){globalupd=0;setTimeout(function(){$('#jqupd').load('# #jqupd');},");
         *_GPP += del;
         *_GPP += F(");});});\n setInterval(function(){if(globalupd){$('#jqupd').load('# #jqupd');}else{globalupd=1;}},");
         *_GPP += prd;
         *_GPP += F(");");
-		JS_END();
-		*_GPP += F("<div id='jqupd' style='width:100%;'>\n");
+        JS_END();
+        *_GPP += F("<div id='jqupd' style='width:100%;'>\n");
         send();
     }
     void JQ_UPDATE_END() {
@@ -358,24 +358,24 @@ struct Builder {
     // список имён компонентов, изменение (клик) которых приведёт к перезагрузке страницы
     void RELOAD_CLICK(const String& list) {
         JS_BEGIN();
-		*_GPP += F("_clkRelList='");
+        *_GPP += F("_clkRelList='");
         *_GPP += list;
         *_GPP += F("'.split(',');_redirTout=");
         *_GPP += reloadTimeout;
         *_GPP += ';';
-		JS_END();
+        JS_END();
         send();
     }
     
     // вызвать update у компонентов в списке list при клике по компонентам из списка names
     void UPDATE_CLICK(const String& list, const String& names) {
         JS_BEGIN();
-		*_GPP += F("_clkUpdList['");
+        *_GPP += F("_clkUpdList['");
         *_GPP += names;
         *_GPP += F("']='");
         *_GPP += list;
         *_GPP += F("';");
-		JS_END();
+        JS_END();
         send();
     }
     
@@ -773,13 +773,13 @@ struct Builder {
     String ICON(const String& faname, int size = 20, PGM_P st = GP_DEFAULT) {
         String s(F("<i class='fa fa-"));
         s += faname;
-		s += F("' style='");
+        s += F("' style='");
         if (size) {
             s += F("font-size:");
             s += size;
             s += F("px;");
         }
-		if (st != GP_DEFAULT) {
+        if (st != GP_DEFAULT) {
             s += F("color:");
             s += FPSTR(st);
             s += ";";
@@ -788,42 +788,42 @@ struct Builder {
         return s;
     }
     String ICON_FILE(const String& uri, int size = 20, PGM_P st = GP_DEFAULT) {
-		String s(F("<i class='i_mask' style='-webkit-mask:center/contain no-repeat url("));
-		s += uri;
-		s += F(");");
-		if (st != GP_DEFAULT) {
-			s += F("background-color:");
-			s += FPSTR(st);
-			s += ";";
-		}
-		if (size) {
-			s += F("width:");
-			s += size;
-			s += F("px;height:");
-			s += size;
-			s += F("px;");
-		}
-		s += F("'></i>");
-		return s;
+        String s(F("<i class='i_mask' style='-webkit-mask:center/contain no-repeat url("));
+        s += uri;
+        s += F(");");
+        if (st != GP_DEFAULT) {
+            s += F("background-color:");
+            s += FPSTR(st);
+            s += ";";
+        }
+        if (size) {
+            s += F("width:");
+            s += size;
+            s += F("px;height:");
+            s += size;
+            s += F("px;");
+        }
+        s += F("'></i>");
+        return s;
     }
-	
-	void ICON_BUTTON_RAW(const String& name, const String& icon) {
-		*_GPP += F("<div class='i_btn' id='");
-		*_GPP += name;
+    
+    void ICON_BUTTON_RAW(const String& name, const String& icon) {
+        *_GPP += F("<div class='i_btn' id='");
+        *_GPP += name;
         *_GPP += F("' name='");
         *_GPP += name;
         *_GPP += F("' onmousedown='if(!_touch)GP_press(this,1)' onmouseup='if(!_touch)GP_press(this,2)' onmouseleave='if(_pressId&&!_touch)GP_press(this,2);' "
         "ontouchstart='_touch=1;GP_press(this,1)' ontouchend='GP_press(this,2)' onclick='GP_click(this)'>");
-		*_GPP += icon;
-		*_GPP += F("</div>");
-	}
-	
-	void ICON_BUTTON(const String& name, const String& faname, int size = 0, PGM_P st = GP_DEFAULT) {
-		ICON_BUTTON_RAW(name, ICON(faname, size, st));
-	}
-	void ICON_FILE_BUTTON(const String& name, const String& uri, int size = 0, PGM_P st = GP_DEFAULT) {
-		ICON_BUTTON_RAW(name, ICON_FILE(uri, size, st));
-	}
+        *_GPP += icon;
+        *_GPP += F("</div>");
+    }
+    
+    void ICON_BUTTON(const String& name, const String& faname, int size = 0, PGM_P st = GP_DEFAULT) {
+        ICON_BUTTON_RAW(name, ICON(faname, size, st));
+    }
+    void ICON_FILE_BUTTON(const String& name, const String& uri, int size = 0, PGM_P st = GP_DEFAULT) {
+        ICON_BUTTON_RAW(name, ICON_FILE(uri, size, st));
+    }
     
     // ======================= НАВИГАЦИЯ =======================
     void NAV_TABS_LINKS(const String& urls, const String& names, PGM_P st = GP_GREEN) {
@@ -1499,13 +1499,13 @@ struct Builder {
         *_GPP += F("' rows='");
         *_GPP += rows;
         *_GPP += F("' disabled></textarea>\n");
-		JS_BEGIN();
+        JS_BEGIN();
         *_GPP += F("setInterval(function(){GP_update('");
         *_GPP += name;
         *_GPP += F("')},");
         *_GPP += prd;
         *_GPP += F(");");
-		JS_END();
+        JS_END();
         send();
     }
     void AREA_LOG(int rows = 5, int prd = 1000, const String& w = "") {
@@ -1517,21 +1517,29 @@ struct Builder {
     }
     
     // ======================= НАСТРОЙКА =======================
-    void CHECK(const String& name, bool state = 0, bool dis = false) {
-        *_GPP += F("<input type='checkbox' name='");
+    void CHECK(const String& name, bool state = 0, PGM_P st = GP_GREEN, bool dis = false) {
+        if (st != GP_GREEN) {
+            *_GPP += F("<style>#__");
+            *_GPP += name;
+            *_GPP += F(" input:checked+span::before{border-color:");
+            *_GPP += FPSTR(st);
+            *_GPP += F(";background-color:");
+            *_GPP += FPSTR(st);
+            *_GPP += F("}</style>\n");
+        }
+        *_GPP += F("<label id='__");
+        *_GPP += name;
+        *_GPP += F("' class='check_c'><input type='checkbox' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
         *_GPP += "' ";
         if (state) *_GPP += F("checked ");
         if (dis) *_GPP += F("disabled ");
-        *_GPP += F("onclick='GP_click(this)'>\n");
-        *_GPP += F("<input type='hidden' value='0' name='");
-        *_GPP += name;
-        *_GPP += "'>\n";
+        *_GPP += F("onclick='GP_click(this)'><span></span></label>\n");
         send();
     }
-    void SWITCH(const String& name, bool state = 0, bool dis = false, PGM_P st = GP_GREEN) {
+    void SWITCH(const String& name, bool state = 0, PGM_P st = GP_GREEN, bool dis = false) {
         if (st != GP_GREEN) {
             *_GPP += F("<style>#__");
             *_GPP += name;
@@ -1541,8 +1549,7 @@ struct Builder {
         }
         *_GPP += F("<label id='__");
         *_GPP += name;
-        *_GPP += "'";
-        *_GPP += F(" class='switch'><input class='_sw_c' type='checkbox' name='");
+        *_GPP += F("' class='switch'><input class='_sw_c' type='checkbox' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -2180,10 +2187,10 @@ struct Builder {
     
     // ================== ОТПРАВКА ОБЪЕКТОВ ===================
     void TITLE(GP_TITLE& title) {
-        TITLE(title.text, title.name);
+        TITLE(title.text, title.name, title.style);
     }
     void LABEL(GP_LABEL& label) {
-        LABEL(label.text, label.name);
+        LABEL(label.text, label.name, label.style);
     }
     void LABEL_BLOCK(GP_LABEL_BLOCK& label) {
         LABEL_BLOCK(label.text, label.name, label.style);
@@ -2200,7 +2207,7 @@ struct Builder {
     }
     
     void BUTTON(GP_BUTTON& btn) {
-        BUTTON(btn.name, btn.text, btn.target, btn.style, btn.width);
+        BUTTON(btn.name, btn.text, btn.target, btn.style, btn.width, btn.disabled, btn.reload);
     }
     void BUTTON_MINI(GP_BUTTON_MINI& btn) {
         BUTTON_MINI(btn.name, btn.text, btn.target, btn.style, btn.width);
@@ -2214,11 +2221,11 @@ struct Builder {
         NUMBER_RAW(num.name, num.placeholder, (isnan(num.value) ? String("") : String(num.value, (uint16_t)num.decimals)), num.min, num.max, num.width, num.disabled);
     }
     
-    void TEXT(GP_TEXT& num) {
-        TEXT(num.name, num.placeholder, num.text, num.width, num.disabled);
+    void TEXT(GP_TEXT& txt) {
+        TEXT(txt.name, txt.placeholder, txt.text, txt.width, txt.maxlen, txt.pattern, txt.disabled);
     }
-    void PASS(GP_PASS& num) {
-        PASS(num.name, num.placeholder, num.text, num.width);
+    void PASS(GP_PASS& pas) {
+        PASS(pas.name, pas.placeholder, pas.text, pas.width, pas.maxlen, pas.pattern, pas.disabled);
     }
     
     void AREA(GP_AREA& ar) {
@@ -2226,10 +2233,10 @@ struct Builder {
     }
     
     void CHECK(GP_CHECK& ch) {
-        CHECK(ch.name, ch.state, ch.disabled);
+        CHECK(ch.name, ch.state, ch.style, ch.disabled);
     }
     void SWITCH(GP_SWITCH& sw) {
-        SWITCH(sw.name, sw.state, sw.disabled);
+        SWITCH(sw.name, sw.state, sw.style, sw.disabled);
     }
     
     void DATE(GP_DATE& d) {
@@ -2243,13 +2250,13 @@ struct Builder {
     }
     
     void SPINNER(GP_SPINNER& s) {
-        SPINNER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.width);
+        SPINNER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled);
     }
     void SLIDER(GP_SLIDER& s) {
-        SLIDER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled);
+        SLIDER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled, s.oninput);
     }
     
     void SELECT(GP_SELECT& s) {
-        SELECT(s.name, s.list, s.selected, s.disabled);
+        SELECT(s.name, s.list, s.selected, s.numbers, s.disabled, s.reload);
     }
 };

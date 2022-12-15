@@ -245,7 +245,7 @@ struct GPcanvas {
     }
     
     // выравнивание текста
-    // CV_LEFT, CV_CENTER, CV_RIGHT	
+    // CV_LEFT, CV_CENTER, CV_RIGHT    
     // TXT_TOP, TXT_BOTTOM, TXT_CENTER, TXT_BASELINE
     void textAlign(PGM_P h, PGM_P v) {
         textAlign(h);

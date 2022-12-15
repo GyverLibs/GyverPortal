@@ -112,19 +112,19 @@ public:
                 server.send(200);
                 return;
                 #endif
-            } else if (_uri.startsWith(F("/GP_ping"))) {      	// пинг
-				server.send(200);
-				return;
+            } else if (_uri.startsWith(F("/GP_ping"))) {          // пинг
+                server.send(200);
+                return;
             } else if (_uri.startsWith(F("/GP_SCRIPT.js"))) {   // скрипты
-				sendFile_P(GP_JS_TOP, "text/javascript");
-				return;
+                sendFile_P(GP_JS_TOP, "text/javascript");
+                return;
             } else if (_uri.startsWith(F("/GP_STYLE.css"))) {   // стили
-				sendFile_P(_gp_style, "text/css");
-				return;
+                sendFile_P(_gp_style, "text/css");
+                return;
             } else if (_uri.startsWith(F("/GP_CANVAS.js"))) {   // канвас
-				sendFile_P(GP_JS_CANVAS, "text/javascript");
-				return;
-			} else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
+                sendFile_P(GP_JS_CANVAS, "text/javascript");
+                return;
+            } else if (_uri.startsWith(F("/GP_update"))) {      // апдейт
                 if (server.argName(0) == "GP_log") {            // лог
                     if (log.available()) server.send(200, "text/plain", log.read());
                     else server.send(200);
@@ -537,7 +537,7 @@ public:
     
     // вернёт часть имени формы, находящейся под номером idx после разделителя /
     String formNameSub(int idx = 1) {
-        return form() ? (GPlistIdx(idx + 1, _uri, '/')) : String("");
+        return form() ? (GPlistIdx(_uri, idx + 1, '/')) : String("");
     }
     
     // вернёт true, если был submit с форм, имя которых начинмется с name
@@ -569,7 +569,7 @@ public:
     
     // вернёт часть имени кликнутого компонента, находящейся под номером idx после разделителя /
     String clickNameSub(int idx = 1) {
-        return click() ? (GPlistIdx(idx, server.argName(0), '/')) : String();
+        return click() ? (GPlistIdx(server.argName(0), idx, '/')) : String();
     }
     
     
@@ -591,7 +591,7 @@ public:
     
     // вернёт часть имени hold компонента, находящейся под номером idx после разделителя /
     String holdNameSub(int idx = 1) {
-        return _hold.length() ? (GPlistIdx(idx, _hold, '/')) : String();
+        return _hold.length() ? (GPlistIdx(_hold, idx, '/')) : String();
     }
     
     // вернёт true, если кнопка удерживается и имя компонента начинается с указанного
@@ -665,57 +665,57 @@ public:
     }
     
     //
-    bool clickObj(GP_BUTTON& btn) {
+    bool click(GP_BUTTON& btn) {
         return click(btn.name);
     }
-    bool clickObj(GP_BUTTON_MINI& btn) {
+    bool click(GP_BUTTON_MINI& btn) {
         return click(btn.name);
     }
     
-    bool clickObj(GP_NUMBER& num) {
-        return click() ? copyObj(num) : 0;
+    bool click(GP_NUMBER& num) {
+        return click() ? copy(num) : 0;
     }
-    bool clickObj(GP_NUMBER_F& num) {
-        return click() ? copyObj(num) : 0;
-    }
-    
-    bool clickObj(GP_TEXT& txt) {
-        return click() ? copyObj(txt) : 0;
-    }
-    bool clickObj(GP_PASS& pas) {
-        return click() ? copyObj(pas) : 0;
+    bool click(GP_NUMBER_F& num) {
+        return click() ? copy(num) : 0;
     }
     
-    bool clickObj(GP_AREA& ar) {
-        return click() ? copyObj(ar) : 0;
+    bool click(GP_TEXT& txt) {
+        return click() ? copy(txt) : 0;
+    }
+    bool click(GP_PASS& pas) {
+        return click() ? copy(pas) : 0;
     }
     
-    bool clickObj(GP_CHECK& ch) {
-        return click() ? copyObj(ch) : 0;
-    }
-    bool clickObj(GP_SWITCH& sw) {
-        return click() ? copyObj(sw) : 0;
+    bool click(GP_AREA& ar) {
+        return click() ? copy(ar) : 0;
     }
     
-    bool clickObj(GP_DATE& d) {
-        return click() ? copyObj(d) : 0;
+    bool click(GP_CHECK& ch) {
+        return click() ? copy(ch) : 0;
     }
-    bool clickObj(GP_TIME& t) {
-        return click() ? copyObj(t) : 0;
-    }
-    bool clickObj(GP_COLOR& c) {
-        return click() ? copyObj(c) : 0;
+    bool click(GP_SWITCH& sw) {
+        return click() ? copy(sw) : 0;
     }
     
-    bool clickObj(GP_SPINNER& s) {
-        return click() ? copyObj(s) : 0;
+    bool click(GP_DATE& d) {
+        return click() ? copy(d) : 0;
     }
-    bool clickObj(GP_SLIDER& s) {
-        return click() ? copyObj(s) : 0;
+    bool click(GP_TIME& t) {
+        return click() ? copy(t) : 0;
+    }
+    bool click(GP_COLOR& c) {
+        return click() ? copy(c) : 0;
     }
     
-    bool clickObj(GP_SELECT& s) {
-        return click() ? copyObj(s) : 0;
+    bool click(GP_SPINNER& s) {
+        return click() ? copy(s) : 0;
+    }
+    bool click(GP_SLIDER& s) {
+        return click() ? copy(s) : 0;
+    }
+    
+    bool click(GP_SELECT& s) {
+        return click() ? copy(s) : 0;
     }
     
     
@@ -742,73 +742,9 @@ public:
     
     // вернёт часть имени обновляемого компонента, находящейся под номером idx после разделителя /
     String updateNameSub(int idx = 1) {
-        return update() ? (GPlistIdx(idx, *_updPtr, '/')) : String();
+        return update() ? (GPlistIdx(*_updPtr, idx, '/')) : String();
     }
-    
-    
-    // ===================== UPDATE OBJ =====================
-    bool update(GP_TITLE& title) {
-        return update(title.name);
-    }
-    bool update(GP_LABEL& label) {
-        return update(label.name);
-    }
-    bool update(GP_LABEL_BLOCK& label) {
-        return update(label.name);
-    }
-    
-    bool update(GP_LED& led) {
-        return update(led.name);
-    }
-    bool update(GP_LED_RED& led) {
-        return update(led.name);
-    }
-    bool update(GP_LED_GREEN& led) {
-        return update(led.name);
-    }
-    
-    bool update(GP_NUMBER& num) {
-        return update(num.name);
-    }
-    bool update(GP_NUMBER_F& num) {
-        return update(num.name);
-    }
-    
-    bool update(GP_TEXT& txt) {
-        return update(txt.name);
-    }
-    bool update(GP_PASS& pas) {
-        return update(pas.name);
-    }
-    
-    bool update(GP_AREA& ar) {
-        return update(ar.name);
-    }
-    
-    bool update(GP_CHECK& ch) {
-        return update(ch.name);
-    }
-    bool update(GP_SWITCH& sw) {
-        return update(sw.name);
-    }
-    
-    bool update(GP_DATE& d) {
-        return update(d.name);
-    }
-    bool update(GP_TIME& t) {
-        return update(t.name);
-    }
-    bool update(GP_COLOR& c) {
-        return update(c.name);
-    }
-    
-    bool update(GP_SPINNER& s) {
-        return update(s.name);
-    }
-    bool update(GP_SLIDER& s) {
-        return update(s.name);
-    }
-    
+     
     
     // ======================= ANSWER =======================
     // отправить ответ на обновление
@@ -882,131 +818,67 @@ public:
     }
     
     
-    // ===================== ANSWER OBJ =====================
-    bool answer(GP_TITLE& title) {
-        return answer(title.text);
-    }
-    bool answer(GP_LABEL& label) {
-        return answer(label.text);
-    }
-    bool answer(GP_LABEL_BLOCK& label) {
-        return answer(label.text);
-    }
-    
-    bool answer(GP_LED& led) {
-        return answer(led.state);
-    }
-    bool answer(GP_LED_RED& led) {
-        return answer(led.state);
-    }
-    bool answer(GP_LED_GREEN& led) {
-        return answer(led.state);
-    }
-    
-    bool answer(GP_NUMBER& num) {
-        return answer(num.value);
-    }
-    bool answer(GP_NUMBER_F& num) {
-        return answer(num.value, num.decimals);
-    }
-    
-    bool answer(GP_TEXT& txt) {
-        return answer(txt.text);
-    }
-    bool answer(GP_PASS& pas) {
-        return answer(pas.text);
-    }
-    
-    bool answer(GP_AREA& ar) {
-        return answer(ar.text);
-    }
-    
-    bool answer(GP_CHECK& ch) {
-        return answer(ch.state);
-    }
-    bool answer(GP_SWITCH& sw) {
-        return answer(sw.state);
-    }
-    
-    bool answer(GP_DATE& d) {
-        return answer(d.date);
-    }
-    bool answer(GP_TIME& t) {
-        return answer(t.time);
-    }
-    bool answer(GP_COLOR& c) {
-        return answer(c.color);
-    }
-    
-    bool answer(GP_SPINNER& s) {
-        return answer(s.value, s.decimals);
-    }
-    bool answer(GP_SLIDER& s) {
-        return answer(s.value, s.decimals);
-    }
-    
-    
     // ================== UPDATE AUTO OBJ ===================
-    bool updateObj(GP_TITLE& title) {
-        return (update(title) ? answer(title) : 0);
+    bool update(GP_TITLE& title) {
+        return (update(title.name) ? answer(title.text) : 0);
     }
-    bool updateObj(GP_LABEL& label) {
-        return (update(label) ? answer(label) : 0);
+    bool update(GP_LABEL& label) {
+        return (update(label.name) ? answer(label.text) : 0);
     }
-    bool updateObj(GP_LABEL_BLOCK& label) {
-        return (update(label) ? answer(label) : 0);
-    }
-    
-    bool updateObj(GP_LED& led) {
-        return (update(led) ? answer(led) : 0);
-    }
-    bool updateObj(GP_LED_RED& led) {
-        return (update(led) ? answer(led) : 0);
-    }
-    bool updateObj(GP_LED_GREEN& led) {
-        return (update(led) ? answer(led) : 0);
+    bool update(GP_LABEL_BLOCK& label) {
+        return (update(label.name) ? answer(label.text) : 0);
     }
     
-    bool updateObj(GP_NUMBER& num) {
-        return (update(num) ? answer(num) : 0);
+    bool update(GP_LED& led) {
+        return (update(led.name) ? answer(led.state) : 0);
     }
-    bool updateObj(GP_NUMBER_F& num) {
-        return (update(num) ? answer(num) : 0);
+    bool update(GP_LED_RED& led) {
+        return (update(led.name) ? answer(led.state) : 0);
     }
-    
-    bool updateObj(GP_TEXT& txt) {
-        return (update(txt) ? answer(txt) : 0);
-    }
-    bool updateObj(GP_PASS& pas) {
-        return (update(pas) ? answer(pas) : 0);
+    bool update(GP_LED_GREEN& led) {
+        return (update(led.name) ? answer(led.state) : 0);
     }
     
-    bool updateObj(GP_AREA& ar) {
-        return (update(ar) ? answer(ar) : 0);
+    bool update(GP_NUMBER& num) {
+        return (update(num.name) ? answer(num.value) : 0);
+    }
+    bool update(GP_NUMBER_F& num) {
+        return (update(num.name) ? answer(num.value, num.decimals) : 0);
     }
     
-    bool updateObj(GP_CHECK& ch) {
-        return (update(ch) ? answer(ch) : 0);
+    bool update(GP_TEXT& txt) {
+        return (update(txt.name) ? answer(txt.text) : 0);
     }
-    bool updateObj(GP_SWITCH& sw) {
-        return (update(sw) ? answer(sw) : 0);
-    }
-    
-    bool updateObj(GP_DATE& d) {
-        return (update(d) ? answer(d) : 0);
-    }
-    bool updateObj(GP_TIME& t) {
-        return (update(t) ? answer(t) : 0);
-    }
-    bool updateObj(GP_COLOR& c) {
-        return (update(c) ? answer(c) : 0);
+    bool update(GP_PASS& pas) {
+        return (update(pas.name) ? answer(pas.text) : 0);
     }
     
-    bool updateObj(GP_SPINNER& s) {
-        return (update(s) ? answer(s) : 0);
+    bool update(GP_AREA& ar) {
+        return (update(ar.name) ? answer(ar.text) : 0);
     }
-    bool updateObj(GP_SLIDER& s) {
-        return (update(s) ? answer(s) : 0);
+    
+    bool update(GP_CHECK& ch) {
+        return (update(ch.name) ? answer(ch.state) : 0);
+    }
+    bool update(GP_SWITCH& sw) {
+        return (update(sw.name) ? answer(sw.state) : 0);
+    }
+    
+    bool update(GP_DATE& d) {
+        return (update(d.name) ? answer(d.date) : 0);
+    }
+    bool update(GP_TIME& t) {
+        return (update(t.name) ? answer(t.time) : 0);
+    }
+    bool update(GP_COLOR& c) {
+        return (update(c.name) ? answer(c.color) : 0);
+    }
+    
+    bool update(GP_SPINNER& s) {
+        return (update(s.name) ? answer(s.value, s.decimals) : 0);
+    }
+    bool update(GP_SLIDER& s) {
+        return (update(s.name) ? answer(s.value, s.decimals) : 0);
     }
     
     
@@ -1032,7 +904,7 @@ public:
     
     // вернёт часть uri, находящейся под номером idx после разделителя /
     String uriNameSub(int idx = 1) {
-        return GPlistIdx(idx + 1, _uri, '/');
+        return GPlistIdx(_uri, idx + 1, '/');
     }
     
     // длина текста в полученном значении
@@ -1135,49 +1007,49 @@ public:
     
     
     // ===================== COPY OBJ =====================
-    bool copyObj(GP_NUMBER& num) {
+    bool copy(GP_NUMBER& num) {
         return copyInt(num.name, num.value);
     }
-    bool copyObj(GP_NUMBER_F& num) {
+    bool copy(GP_NUMBER_F& num) {
         return copyFloat(num.name, num.value);
     }
     
-    bool copyObj(GP_TEXT& txt) {
+    bool copy(GP_TEXT& txt) {
         return copyString(txt.name, txt.text);
     }
-    bool copyObj(GP_PASS& pas) {
+    bool copy(GP_PASS& pas) {
         return copyString(pas.name, pas.text);
     }
     
-    bool copyObj(GP_AREA& ar) {
+    bool copy(GP_AREA& ar) {
         return copyString(ar.name, ar.text);
     }
     
-    bool copyObj(GP_CHECK& ch) {
+    bool copy(GP_CHECK& ch) {
         return copyBool(ch.name, ch.state);
     }
-    bool copyObj(GP_SWITCH& sw) {
+    bool copy(GP_SWITCH& sw) {
         return copyBool(sw.name, sw.state);
     }
     
-    bool copyObj(GP_DATE& d) {
+    bool copy(GP_DATE& d) {
         return copyDate(d.name, d.date);
     }
-    bool copyObj(GP_TIME& t) {
+    bool copy(GP_TIME& t) {
         return copyTime(t.name, t.time);
     }
-    bool copyObj(GP_COLOR& c) {
+    bool copy(GP_COLOR& c) {
         return copyColor(c.name, c.color);
     }
     
-    bool copyObj(GP_SPINNER& s) {
+    bool copy(GP_SPINNER& s) {
         return copyFloat(s.name, s.value);
     }
-    bool copyObj(GP_SLIDER& s) {
+    bool copy(GP_SLIDER& s) {
         return copyFloat(s.name, s.value);
     }
     
-    bool copyObj(GP_SELECT& s) {
+    bool copy(GP_SELECT& s) {
         return copyInt(s.name, s.selected);
     }
     
@@ -1196,7 +1068,7 @@ public:
             _gp_s = &server;
             _gp_uri = &_uri;
             String page;
-            page.reserve(_bufsize);
+            page.reserve(_bufsize + 200);
             _gp_bufsize = _bufsize;
             _GPP = &page;
             if (_build) _build();

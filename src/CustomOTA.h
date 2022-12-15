@@ -122,7 +122,7 @@ public:
     }
     
     void defBuild(bool UpdateEnd, const String& UpdateError) {
-        #ifndef	GP_OTA_FILES
+        #ifndef    GP_OTA_FILES
         GP.BUILD_BEGIN(400);
         
         #ifndef GP_OTA_LIGHT

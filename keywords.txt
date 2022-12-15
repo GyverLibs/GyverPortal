@@ -79,7 +79,6 @@ clickDownSub	KEYWORD2
 clickUpSub	KEYWORD2
 clickName	KEYWORD2
 clickNameSub	KEYWORD2
-clickObj	KEYWORD2
 
 clickStr	KEYWORD2
 clickString	KEYWORD2
@@ -99,7 +98,6 @@ update	KEYWORD2
 updateSub	KEYWORD2
 updateName	KEYWORD2
 updateNameSub	KEYWORD2
-updateObj	KEYWORD2
 
 answer	KEYWORD2
 
@@ -144,8 +142,6 @@ copyBool	KEYWORD2
 copyDate	KEYWORD2
 copyTime	KEYWORD2
 copyColor	KEYWORD2
-
-copyObj	KEYWORD2
 
 argLength	KEYWORD2
 
@@ -259,6 +255,29 @@ strokeText	KEYWORD2
 drawImage	KEYWORD2
 save	KEYWORD2
 restore	KEYWORD2
+
+############### OBJECTS #################
+reload	KEYWORD2
+disabled	KEYWORD2
+numbers	KEYWORD2
+selected	KEYWORD2
+name	KEYWORD2
+oninput	KEYWORD2
+style	KEYWORD2
+decimals	KEYWORD2
+step	KEYWORD2
+value	KEYWORD2
+color	KEYWORD2
+time	KEYWORD2
+date	KEYWORD2
+state	KEYWORD2
+rows	KEYWORD2
+text	KEYWORD2
+width	KEYWORD2
+maxlen	KEYWORD2
+pattern	KEYWORD2
+placeholder	KEYWORD2
+target	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

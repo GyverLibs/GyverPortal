@@ -25,14 +25,6 @@
       - mDNS (для открытия интерфейса по заданному адресу вместо IP)
       - OTA обновление прошивки и памяти через браузер или curl (возможна защита паролем)
 */
-/*
-    TODO
-    канвас
-    https://www.w3schools.com/html/html5_canvas.asp
-    https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
-    https://developer.mozilla.org/ru/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
-    https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_canvas_createimagedata
-*/
 
 #ifndef _GyverPortal_h
 #define _GyverPortal_h

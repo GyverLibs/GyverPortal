@@ -8,14 +8,16 @@
 #define GP_EMPTY_FLOAT NAN
 
 struct GP_TITLE {
-    GP_TITLE(const char* n = nullptr, const String& t = "") : name(n), text(t) {}
+    GP_TITLE(const char* n = nullptr, const String& t = "", PGM_P st = GP_DEFAULT) : name(n), text(t), style(st) {}
     const char* name;
     String text;
+    PGM_P style;
 };
 struct GP_LABEL {
-    GP_LABEL(const char* n = nullptr, const String& t = "") : name(n), text(t) {}
+    GP_LABEL(const char* n = nullptr, const String& t = "", PGM_P st = GP_DEFAULT) : name(n), text(t), style(st) {}
     const char* name;
     String text;
+    PGM_P style;
 };
 struct GP_LABEL_BLOCK {
     GP_LABEL_BLOCK(const char* n = nullptr, const String& t = "", PGM_P st = GP_GREEN) : name(n), text(t), style(st) {}
@@ -40,23 +42,28 @@ struct GP_LED_GREEN {
     bool state;
 };
 
+
 struct GP_BUTTON {
-    GP_BUTTON(const char* n = nullptr, const String& t = "", const String& tar = "", PGM_P st = GP_GREEN, const String& w = "") : 
-    name(n), text(t), target(tar), style(st), width(w) {}
+    GP_BUTTON(const char* n = nullptr, const String& t = "", const String& tar = "", PGM_P st = GP_GREEN, const String& w = "", bool dis = 0, bool rel = 0) : 
+    name(n), text(t), target(tar), style(st), width(w), disabled(dis), reload(rel) {}
     const char* name;
     String text;
     String target;
     PGM_P style;
     String width;
+    bool disabled;
+    bool reload;
 };
 struct GP_BUTTON_MINI {
-    GP_BUTTON_MINI(const char* n = nullptr, const String& t = "", const String& tar = "", PGM_P st = GP_GREEN, const String& w = "") : 
-    name(n), text(t), target(tar), style(st), width(w) {}
+    GP_BUTTON_MINI(const char* n = nullptr, const String& t = "", const String& tar = "", PGM_P st = GP_GREEN, const String& w = "", bool dis = 0, bool rel = 0) : 
+    name(n), text(t), target(tar), style(st), width(w), disabled(dis), reload(rel) {}
     const char* name;
     String text;
     String target;
     PGM_P style;
     String width;
+    bool disabled;
+    bool reload;
 };
 
 struct GP_NUMBER {
@@ -84,21 +91,26 @@ struct GP_NUMBER_F {
 };
 
 struct GP_TEXT {
-    GP_TEXT(const char* n = nullptr, const String& place = "", const String& txt = "", const String& w = "", bool dis = false) : 
-    name(n), placeholder(place), text(txt), width(w), disabled(dis) {}
+    GP_TEXT(const char* n = nullptr, const String& place = "", const String& txt = "", const String& w = "", int maxl = 0, const String& pat = "", bool dis = false) : 
+    name(n), placeholder(place), text(txt), width(w), maxlen(maxl), pattern(pat), disabled(dis) {}
     const char* name;
     String placeholder;
     String text;
     String width;
+    int maxlen;
+    String pattern;
     bool disabled;
 };
 struct GP_PASS {
-    GP_PASS(const char* n = nullptr, const String& place = "", const String& txt = "", const String& w = "") : 
-    name(n), placeholder(place), text(txt), width(w) {}
+    GP_PASS(const char* n = nullptr, const String& place = "", const String& txt = "", const String& w = "", int maxl = 0, const String& pat = "", bool dis = false) : 
+    name(n), placeholder(place), text(txt), width(w), maxlen(maxl), pattern(pat), disabled(dis) {}
     const char* name;
     String placeholder;
     String text;
     String width;
+    int maxlen;
+    String pattern;
+    bool disabled;
 };
 
 struct GP_AREA {
@@ -111,15 +123,19 @@ struct GP_AREA {
 };
 
 struct GP_CHECK {
-    GP_CHECK(const char* n = nullptr, bool st = 0, bool dis = false) : name(n), state(st), disabled(dis) {}
+    GP_CHECK(const char* n = nullptr, bool sta = 0, PGM_P st = GP_GREEN, bool dis = false) : 
+    name(n), state(sta), style(st), disabled(dis) {}
     const char* name;
     bool state;
+    PGM_P style;
     bool disabled;
 };
 struct GP_SWITCH {
-    GP_SWITCH(const char* n = nullptr, bool st = 0, bool dis = false) : name(n), state(st), disabled(dis) {}
+    GP_SWITCH(const char* n = nullptr, bool sta = 0, PGM_P st = GP_GREEN, bool dis = false) : 
+    name(n), state(sta), style(st), disabled(dis) {}
     const char* name;
     bool state;
+    PGM_P style;
     bool disabled;
 };
 
@@ -146,8 +162,8 @@ struct GP_COLOR {
 };
 
 struct GP_SPINNER {
-    GP_SPINNER(const char* n = nullptr, float v = 0, float mn = NAN, float mx = NAN, float stp = 1, uint8_t dec = 0, PGM_P st = GP_GREEN, const String& w = "") : 
-    name(n), value(v), min(mn), max(mx), step(stp), decimals(dec), style(st), width(w) {}
+    GP_SPINNER(const char* n = nullptr, float v = 0, float mn = NAN, float mx = NAN, float stp = 1, uint8_t dec = 0, PGM_P st = GP_GREEN, bool dis = 0) : 
+    name(n), value(v), min(mn), max(mx), step(stp), decimals(dec), style(st), disabled(dis) {}
     const char* name;
     float value;
     float min;
@@ -155,12 +171,12 @@ struct GP_SPINNER {
     float step;
     uint8_t decimals;
     PGM_P style;
-    String width;
+    bool disabled;
 };
 
 struct GP_SLIDER {
-    GP_SLIDER(const char* n = nullptr, float val = 0, float mn = 0, float mx = 10, float stp = 1, uint8_t dec = 0, PGM_P st = GP_GREEN, bool dis = false) : 
-    name(n), value(val), min(mn), max(mx), step(stp), decimals(dec), style(st), disabled(dis) {}
+    GP_SLIDER(const char* n = nullptr, float val = 0, float mn = 0, float mx = 10, float stp = 1, uint8_t dec = 0, PGM_P st = GP_GREEN, bool dis = false, bool oninp = 0) : 
+    name(n), value(val), min(mn), max(mx), step(stp), decimals(dec), style(st), disabled(dis), oninput(oninp) {}
     const char* name;
     float value = 0;
     float min = 0;
@@ -169,17 +185,20 @@ struct GP_SLIDER {
     uint8_t decimals;
     PGM_P style;
     bool disabled;
+    bool oninput;
 };
 
 struct GP_SELECT {
-    GP_SELECT(const char* n = nullptr, const String& l = "", int sel = 0, bool dis = false) : 
-    name(n), list(l), selected(sel), disabled(dis) {}
+    GP_SELECT(const char* n = nullptr, const String& lst = "", int sel = 0, bool nums = 0, bool dis = false, bool rel = 0) : 
+    name(n), list(lst), selected(sel), numbers(nums), disabled(dis), reload(rel) {}
     const char* name;
     String list;
     int selected;
+    bool numbers;
     bool disabled;
+    bool reload;
     
     String getValue() {
-        return GPlistIdx(selected, list);
+        return GPlistIdx(list, selected);
     }
 };
