@@ -25,11 +25,11 @@ GyverPortal ui;
 
 // конструктор страницы
 void build() {
-  BUILD_BEGIN();
+  GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
   GP.PLOT_STOCK_DARK<2, PLOT_SIZE>("plot", names, data.unix, data.vals);
-  BUILD_END();
+  GP.BUILD_END();
 }
 
 void setup() {

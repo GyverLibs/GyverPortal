@@ -8,7 +8,7 @@ GyverPortal ui;
 
 // конструктор страницы
 void build() {
-  BUILD_BEGIN();
+  GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
   // кнопка отправляет текст из поля txt
@@ -18,7 +18,7 @@ void build() {
 
   GP.AREA_LOG(5);
 
-  BUILD_END();
+  GP.BUILD_END();
 }
 
 void setup() {

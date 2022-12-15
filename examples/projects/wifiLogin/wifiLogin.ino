@@ -14,7 +14,7 @@ struct LoginPass {
 LoginPass lp;
 
 void build() {
-  BUILD_BEGIN();
+  GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);
 
   GP.FORM_BEGIN("/login");
@@ -24,7 +24,7 @@ void build() {
   GP.SUBMIT("Submit");
   GP.FORM_END();
 
-  BUILD_END();
+  GP.BUILD_END();
 }
 
 void setup() {
