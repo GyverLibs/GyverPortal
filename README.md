@@ -19,8 +19,9 @@
 Теперь находится в [Wiki репозитория](https://github.com/GyverLibs/GyverPortal/wiki). Документация на данный момент неполная, на стадии написания!
 > [English docs](https://github-com.translate.goog/GyverLibs/GyverPortal/wiki?_x_tr_sl=ru&_x_tr_tl=en)
 
-## Идеи/проблемы/что будет в следующем обновлении
-Читать/предлагать в issue https://github.com/GyverLibs/GyverPortal/issues/55
+## Идеи/проблемы/актуальная версия
+- Рабочую версию (нестабильную/экспериментальную/ночную) можно скачать [из репозитория](https://github.com/GyverLibs/GyverPortal/archive/refs/heads/main.zip)
+- Изменения в следующей версии читать/предлагать в issue https://github.com/GyverLibs/GyverPortal/issues/55
 - Также можно [обсудить на форуме](https://community.alexgyver.ru/threads/gyverportal.6632/)
 
 ### Известные баги

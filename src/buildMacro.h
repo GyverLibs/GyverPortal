@@ -52,7 +52,7 @@
 #define M_TR7(a1,a2,a3,a4,a5,a6,a7) M_TR6(a1,a2,a3,a4,a5,a6); GP.TD(); a7;
 #define M_TR8(a1,a2,a3,a4,a5,a6,a7,a8) M_TR7(a1,a2,a3,a4,a5,a6,a7); GP.TD(); a8;
 #define M_TR9(a1,a2,a3,a4,a5,a6,a7,a8,a9) M_TR8(a1,a2,a3,a4,a5,a6,a7,a8); GP.TD(); a9;
-#define M_TR10(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10) M_TR8(a1,a2,a3,a4,a5,a6,a7,a8,a9); GP.TD(); a10;
+#define M_TR10(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10) M_TR9(a1,a2,a3,a4,a5,a6,a7,a8,a9); GP.TD(); a10;
 
 #define M_BOX(...) OVR_MACRO(M_BOX, __VA_ARGS__)
 #define M_BOX1(args) GP.BOX_BEGIN(); args; GP.BOX_END();

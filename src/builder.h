@@ -316,9 +316,9 @@ struct Builder {
     // ======================= UPDATE =======================
     void UPDATE(const String& list, int prd = 1000) {
         JS_BEGIN();
-        *_GPP += F("setInterval(function(){GP_update('");
+        *_GPP += F("setInterval(()=>GP_update('");
         *_GPP += list;
-        *_GPP += F("'.replace(' ',''))},");
+        *_GPP += F("'),");
         *_GPP += prd;
         *_GPP += F(");");
         JS_END();
@@ -387,6 +387,12 @@ struct Builder {
     // ====================== ТАБЛИЦЫ ======================
     GPalign* _als = nullptr;
     int _alsCount = 0;
+    
+    void TABLE_BORDER(bool show) {
+        *_GPP += F("<style>td{border:");
+        *_GPP += show ? F("1px solid") : F("none");
+        *_GPP += F("}</style>\n");
+    }
     
     void TABLE_BEGIN(const String& tdw = "", GPalign* als = nullptr, const String& w = "100%") {
         _als = als;
@@ -1026,6 +1032,22 @@ struct Builder {
         send();
     }
     
+    void CAM_STREAM(int width = 500, int port = 90) {
+        *_GPP += F("<img id='_stream' style='max-height:100%;width:");
+        *_GPP += width;
+        *_GPP += F("px'>\n<script>window.onload=document.getElementById('_stream').src=window.location.href.slice(0,-1)+':");
+        *_GPP += port;
+        *_GPP += F("/';</script>\n");
+        send();
+    }
+    void CAM_STREAM(const String& width, int port = 90) {
+        *_GPP += F("<img id='_stream' style='max-height:100%;width:");
+        *_GPP += width;
+        *_GPP += F("'>\n<script>window.onload=document.getElementById('_stream').src=window.location.href.slice(0,-1)+':");
+        *_GPP += port;
+        *_GPP += F("/';</script>\n");
+        send();
+    }
     
     // ======================= ФАЙЛОВЫЙ МЕНЕДЖЕР =======================
     void _fileRow(const String& fpath, int size) {
@@ -1446,7 +1468,7 @@ struct Builder {
         send();
     }
     void PASS(const String& name, const String& place = "", const String& value = "", const String& width = "", int maxlength = 0, const String& pattern = "", bool dis = false) {
-        *_GPP += F("<input type='password' name='");
+        *_GPP += F("<div class='passCont'><input type='password' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -1469,7 +1491,7 @@ struct Builder {
             *_GPP += pattern;
         }
         *_GPP += ">\n";
-        *_GPP += F("<span class='eyepass' onclick='GP_eye(this)'>&#x1f441;&#xFE0E;</span>\n");
+        *_GPP += F("<span class='eyepass' onclick='GP_eye(this)'>&#x1f441;&#xFE0E;</span></div>\n");
         send();
     }
     
@@ -1500,9 +1522,9 @@ struct Builder {
         *_GPP += rows;
         *_GPP += F("' disabled></textarea>\n");
         JS_BEGIN();
-        *_GPP += F("setInterval(function(){GP_update('");
+        *_GPP += F("setInterval(()=>GP_update('");
         *_GPP += name;
-        *_GPP += F("')},");
+        *_GPP += F("'),");
         *_GPP += prd;
         *_GPP += F(");");
         JS_END();
@@ -1677,13 +1699,17 @@ struct Builder {
         *_GPP += ">\n";
     }
     
-    void SPINNER(const String& name, float value = 0, float min = NAN, float max = NAN, float step = 1, uint16_t dec = 0, PGM_P st = GP_GREEN, bool dis = 0) {
+    void SPINNER(const String& name, float value = 0, float min = NAN, float max = NAN, float step = 1, uint16_t dec = 0, PGM_P st = GP_GREEN, const String& w = "", bool dis = 0) {
         *_GPP += F("<div id='spinner' class='spinner'>\n");
         SPIN_BTN(name, -step, st, dec, dis);
-        *_GPP += F("<input class='spin_inp' type='number' name='");
+        *_GPP += F("<input type='number' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
+        if (w.length()) {
+            *_GPP += F("' style='width:");
+            *_GPP += w;
+        }
         *_GPP += F("' step='");
         _FLOAT_DEC(step, dec);
         *_GPP += F("' onkeyup='GP_spinw(this)' onkeydown='GP_spinw(this)' onchange='GP_spinw(this);GP_click(this)' onmousewheel='GP_spinw(this);GP_wheel(this);GP_click(this)' value='");
@@ -1696,8 +1722,9 @@ struct Builder {
             *_GPP += F("' max='");
             _FLOAT_DEC(max, dec);
         }
-        *_GPP += "'";
-        if (dis) *_GPP += F("disabled");
+        *_GPP += "' ";
+        if (dis) *_GPP += F("disabled ");
+        if (!w.length()) *_GPP += F("class='spin_inp'");
         *_GPP += ">\n";
         SPIN_BTN(name, step, st, dec, dis);
         *_GPP += F("</div>\n");
@@ -1817,15 +1844,6 @@ struct Builder {
             idx++;
         }
         *_GPP += F("</select>\n");
-        send();
-    }
-    
-    void CAM_STREAM(int width = 500, int port = 90) {
-        *_GPP += F("<img id='_stream' style='max-height:100%;width:");
-        *_GPP += width;
-        *_GPP += F("px'>\n<script>window.onload=document.getElementById('_stream').src=window.location.href.slice(0,-1)+':");
-        *_GPP += port;
-        *_GPP += F("/';</script>\n");
         send();
     }
     
@@ -2259,7 +2277,7 @@ struct Builder {
     }
     
     void SPINNER(GP_SPINNER& s) {
-        SPINNER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled);
+        SPINNER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.width, s.disabled);
     }
     void SLIDER(GP_SLIDER& s) {
         SLIDER(s.name, s.value, s.min, s.max, s.step, s.decimals, s.style, s.disabled, s.oninput);

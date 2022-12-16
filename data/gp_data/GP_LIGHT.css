@@ -1,3 +1,7 @@
+p {
+  display: inline;
+}
+
 .mainblock {
   margin: auto;
   max-width: 100%
@@ -421,7 +425,7 @@ input::-webkit-inner-spin-button {
 }
 
 .spinner {
-  display: flex;
+  display: inline-flex;
   align-items: center;
 }
 
@@ -521,11 +525,15 @@ body {
 
 .eyepass {
   position: absolute;
-  margin-left: -40px;
+  margin-left: -35px;
   margin-top: 7px;
   cursor: pointer;
   font-size: 25px;
   color: #13161a;
+}
+
+.passCont {
+  display: inline-block
 }
 
 table {

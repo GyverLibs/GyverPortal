@@ -67,3 +67,12 @@ String cam_stream_window(int width = 500) {
     s += F("/';</script>\n");
     return s;
 }
+String cam_stream_window(const String& width) {
+    String s;
+    s += F("<img id='_stream' style='max-height:100%;width:");
+    s += width;
+    s += F("'>\n<script>window.onload=document.getElementById('_stream').src=window.location.href.slice(0,-1)+':");
+    s += _s_port;
+    s += F("/';</script>\n");
+    return s;
+}

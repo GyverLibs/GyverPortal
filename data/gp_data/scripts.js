@@ -109,7 +109,7 @@ function openTab(tab, btn, blk) {
 }
 
 function GP_spinw(arg) {
-  arg.style.width = ((arg.value.length + 2) * 12) + 'px';
+  if (arg.className == 'spin_inp') arg.style.width = ((arg.value.length + 2) * 12) + 'px';
 }
 
 function GP_spin(arg) {
@@ -120,6 +120,7 @@ function GP_spin(arg) {
 }
 
 function GP_update(ids) {
+  ids = ids.replaceAll(' ', '');
   var xhttp = new XMLHttpRequest();
   xhttp.timeout = 700;
   xhttp.open('GET', '/GP_update?' + ids + '=', true);
@@ -204,5 +205,5 @@ function getEl(id) {
 function sdbTgl() {
   let flag = getEl('dashOver').style.display == 'block';
   getEl('dashOver').style.display = flag ? 'none' : 'block';
-  getEl('dashSdb').style.left = flag ? '-280px' : '0';
+  getEl('dashSdb').style.left = flag ? '-250px' : '0';
 }

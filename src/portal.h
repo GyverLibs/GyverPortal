@@ -402,7 +402,6 @@ public:
         return timeSynced() ? GPtime(getUnix(), getGMT()) : GPtime();
     }
     
-    
     // ======================== FILE ========================
     // DELETE
     // вернёт true при запросе на удаление файла

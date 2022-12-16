@@ -162,8 +162,8 @@ struct GP_COLOR {
 };
 
 struct GP_SPINNER {
-    GP_SPINNER(const char* n = nullptr, float v = 0, float mn = NAN, float mx = NAN, float stp = 1, uint8_t dec = 0, PGM_P st = GP_GREEN, bool dis = 0) : 
-    name(n), value(v), min(mn), max(mx), step(stp), decimals(dec), style(st), disabled(dis) {}
+    GP_SPINNER(const char* n = nullptr, float v = 0, float mn = NAN, float mx = NAN, float stp = 1, uint8_t dec = 0, PGM_P st = GP_GREEN, const String& w = "", bool dis = 0) : 
+    name(n), value(v), min(mn), max(mx), step(stp), decimals(dec), style(st), width(w), disabled(dis) {}
     const char* name;
     float value;
     float min;
@@ -171,6 +171,7 @@ struct GP_SPINNER {
     float step;
     uint8_t decimals;
     PGM_P style;
+    String width;
     bool disabled;
 };
 
