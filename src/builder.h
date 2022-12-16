@@ -78,7 +78,7 @@ struct Builder {
         if (name.length()) HIDDEN(name, F("_title"), text);
         if (text.length()) {
             JS_BEGIN();
-            *_GPP += F("_docTitle=document.title='");
+            *_GPP += F("document.title='");
             *_GPP += text;
             *_GPP += "'";
             JS_END();
@@ -263,7 +263,7 @@ struct Builder {
         JS_BEGIN();
         *_GPP += F("setInterval(function(){var xhttp=new XMLHttpRequest();xhttp.timeout=300;xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
         "xhttp.onreadystatechange=function(){");
-        if (!code.length()) *_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
+        if (!code.length()) *_GPP += F("if(!this.status)alert('Connection Lost!');"); //*_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
         else *_GPP += code;
         *_GPP += F("}},");
         *_GPP += prd;

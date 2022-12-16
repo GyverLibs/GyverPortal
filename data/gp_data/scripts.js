@@ -1,5 +1,4 @@
-var _docTitle = 'GyverPortal',
-  _clkRelList = [],
+var _clkRelList = [],
   _redirTout = 200,
   _touch = 0,
   _clkRedrList = {},
@@ -7,7 +6,7 @@ var _docTitle = 'GyverPortal',
   _pressId = null,
   _spinInt = null,
   _spinF = 0;
-document.title = _docTitle;
+document.title = 'GyverPortal';
 
 function GP_delete(url) {
   if (!confirm('Delete ' + url + '?')) return;
@@ -160,7 +159,7 @@ function GP_apply(item, resp) {
         eval(val);
         break;
       case '_title':
-        _docTitle = document.title = resp;
+        document.title = resp;
         break;
     }
   } else if (item.type == 'checkbox' || item.type == 'radio') item.checked = Number(resp);
