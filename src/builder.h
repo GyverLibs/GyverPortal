@@ -259,10 +259,13 @@ struct Builder {
         *_GPP += F("\n</script>\n");
     }
     
-    void ONLINE_CHECK(int prd = 5000) {
+    void ONLINE_CHECK(int prd = 5000, const String& code = "") {
         JS_BEGIN();
         *_GPP += F("setInterval(function(){var xhttp=new XMLHttpRequest();xhttp.timeout=300;xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
-        "xhttp.onreadystatechange=function(){document.title=((!this.status)?'🚫':'')+_docTitle;}},");
+        "xhttp.onreadystatechange=function(){");
+        if (!code.length()) *_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
+        else *_GPP += code;
+        *_GPP += F("}},");
         *_GPP += prd;
         *_GPP += F(");");
         JS_END();
