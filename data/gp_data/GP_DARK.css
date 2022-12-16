@@ -673,6 +673,7 @@ input[type='number'] {
 
 .sblock>a {
   font-size: 18px;
+  text-align: left;
   cursor: pointer;
   padding: 10px 15px;
   text-decoration: none;

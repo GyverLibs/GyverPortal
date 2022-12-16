@@ -54,15 +54,22 @@ enum GP_DrawMode {
 
 struct GPcanvas {
     GPcanvas(int sz = 500) {
-        if (_GPP) ps = _GPP;
+        if (_GPP) ps = _GPP;    // внутри билдера
         else {
             s.reserve(sz);
-            ps = &s;
+            ps = &s;            // в программе
         }
     }
     
+    // добавить строку кода на js (оканчивается; !!!)
     void add(const String& s) {
+        _check();
         *ps += s;
+    }
+    
+    // очистить буфер (для рисования снаружи билдера)
+    void clearBuffer() {
+        if (!_GPP) s = "";
     }
     
     // =====================================================
@@ -631,17 +638,17 @@ struct GPcanvas {
     
     // private
     void addCmd(int cmd) {
-        *ps += cmd;
-        *ps += "::";
+        add(cmd);
+        add("::");
     }
     void semi() {
-        *ps += ';';
+        add(';');
     }
     void quote() {
-        *ps += '\'';
+        add('\'');
     }
     void comma() {
-        *ps += ',';
+        add(',');
     }
     void params(int num, ...) {
         va_list valist;
@@ -653,12 +660,15 @@ struct GPcanvas {
         va_end(valist);
     }
     void add(int v) {
+        _check();
         *ps += v;
     }
     void add(char v) {
+        _check();
         *ps += v;
     }
     void add(double v) {
+        _check();
         *ps += v;
     }
     
@@ -699,10 +709,22 @@ struct GPcanvas {
         font(f);
     }
     
+    String& _read() {
+        sent = 1;
+        return s;
+    }
+    void _check() {
+        if (sent) {
+            clearBuffer();
+            sent = 0;
+        }
+    }
+    
     String s;
     String* ps;
     bool strokeF = 1;
     bool fillF = 1;
+    bool sent = 0;
     const char* fname = "Arial";
     int fsize = 20;
     GP_DrawMode eMode = M_RADIUS;

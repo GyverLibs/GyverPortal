@@ -777,7 +777,7 @@ public:
         return answer(time.encode());
     }
     bool answer(GPcanvas& cv) {
-        return answer(cv.s);
+        return answer(cv._read());
     }
     
     // ==================== UPDATE AUTO =====================
