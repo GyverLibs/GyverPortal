@@ -256,13 +256,15 @@ struct Builder {
     
     void ONLINE_CHECK(int prd = 5000, const String& code = "") {
         JS_BEGIN();
-        *_GPP += F("setInterval(function(){var xhttp=new XMLHttpRequest();xhttp.timeout=300;xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
+        *_GPP += F("setInterval(function(){var xhttp=new XMLHttpRequest();xhttp.timeout=");
+        *_GPP += prd;
+        *_GPP += F(";xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
         "xhttp.onreadystatechange=function(){");
         if (!code.length()) *_GPP += F("if(!this.status)alert('Connection Lost!');"); //*_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
         else *_GPP += code;
         *_GPP += F("}},");
         *_GPP += prd;
-        *_GPP += F(");");
+        *_GPP += F(");\n");
         JS_END();
     }
     
