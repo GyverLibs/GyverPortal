@@ -625,7 +625,8 @@ public:
     bool clickFloat(T& t) {
         return click() ? copyFloat(t) : 0;
     }
-    bool clickBool(bool& t) {
+    template <typename T>
+    bool clickBool(T& t) {
         return click() ? copyBool(t) : 0;
     }
     bool clickDate(GPdate& t) {
@@ -653,7 +654,8 @@ public:
     bool clickFloat(const String& n, T& t) {
         return click() ? copyFloat(n, t) : 0;
     }
-    bool clickBool(const String& n, bool& t) {
+    template <typename T>
+    bool clickBool(const String& n, T& t) {
         return click() ? copyBool(n, t) : 0;
     }
     bool clickDate(const String& n, GPdate& t) {
@@ -1012,7 +1014,8 @@ public:
     bool copyFloat(T& t) {
         return server.args() ? (t = getFloat(), 1) : 0;
     }
-    bool copyBool(bool& t) {
+    template <typename T>
+    bool copyBool(T& t) {
         return server.args() ? (t = getBool(), 1) : 0;
     }
     bool copyDate(GPdate& t) {
@@ -1040,7 +1043,8 @@ public:
     bool copyFloat(const String& n, T& t) {
         return server.hasArg(n) ? (t = getFloat(n), 1) : 0;
     }
-    bool copyBool(const String& n, bool& t) {
+    template <typename T>
+    bool copyBool(const String& n, T& t) {
         return server.hasArg(n) ? (t = getBool(n), 1) : 0;
     }
     bool copyDate(const String& n, GPdate& t) {

@@ -1555,7 +1555,10 @@ struct Builder {
         *_GPP += "' ";
         if (state) *_GPP += F("checked ");
         if (dis) *_GPP += F("disabled ");
-        *_GPP += F("onclick='GP_click(this)'><span></span></label>\n");
+        *_GPP += F("onclick='GP_click(this)'><span></span></label>\n"
+        "<input type='hidden' value='0' name='");
+        *_GPP += name;
+        *_GPP += "'>\n";
         send();
     }
     void SWITCH(const String& name, bool state = 0, PGM_P st = GP_GREEN, bool dis = false) {
