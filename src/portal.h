@@ -610,6 +610,35 @@ public:
     
     
     // ===================== CLICK AUTO =====================
+    // нулевой аргумент (для вызова в условии)
+    bool clickStr(char* t, int len = 0) {
+        return click() ? copyStr(t, len) : 0;
+    }
+    bool clickString(String& t) {
+        return click() ? copyString(t) : 0;
+    }
+    template <typename T>
+    bool clickInt(T& t) {
+        return click() ? copyInt(t) : 0;
+    }
+    template <typename T>
+    bool clickFloat(T& t) {
+        return click() ? copyFloat(t) : 0;
+    }
+    bool clickBool(bool& t) {
+        return click() ? copyBool(t) : 0;
+    }
+    bool clickDate(GPdate& t) {
+        return click() ? copyDate(t) : 0;
+    }
+    bool clickTime(GPtime& t) {
+        return click() ? copyTime(t) : 0;
+    }
+    bool clickColor(GPcolor& t) {
+        return click() ? copyColor(t) : 0;
+    }
+    
+    // с указанием имени компонента
     bool clickStr(const String& n, char* t, int len = 0) {
         return click() ? copyStr(n, t, len) : 0;
     }
@@ -764,13 +793,13 @@ public:
         return answer(s);
     }
     
-    bool answer(GPcolor& col) {
+    bool answer(GPcolor col) {
         return answer(col.encode());
     }
-    bool answer(GPdate& date) {
+    bool answer(GPdate date) {
         return answer(date.encode());
     }
-    bool answer(GPtime& time) {
+    bool answer(GPtime time) {
         return answer(time.encode());
     }
     bool answer(GPcanvas& cv) {
@@ -968,7 +997,35 @@ public:
 
     
     // ===================== COPY-ПАРСЕРЫ =====================
-    // БЕЗОПАСНЫЕ ФУНКЦИИ (проверяют запрос). Копируют данные из запроса в переменную
+    // ОПАСНЫЕ парсеры (не проверяют запрос). Использовать только в условии!
+    bool copyStr(char* t, int len = 0) {
+        return (server.args() && (!len || argLength() < len)) ? (strcpy(t, server.arg(0).c_str()), 1) : 0;
+    }
+    bool copyString(String& t) {
+        return server.args() ? (t = server.arg(0), 1) : 0;
+    }
+    template <typename T>
+    bool copyInt(T& t) {
+        return server.args() ? (t = getInt(), 1) : 0;
+    }
+    template <typename T>
+    bool copyFloat(T& t) {
+        return server.args() ? (t = getFloat(), 1) : 0;
+    }
+    bool copyBool(bool& t) {
+        return server.args() ? (t = getBool(), 1) : 0;
+    }
+    bool copyDate(GPdate& t) {
+        return server.args() ? (t = getDate(), 1) : 0;
+    }
+    bool copyTime(GPtime& t) {
+        return server.args() ? (t = getTime(), 1) : 0;
+    }
+    bool copyColor(GPcolor& t) {
+        return server.args() ? (t = getColor(), 1) : 0;
+    }
+    
+    // БЕЗОПАСНЫЕ парсеры (проверяют запрос). Копируют данные из запроса в переменную
     bool copyStr(const String& n, char* t, int len = 0) {
         return (server.hasArg(n) && (!len || argLength(n) < len)) ? (strcpy(t, server.arg(n).c_str()), 1) : 0;
     }

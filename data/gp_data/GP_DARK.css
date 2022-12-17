@@ -754,7 +754,6 @@ input[type='number'] {
   background-color: #fff;
   border: 1px solid #adb5bd;
   border-radius: 0.25em;
-  transition: .2s;
   cursor: pointer;
 }
 

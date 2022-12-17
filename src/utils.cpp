@@ -83,7 +83,7 @@ int GPinList(const String& s, const String& li) {
     if (s == li) return 0;
     int p = 0, t = 0;
     while (1) {
-        t = li.indexOf(s, p);
+        t = li.lastIndexOf(s, p);
         if (t < 0) return -1;
         if (!t && li[t+l] == ',') break;
         if (t && li[t-1] == ',' && (li[t+l] == ',' || !li[t+l])) break;
