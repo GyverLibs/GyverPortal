@@ -39,7 +39,7 @@ static esp_err_t _stream_handler(httpd_req_t *req) {
             res = httpd_resp_send_chunk(req, _STREAM_END, strlen(_STREAM_END));
         }
         esp_camera_fb_return(fb);
-        vTaskDelay(20);
+        delay(20);
     }
     return res;
 }

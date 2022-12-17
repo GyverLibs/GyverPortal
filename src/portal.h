@@ -27,6 +27,7 @@ extern uint32_t _gp_unix_tmr;
 extern uint32_t _gp_local_unix;
 extern const char* _gp_style;
 extern uint8_t _gp_seed;
+extern const char* _gp_mdns;
 
 #define GP_DEBUG_EN
 #ifdef GP_DEBUG_EN
@@ -69,15 +70,16 @@ public:
 
     // ========================= СИСТЕМА =========================
     // запустить портал. Можно передать имя MDNS (оставь пустым "" если MDNS не нужен) и порт
-    void start(__attribute__((unused)) const String& mdns, uint16_t port = 80) {
+    void start(const char* mdns = "", uint16_t port = 80) {
+        _gp_mdns = mdns;
         _gp_unix_tmr = 0;
         _active = 1;
         _dns = (WiFi.getMode() == WIFI_AP);
         
         #ifndef GP_NO_MDNS
-        if (mdns.length()) {
+        if (strlen(mdns)) {
             _mdnsF = 1;
-            MDNS.begin(mdns.c_str());  
+            MDNS.begin(mdns);  
             MDNS.addService("http", "tcp", port);
         }
         #endif
@@ -271,11 +273,6 @@ public:
             
         });
         #endif
-    }
-    
-    // запустить портал
-    void start(__attribute__((unused)) uint8_t mode = WIFI_STA) {
-        start("");
     }
     
     // остановить портал

@@ -1,4 +1,4 @@
-// изменение имени окна
+// таблица с системной информацией
 
 #define AP_SSID ""
 #define AP_PASS ""
@@ -6,20 +6,13 @@
 #include <GyverPortal.h>
 GyverPortal ui;
 
+// конструктор страницы
 void build() {
-  GP.BUILD_BEGIN();
-  GP.THEME(GP_DARK);
+  GP.BUILD_BEGIN(GP_DARK);
 
-  // проверять статус платы
-  // зажми reset и смотри на название вкладки браузера
-  GP.ONLINE_CHECK();
-  
-  GP.TITLE("MyPortal");
-  
+  GP.SYSTEM_INFO();
+
   GP.BUILD_END();
-}
-
-void action() {
 }
 
 void setup() {
@@ -32,9 +25,13 @@ void setup() {
   }
   Serial.println(WiFi.localIP());
 
+  // подключаем конструктор и запускаем
   ui.attachBuild(build);
   ui.attach(action);
   ui.start();
+}
+
+void action() {
 }
 
 void loop() {

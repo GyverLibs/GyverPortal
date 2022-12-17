@@ -22,8 +22,9 @@ label{white-space:nowrap;font-size:20px;margin:0 5px;}
 .thinBlock{background:none;border:2px solid #3c4048;box-shadow:none;}
 .thinText{padding:0px 10px;background:#ffffff;color:#3c4048;font-size:20px;}
 .thinTab{background:none;border:none;color:#9c9ea1;margin-top:-17px;margin-bottom:5px;display:block;}
-.inliner{display:flex;flex-direction:row;align-content:center;flex-wrap:nowrap;align-items:center;}input[type=number],input[type=text],input[type=password],input[type=date],input[type=time],input[type=color],input[type=checkbox],select,textarea
-{border-radius:8px;padding:3px 10px;vertical-align:middle;position:relative;margin:6px 4px;font-size:20px;height:40px;cursor:pointer;width:90%;max-width:200px;border:1px solid #ccc;}
+.inliner{display:flex;flex-direction:row;align-content:center;flex-wrap:nowrap;align-items:center;}
+input[type=number],input[type=text],input[type=password],input[type=date],input[type=time],input[type=color],input[type=checkbox],select,textarea{
+border-radius:8px;padding:3px 10px;vertical-align:middle;position:relative;margin:6px 4px;font-size:20px;height:40px;cursor:pointer;border:1px solid #ccc;}
 input[type=date],input[type=time]{width:180px;}
 input[type=color]{width:80px;height:40px;}
 input[type=checkbox]{width:27px;height:27px;margin-bottom:10px;}
@@ -142,8 +143,8 @@ label{white-space:nowrap;font-size:20px;margin:0 5px;}
 .thinBlock{background:none;border:2px solid #3c4048;}
 .thinText{padding:0px 10px;background:#13161a;font-size:20px;}
 .thinTab{background:none;border:none;color:#9c9ea1;margin-top:-17px;margin-bottom:5px;display:block;}
-.inliner{display:flex;flex-direction:row;align-content:center;flex-wrap:nowrap;align-items:center;}input[type=number],input[type=text],input[type=password],input[type=date],input[type=time],input[type=color],input[type=checkbox],select,textarea
-{border-radius:8px;padding:3px 10px;color:#bbb;border:none;background-color:#2a2d35;vertical-align:middle;position:relative;margin:6px 4px;font-size:20px;height:40px;cursor:pointer;width:90%;max-width:200px;}
+.inliner{display:flex;flex-direction:row;align-content:center;flex-wrap:nowrap;align-items:center;}input[type=number],input[type=text],input[type=password],input[type=date],input[type=time],input[type=color],input[type=checkbox],select,textarea{
+    border-radius:8px;padding:3px 10px;color:#bbb;border:none;background-color:#2a2d35;vertical-align:middle;position:relative;margin:6px 4px;font-size:20px;height:40px;cursor:pointer;}
 input[type=date],input[type=time]{width:180px;}
 input[type=color]{width:80px;height:40px;}
 input[type=checkbox]{width:27px;height:27px;margin-bottom:10px;}

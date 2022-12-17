@@ -1,5 +1,5 @@
+var _tout = 700;
 var _clkRelList = [],
-  _redirTout = 200,
   _touch = 0,
   _clkRedrList = {},
   _clkUpdList = {},
@@ -10,38 +10,36 @@ document.title = 'GyverPortal';
 
 function GP_delete(url) {
   if (!confirm('Delete ' + url + '?')) return;
-  GP_send('/GP_delete?' + url);
-  setTimeout(function() {
-    location.reload();
-  }, _redirTout);
+  GP_send('/GP_delete?' + url, 1);
 }
 
 function GP_rename(url) {
   res = prompt('Rename File', url);
   if (!res) return;
-  GP_send('/GP_rename?' + url + '=' + res);
-  setTimeout(function() {
-    location.reload();
-  }, _redirTout);
-}
-
-function GP_redirect(url) {
-  setTimeout(function() {
-    location.href = url;
-  }, _redirTout);
+  GP_send('/GP_rename?' + url + '=' + res, 1);
 }
 
 function GP_hint(id, txt) {
   el = getEl(id);
-  if (el.className == '_sw_c');
-  el = getEl('_' + id);
+  if (el.className == '_sw_c') {
+    el = getEl('_' + id)
+  }
   el.title = txt;
 }
 
-function GP_send(req) {
+function GP_send(req, r = null) {
   var xhttp = new XMLHttpRequest();
   xhttp.open('POST', req, true);
   xhttp.send();
+  xhttp.timeout = _tout;
+  if (r) {
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        if (r == 1) location.reload();
+        else location.href = r
+      }
+    }
+  }
 }
 
 function GP_press(arg, dir) {
@@ -49,7 +47,7 @@ function GP_press(arg, dir) {
   if (arg.name) GP_send('/GP_press?' + arg.name + '=' + dir);
 }
 
-function GP_click(arg, r = 0) {
+function GP_click(arg, r = null) {
   if (!arg.name) arg.name = arg.id;
   var v;
   if (arg.type == 'number') {
@@ -59,7 +57,8 @@ function GP_click(arg, r = 0) {
   if (arg.type == 'checkbox') v = arg.checked ? '1' : '0';
   else if (arg.type == 'button' || arg.value == undefined) v = '';
   else v = arg.value;
-  GP_send('/GP_click?' + arg.name + '=' + encodeURIComponent(v));
+  if (_clkRelList.includes(arg.name)) r = 1;
+  GP_send('/GP_click?' + arg.name + '=' + encodeURIComponent(v), r);
   if (_clkUpdList) {
     for (var key in _clkUpdList) {
       if (key.includes(arg.name)) GP_update(_clkUpdList[key]);
@@ -69,10 +68,7 @@ function GP_click(arg, r = 0) {
     for (var key in _clkRedrList) {
       if (_clkRedrList[key].includes(arg.name)) GP_update(key);
     }
-  }
-  if (r != 0 || _clkRelList.includes(arg.name)) setTimeout(function() {
-    location.reload();
-  }, (r ? r : _redirTout));
+  };
 }
 
 function GP_clickid(btn, tar) {
@@ -121,7 +117,7 @@ function GP_spin(arg) {
 function GP_update(ids) {
   ids = ids.replaceAll(' ', '');
   var xhttp = new XMLHttpRequest();
-  xhttp.timeout = 700;
+  xhttp.timeout = _tout;
   xhttp.open('GET', '/GP_update?' + ids + '=', true);
   xhttp.send();
   xhttp.onreadystatechange = function() {
@@ -131,7 +127,7 @@ function GP_update(ids) {
       if (ids.length != resps.length) return;
       for (let i = 0; i < ids.length; i++) GP_apply(getEl(ids[i]), resps[i]);
     }
-  };
+  }
 }
 
 function GP_apply(item, resp) {
@@ -178,7 +174,7 @@ function GP_apply(item, resp) {
   if (item.type == 'range') GP_change(item);
 }
 
-function GP_sendForm(id) {
+function GP_sendForm(id, url) {
   var elms = getEl(id).elements;
   var qs = '';
   for (var i = 0, elm; elm = elms[i++];) {
@@ -188,7 +184,7 @@ function GP_sendForm(id) {
       qs += elm.name + '=' + encodeURIComponent(v) + '&';
     }
   }
-  GP_send(id + '?' + qs.slice(0, -1));
+  GP_send(id + '?' + qs.slice(0, -1), url);
 }
 
 function GP_eye(arg) {

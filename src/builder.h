@@ -26,9 +26,9 @@ extern uint32_t _gp_unix_tmr;
 extern uint32_t _gp_local_unix;
 extern const char* _gp_style;
 extern uint8_t _gp_seed;
+extern const char* _gp_mdns;
 
 struct Builder {
-    int reloadTimeout = 150;
     uint8_t _gp_nav_pos = 0;
     uint8_t _gp_nav_id = 0;
     int _spinInt = 200;
@@ -36,11 +36,6 @@ struct Builder {
     // период изменения значения при удержании кнопки спиннера
     void setSpinnerPeriod(int prd) {
         _spinInt = prd;
-    }
-    
-    // задержка перезагрузки страницы для SELECT и BUTTON при включенном rel
-    void setReloadTimeout(int tout) {
-        reloadTimeout = tout;
     }
     
     // ======================= БИЛДЕР =======================
@@ -363,9 +358,7 @@ struct Builder {
         JS_BEGIN();
         *_GPP += F("_clkRelList='");
         *_GPP += list;
-        *_GPP += F("'.split(',');_redirTout=");
-        *_GPP += reloadTimeout;
-        *_GPP += ';';
+        *_GPP += F("'.split(',');");
         JS_END();
         send();
     }
@@ -508,13 +501,9 @@ struct Builder {
     }
     
     void FORM_SEND(const String& text, const String& url = "", PGM_P st = GP_GREEN, const String& cls = "") {
-        *_GPP += F("<input type='button' onclick='GP_sendForm(this.parentNode.id);");
-        if (url.length()) {
-            *_GPP += F("GP_redirect(\"");
-            *_GPP += url;
-            *_GPP += F("\");");
-        }
-        *_GPP += F("' value='");
+        *_GPP += F("<input type='button' onclick='GP_sendForm(this.parentNode.id,\"");
+        *_GPP += url;
+        *_GPP += F("\")' value='");
         *_GPP += text;
         if (st != GP_GREEN) {
             *_GPP += F("' style='background:");
@@ -1062,17 +1051,15 @@ struct Builder {
         *_GPP += fpath;
         *_GPP += F("</a>\n<td align='right'>[");
         *_GPP += String(size / 1000.0, 1);
-        *_GPP += F(" kB]\n<td align='center'>\n");
-        *_GPP += F("<td align='center'>\n");
-        *_GPP += F("<span title='Rename' style='cursor:pointer' onclick='GP_rename(\"");
+        *_GPP += F(" kB]\n"
+        "<td align='center'>\n"
+        "<span title='Rename' style='cursor:pointer' onclick='GP_rename(\"");
         *_GPP += fpath;
-        *_GPP += F("\")'>📝</span>\n");
-        *_GPP += F("<td align='center'>\n");
-        *_GPP += F("<a style='text-decoration:none' href='");
+        *_GPP += F("\")'>📝</span>\n"
+        "<a style='text-decoration:none' href='");
         *_GPP += fpath;
-        *_GPP += F("' download><span title='Download'>📥</span></a>\n");
-        *_GPP += F("<td align='center'>\n");
-        *_GPP += F("<span title='Delete' style='cursor:pointer' onclick='GP_delete(\"");
+        *_GPP += F("' download><span title='Download'>📥</span></a>\n"
+        "<span title='Delete' style='cursor:pointer' onclick='GP_delete(\"");
         *_GPP += fpath;
         *_GPP += F("\")'>❌</span>\n");
     }
@@ -1127,13 +1114,13 @@ struct Builder {
         *_GPP += (fsi.usedBytes * 100 / fsi.totalBytes);
         *_GPP += F("%)</strong>");
 #endif
-        *_GPP += F("</table>");
+        *_GPP += F("</table>\n");
         send();
     }
     
     // ================ СИСТЕМНАЯ ИНФОРМАЦИЯ ================
-    void SYSTEM_INFO(const String& fwv = "") {
-        TABLE_BEGIN("300px");
+    void SYSTEM_INFO(const String& fwv = "", const String& w = "") {
+        TABLE_BEGIN(w);
         // ===========
         TR();
         TD(GP_CENTER, 3);
@@ -1158,6 +1145,13 @@ struct Builder {
             TD(GP_LEFT); PLAIN(F("AP IP"));
             TD(GP_RIGHT); BOLD(WiFi.softAPIP().toString());
         }
+        
+        if (_gp_mdns && strlen(_gp_mdns)) {
+            TR();
+            TD(GP_LEFT); PLAIN(F("mDNS"));
+            TD(GP_RIGHT); BOLD(String(_gp_mdns) + ".local");
+        }
+        
         TR();
         TD(GP_LEFT); PLAIN(F("Subnet"));
         TD(GP_RIGHT); BOLD(WiFi.subnetMask().toString());
@@ -1191,7 +1185,7 @@ struct Builder {
     #endif
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Sketch Size"));
+        TD(GP_LEFT); PLAIN(F("Sketch Size (Free)"));
         TD(GP_RIGHT); BOLD(String(ESP.getSketchSize() / 1000.0, 1) + " kB (" + String(ESP.getFreeSketchSpace() / 1000.0, 1) + ")");
         
         TR();
@@ -1216,7 +1210,7 @@ struct Builder {
         
         TR();
         TD(GP_LEFT); PLAIN(F("Cpu Freq."));
-        TD(GP_RIGHT); BOLD(String(ESP.getCpuFreqMHz()));
+        TD(GP_RIGHT); BOLD(String(ESP.getCpuFreqMHz()) + F(" MHz"));
         
         TR();
         TD(GP_LEFT); PLAIN(F("Date"));
@@ -1308,7 +1302,7 @@ struct Builder {
             *_GPP += F("')\"");
         } else {
             *_GPP += F("onclick='GP_click(this,");
-            *_GPP += rel ? reloadTimeout : 0;
+            *_GPP += rel;
             *_GPP += F(")'");
         }
         if (dis) *_GPP += F(" disabled");
@@ -1355,11 +1349,9 @@ struct Builder {
         *_GPP += value;
         
         if (name.length()){
-            *_GPP += F("' onclick='GP_click(this);setTimeout(function(){location.href=\"");
+            *_GPP += F("' onclick='GP_click(this,\"");
             *_GPP += url;
-            *_GPP += F("\";},");
-            *_GPP += reloadTimeout;
-            *_GPP += F(");'>\n");
+            *_GPP += F("\");'>\n");
         } else {
             *_GPP += F("' onclick='location.href=\"");
             *_GPP += url;
@@ -1769,7 +1761,7 @@ struct Builder {
         *_GPP += "' ";
         if (dis) *_GPP += F("disabled ");
         *_GPP += F("onchange='GP_click(this,");
-        *_GPP += rel ? reloadTimeout : 0;
+        *_GPP += rel;
         *_GPP += F(")'>\n");
         
         GP_parser p(list);
@@ -1800,7 +1792,7 @@ struct Builder {
         *_GPP += "' ";
         if (dis) *_GPP += F("disabled ");
         *_GPP += F("onchange='GP_click(this,");
-        *_GPP += rel ? reloadTimeout : 0;
+        *_GPP += rel;
         *_GPP += F(")'>\n");
         int idx = 0; 
         while (list[idx].length()) {
@@ -1829,7 +1821,7 @@ struct Builder {
         *_GPP += "' ";
         if (dis) *_GPP += F("disabled ");
         *_GPP += F("onchange='GP_click(this,");
-        *_GPP += rel ? reloadTimeout : 0;
+        *_GPP += rel;
         *_GPP += F(")'>\n");
         int idx = 0; 
         while (list[idx]!=nullptr) {
