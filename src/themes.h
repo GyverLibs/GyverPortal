@@ -8,7 +8,7 @@ p{display:inline;}
 a,a:visited{color:#444}
 a:hover{color:#777}
 body{font-family:Verdana;margin-top:15px;}
-hr{width:95%;margin-bottom:10px;}
+hr{width:95%;margin:5px 0;}
 h2{margin:8px 0;}
 span{font-size:16px;}
 label{white-space:nowrap;font-size:20px;margin:0 5px;}
@@ -129,7 +129,7 @@ a:hover{color:#3d9941}
 #blockBack input[type=range]{background:#13161a;background-repeat:no-repeat;}
 #blockBack input:checked+.slider{background-color:#37a93c}
 body{font-family:Verdana;background:#13161a;color:#bbb;margin-top:15px;}
-hr{width:95%;margin-bottom:10px;border:none;border-top:2px solid #394048;}
+hr{width:95%;margin:5px 0;border:none;border-top:2px solid #394048;}
 h2{margin:8px 0;}
 span{font-size:16px;}
 label{white-space:nowrap;font-size:20px;margin:0 5px;}

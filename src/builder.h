@@ -128,7 +128,7 @@ struct Builder {
             *_GPP += w;
             *_GPP += F("px'");
         }
-        *_GPP += F(">\n");
+        *_GPP += ">\n";
         send();
     }
     void UI_END() {
@@ -260,7 +260,7 @@ struct Builder {
         *_GPP += prd;
         *_GPP += F(";xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
         "xhttp.onreadystatechange=function(){");
-        if (!code.length()) *_GPP += F("if(!this.status)alert('Connection Lost!');"); //*_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
+        if (!code.length()) *_GPP += F("if(!this.status)alert('Device offline!');"); //*_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
         else *_GPP += code;
         *_GPP += F("}},");
         *_GPP += prd;
@@ -1130,45 +1130,45 @@ struct Builder {
         HR();
         
         TR();
-        TD(GP_LEFT); PLAIN(F("WiFi Mode"));
-        TD(GP_RIGHT); BOLD(WiFi.getMode() == WIFI_AP ? F("AP") : (WiFi.getMode() == WIFI_STA ? F("STA") : F("AP_STA")));
+        TD(GP_LEFT); BOLD(F("WiFi Mode"));
+        TD(GP_RIGHT); PLAIN(WiFi.getMode() == WIFI_AP ? F("AP") : (WiFi.getMode() == WIFI_STA ? F("STA") : F("AP_STA")));
         
         if (WiFi.getMode() != WIFI_AP) {
             TR();
-            TD(GP_LEFT); PLAIN(F("SSID"));
-            TD(GP_RIGHT); BOLD(WiFi.SSID());
+            TD(GP_LEFT); BOLD(F("SSID"));
+            TD(GP_RIGHT); PLAIN(WiFi.SSID());
             
             TR();
-            TD(GP_LEFT); PLAIN(F("Local IP"));
-            TD(GP_RIGHT); BOLD(WiFi.localIP().toString());
+            TD(GP_LEFT); BOLD(F("Local IP"));
+            TD(GP_RIGHT); PLAIN(WiFi.localIP().toString());
         }
         if (WiFi.getMode() != WIFI_STA) {
             TR();
-            TD(GP_LEFT); PLAIN(F("AP IP"));
-            TD(GP_RIGHT); BOLD(WiFi.softAPIP().toString());
+            TD(GP_LEFT); BOLD(F("AP IP"));
+            TD(GP_RIGHT); PLAIN(WiFi.softAPIP().toString());
         }
         
         if (_gp_mdns && strlen(_gp_mdns)) {
             TR();
-            TD(GP_LEFT); PLAIN(F("mDNS"));
-            TD(GP_RIGHT); BOLD(String(_gp_mdns) + ".local");
+            TD(GP_LEFT); BOLD(F("mDNS"));
+            TD(GP_RIGHT); PLAIN(String(_gp_mdns) + ".local");
         }
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Subnet"));
-        TD(GP_RIGHT); BOLD(WiFi.subnetMask().toString());
+        TD(GP_LEFT); BOLD(F("Subnet"));
+        TD(GP_RIGHT); PLAIN(WiFi.subnetMask().toString());
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Gateway"));
-        TD(GP_RIGHT); BOLD(WiFi.gatewayIP().toString());
+        TD(GP_LEFT); BOLD(F("Gateway"));
+        TD(GP_RIGHT); PLAIN(WiFi.gatewayIP().toString());
         
         TR();
-        TD(GP_LEFT); PLAIN(F("MAC Address"));
-        TD(GP_RIGHT); BOLD(WiFi.macAddress());
+        TD(GP_LEFT); BOLD(F("MAC Address"));
+        TD(GP_RIGHT); PLAIN(WiFi.macAddress());
         
         TR();
-        TD(GP_LEFT); PLAIN(F("RSSI"));
-        TD(GP_RIGHT); BOLD("📶 " + String(constrain(2 * (WiFi.RSSI() + 100), 0, 100)) + '%');
+        TD(GP_LEFT); BOLD(F("RSSI"));
+        TD(GP_RIGHT); PLAIN("📶 " + String(constrain(2 * (WiFi.RSSI() + 100), 0, 100)) + '%');
         
         // ===========
         TR();
@@ -1177,22 +1177,22 @@ struct Builder {
         HR();
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Free Heap"));
-        TD(GP_RIGHT); BOLD(String(ESP.getFreeHeap() / 1000.0, 3) + " kB");
+        TD(GP_LEFT); BOLD(F("Free Heap"));
+        TD(GP_RIGHT); PLAIN(String(ESP.getFreeHeap() / 1000.0, 3) + " kB");
         
     #ifdef ESP8266
         TR();
-        TD(GP_LEFT); PLAIN(F("Heap Fragmentation"));
-        TD(GP_RIGHT); BOLD(String(ESP.getHeapFragmentation()) + '%');
+        TD(GP_LEFT); BOLD(F("Heap Fragmentation"));
+        TD(GP_RIGHT); PLAIN(String(ESP.getHeapFragmentation()) + '%');
     #endif
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Sketch Size (Free)"));
-        TD(GP_RIGHT); BOLD(String(ESP.getSketchSize() / 1000.0, 1) + " kB (" + String(ESP.getFreeSketchSpace() / 1000.0, 1) + ")");
+        TD(GP_LEFT); BOLD(F("Sketch Size (Free)"));
+        TD(GP_RIGHT); PLAIN(String(ESP.getSketchSize() / 1000.0, 1) + " kB (" + String(ESP.getFreeSketchSpace() / 1000.0, 1) + ")");
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Flash Size"));
-        TD(GP_RIGHT); BOLD(String(ESP.getFlashChipSize() / 1000.0, 1) + " kB");
+        TD(GP_LEFT); BOLD(F("Flash Size"));
+        TD(GP_RIGHT); PLAIN(String(ESP.getFlashChipSize() / 1000.0, 1) + " kB");
         
         // ===========
         TR();
@@ -1202,30 +1202,30 @@ struct Builder {
         
     #ifdef ESP8266
         TR();
-        TD(GP_LEFT); PLAIN(F("Chip ID"));
-        TD(GP_RIGHT); BOLD("0x" + String(ESP.getChipId(), HEX));
+        TD(GP_LEFT); BOLD(F("Chip ID"));
+        TD(GP_RIGHT); PLAIN("0x" + String(ESP.getChipId(), HEX));
     #endif
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Cycle Count"));
-        TD(GP_RIGHT); BOLD(String(ESP.getCycleCount()));
+        TD(GP_LEFT); BOLD(F("Cycle Count"));
+        TD(GP_RIGHT); PLAIN(String(ESP.getCycleCount()));
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Cpu Freq."));
-        TD(GP_RIGHT); BOLD(String(ESP.getCpuFreqMHz()) + F(" MHz"));
+        TD(GP_LEFT); BOLD(F("Cpu Freq."));
+        TD(GP_RIGHT); PLAIN(String(ESP.getCpuFreqMHz()) + F(" MHz"));
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Date"));
+        TD(GP_LEFT); BOLD(F("Date"));
         GPdate date(_gp_local_unix);
-        TD(GP_RIGHT); BOLD(date.encode());
+        TD(GP_RIGHT); PLAIN(date.encode());
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Time"));
+        TD(GP_LEFT); BOLD(F("Time"));
         GPtime time(_gp_local_unix);
-        TD(GP_RIGHT); BOLD(time.encode());
+        TD(GP_RIGHT); PLAIN(time.encode());
         
         TR();
-        TD(GP_LEFT); PLAIN(F("Uptime"));
+        TD(GP_LEFT); BOLD(F("Uptime"));
         uint32_t sec = millis() / 1000ul;
         uint8_t second = sec % 60ul;
         sec /= 60ul;
@@ -1240,7 +1240,7 @@ struct Builder {
         s += ':';
         s += second / 10;
         s += second % 10;
-        TD(GP_RIGHT); BOLD(s);
+        TD(GP_RIGHT); PLAIN(s);
         
         // ===========
         TR();
@@ -1249,23 +1249,23 @@ struct Builder {
         HR();
         
         TR();
-        TD(GP_LEFT); PLAIN(F("SDK"));
-        TD(GP_RIGHT); BOLD(ESP.getSdkVersion());
+        TD(GP_LEFT); BOLD(F("SDK"));
+        TD(GP_RIGHT); PLAIN(ESP.getSdkVersion());
         
     #ifdef ESP8266
         TR();
-        TD(GP_LEFT); PLAIN(F("Core"));
-        TD(GP_RIGHT); BOLD(ESP.getCoreVersion());
+        TD(GP_LEFT); BOLD(F("Core"));
+        TD(GP_RIGHT); PLAIN(ESP.getCoreVersion());
     #endif
     
         TR();
-        TD(GP_LEFT); PLAIN(F("GyverPortal"));
-        TD(GP_RIGHT); BOLD(GP_VERSION);
+        TD(GP_LEFT); BOLD(F("GyverPortal"));
+        TD(GP_RIGHT); PLAIN(GP_VERSION);
         
         if (fwv.length()) {
             TR();
-            TD(GP_LEFT); PLAIN(F("Firmware"));
-            TD(GP_RIGHT); BOLD(fwv);
+            TD(GP_LEFT); BOLD(F("Firmware"));
+            TD(GP_RIGHT); PLAIN(fwv);
         }
 
         TABLE_END();
@@ -1754,6 +1754,25 @@ struct Builder {
         *_GPP += "' ";
         if (dis) *_GPP += F("disabled ");
         *_GPP += F("onchange='GP_click(this)'>\n");
+        send();
+    }
+    
+    void RADIO(const String& name, const String& group, const String& label = "", bool sel = 0,  bool dis = 0) {
+        *_GPP += F("<input type='radio' name='");
+        *_GPP += group;
+        *_GPP += F("' id='");
+        *_GPP += name;
+        *_GPP += F("' value='");
+        *_GPP += name;
+        *_GPP += "'";
+        if (sel) *_GPP += F(" checked");
+        if (dis) *_GPP += F(" disabled");
+        *_GPP += ">\n";
+        if (label.length()) {
+            *_GPP += F("<label for='");
+            *_GPP += name;
+            *_GPP += F("'label>\n");
+        }
         send();
     }
     

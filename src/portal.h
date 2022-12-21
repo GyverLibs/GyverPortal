@@ -114,7 +114,7 @@ public:
                 server.send(200);
                 return;
                 #endif
-            } else if (_uri.startsWith(F("/GP_ping"))) {          // пинг
+            } else if (_uri.startsWith(F("/GP_ping"))) {        // пинг
                 server.send(200);
                 return;
             } else if (_uri.startsWith(F("/GP_SCRIPT.js"))) {   // скрипты
@@ -1242,6 +1242,8 @@ private:
     bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 1, _autoU = 1, _autoDel = 1, _autoRen = 1;
     bool downOn = 1, uplOn = 1;
     uint8_t _holdF = 0;
+    
+    uint32_t _onlPrd = 1000;
     
     void (*_build)() = nullptr;
     void (*_buildR)(GyverPortal& p) = nullptr;
