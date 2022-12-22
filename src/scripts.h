@@ -19,7 +19,8 @@ function GP_send(req,r=null){
             }
         }
     }
-}
+}
+
 function GP_press(arg,dir){_pressId=(dir==1)?arg.name:null;if(arg.name)GP_send('/GP_press?'+arg.name+'='+dir);}
 function GP_click(arg,r=null){if(!arg.name)arg.name=arg.id;var v;
 if(arg.type=='number'){
@@ -36,7 +37,7 @@ function GP_clickid(btn,tar){GP_send('/GP_click?'+btn+'='+encodeURIComponent(get
 function GP_change(arg){arg.style.backgroundSize=(arg.value-arg.min)*100/(arg.max-arg.min)+'% 100%';getEl(arg.id+'_val').value=arg.value}
 function GP_wheel(arg){var e=window.event;arg.value-=Math.sign(e.deltaY||e.detail||e.wheelDelta)*Number(arg.step);}
 function saveFile(id){getEl(id).click();}
-unction GP_submId(id){getEl(id).submit();event.preventDefault();}
+function GP_submId(id){getEl(id).submit();event.preventDefault();}
 function openTab(tab,btn,blk){var x=document.getElementsByClassName(blk);
 for(var i=0;i<x.length;i++)x[i].style.display='none';
 getEl(tab).style.display='block';
@@ -68,7 +69,8 @@ else item.innerHTML=resp;}
 else {if(item.name=='_gplog'){item.innerHTML+=resp;item.scrollTop=item.scrollHeight;}
 else item.value=resp;}
 if(item.type=='range')GP_change(item);}
-function GP_sendForm(id,url){
+
+function GP_sendForm(id,url){
 var elms=getEl(id).elements;var qs='';
 for(var i=0,elm;elm=elms[i++];){if(elm.name){
 var v=elm.value;

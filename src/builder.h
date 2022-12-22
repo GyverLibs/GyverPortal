@@ -162,7 +162,7 @@ struct Builder {
         updateTime();
     }
     void JS_TOP() {
-        *_GPP += F("<script src='/GP_SCRIPT.js?=");
+        *_GPP += F("<script src='/GP_SCRIPT.js?v" GP_VERSION "=");
         *_GPP += _gp_seed;
         *_GPP += F("'></script>\n");
         updateTime();
@@ -185,9 +185,10 @@ struct Builder {
     }
     
     void THEME(PGM_P style) {
-        *_GPP += F("<link rel='stylesheet' href='/GP_STYLE.css?=");
+        *_GPP += F("<link rel='stylesheet' href='/GP_STYLE.css?v" GP_VERSION "=");
         *_GPP += ((uint32_t)style) & 0xFFFF;
-        *_GPP += F("'>\n");
+        *_GPP += "'";
+        *_GPP += ">\n";
         _gp_style = style;
     }
     void THEME_FILE(const String& style) {
@@ -1757,22 +1758,24 @@ struct Builder {
         send();
     }
     
-    void RADIO(const String& name, const String& group, const String& label = "", bool sel = 0,  bool dis = 0) {
+    void RADIO(const String& name, int num, /*const String& label = "", */int val = -1,  bool dis = 0) {
         *_GPP += F("<input type='radio' name='");
-        *_GPP += group;
+        *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
+        *_GPP += '_';
+        *_GPP += num;
         *_GPP += F("' value='");
-        *_GPP += name;
-        *_GPP += "'";
-        if (sel) *_GPP += F(" checked");
+        *_GPP += num;
+        *_GPP += "' onchange='GP_click(this)'";
+        if (val == num) *_GPP += F(" checked");
         if (dis) *_GPP += F(" disabled");
         *_GPP += ">\n";
-        if (label.length()) {
+        /*if (label.length()) {
             *_GPP += F("<label for='");
             *_GPP += name;
             *_GPP += F("'label>\n");
-        }
+        }*/
         send();
     }
     
