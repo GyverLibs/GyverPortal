@@ -317,9 +317,9 @@ struct Builder {
     // ======================= UPDATE =======================
     void UPDATE(const String& list, int prd = 1000) {
         JS_BEGIN();
-        *_GPP += F("setInterval(()=>GP_update('");
+        *_GPP += F("setInterval(function(){if(!document.hidden)GP_update('");
         *_GPP += list;
-        *_GPP += F("'),");
+        *_GPP += F("')},");
         *_GPP += prd;
         *_GPP += F(");");
         JS_END();
