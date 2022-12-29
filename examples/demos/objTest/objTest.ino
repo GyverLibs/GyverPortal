@@ -38,8 +38,7 @@ GP_SLIDER sl("sl");
 GP_SELECT sel("sel");
 
 void build() {
-  BUILD_BEGIN();
-  GP.THEME(GP_DARK);
+  GP.BUILD_BEGIN(GP_DARK);
   //GP.UPDATE("t1,l1,lb1,led1,led2,led3,num,numf,txt,pas,ar,ch,sw,dat,tm,col,sp,sl");
 
   GP.TITLE(tit);
@@ -77,44 +76,44 @@ void build() {
   GP.SUBMIT("Submit");
   GP.FORM_END();
 
-  BUILD_END();
+  GP.BUILD_END();
 }
 
 void action() {
   if (ui.form("/save")) {
-    ui.copyObj(num);
-    ui.copyObj(numf);
+    ui.copy(num);
+    ui.copy(numf);
     Serial.println(num.value);
     Serial.println(numf.value);
 
-    ui.copyObj(txt);
-    ui.copyObj(pas);
+    ui.copy(txt);
+    ui.copy(pas);
     Serial.println(txt.text);
     Serial.println(pas.text);
 
-    ui.copyObj(ar);
+    ui.copy(ar);
     Serial.println(ar.text);
 
-    ui.copyObj(ch);
-    ui.copyObj(sw);
+    ui.copy(ch);
+    ui.copy(sw);
     Serial.println(ch.state);
     Serial.println(sw.state);
 
-    ui.copyObj(dat);
-    ui.copyObj(tm);
+    ui.copy(dat);
+    ui.copy(tm);
     Serial.println(dat.date.encode());
     Serial.println(tm.time.encode());
 
-    ui.copyObj(col);
+    ui.copy(col);
     Serial.println(col.color.encode());
 
-    ui.copyObj(sp);
+    ui.copy(sp);
     Serial.println(sp.value);
 
-    ui.copyObj(sl);
+    ui.copy(sl);
     Serial.println(sl.value);
 
-    ui.copyObj(sel);
+    ui.copy(sel);
     Serial.println(sel.selected);
     Serial.println(sel.getValue());
   }
@@ -123,28 +122,28 @@ void action() {
     if (ui.clickUp(btn)) Serial.println("down");
     if (ui.clickDown(btn)) Serial.println("up");
     
-    if (ui.clickObj(btn)) Serial.println("btn");
-    if (ui.clickObj(btnm)) Serial.println("btn mini");
+    if (ui.click(btn)) Serial.println("btn");
+    if (ui.click(btnm)) Serial.println("btn mini");
 
-    if (ui.clickObj(num)) Serial.println(num.value);
-    if (ui.clickObj(numf)) Serial.println(numf.value);
+    if (ui.click(num)) Serial.println(num.value);
+    if (ui.click(numf)) Serial.println(numf.value);
 
-    if (ui.clickObj(txt)) Serial.println(txt.text);
-    if (ui.clickObj(pas)) Serial.println(pas.text);
+    if (ui.click(txt)) Serial.println(txt.text);
+    if (ui.click(pas)) Serial.println(pas.text);
 
-    if (ui.clickObj(ar)) Serial.println(ar.text);
+    if (ui.click(ar)) Serial.println(ar.text);
 
-    if (ui.clickObj(ch)) Serial.println(ch.state);
-    if (ui.clickObj(sw)) Serial.println(sw.state);
+    if (ui.click(ch)) Serial.println(ch.state);
+    if (ui.click(sw)) Serial.println(sw.state);
 
-    if (ui.clickObj(dat)) Serial.println(dat.date.encode());
-    if (ui.clickObj(tm)) Serial.println(tm.time.encode());
-    if (ui.clickObj(col)) Serial.println(col.color.encode());
+    if (ui.click(dat)) Serial.println(dat.date.encode());
+    if (ui.click(tm)) Serial.println(tm.time.encode());
+    if (ui.click(col)) Serial.println(col.color.encode());
 
-    if (ui.clickObj(sp)) Serial.println(sp.value);
-    if (ui.clickObj(sl)) Serial.println(sl.value);
+    if (ui.click(sp)) Serial.println(sp.value);
+    if (ui.click(sl)) Serial.println(sl.value);
 
-    if (ui.clickObj(sel)) {
+    if (ui.click(sel)) {
       Serial.println(sel.selected);
       Serial.println(sel.getValue());
     }
@@ -154,34 +153,34 @@ void action() {
     tit.text = random(10);
     lab.text = random(10);
     labb.text = random(10);
-    ui.updateObj(tit);
-    ui.updateObj(lab);
-    ui.updateObj(labb);
+    ui.update(tit);
+    ui.update(lab);
+    ui.update(labb);
 
     led1.state = random(2);
     led2.state = random(2);
     led3.state = random(2);
-    ui.updateObj(led1);
-    ui.updateObj(led2);
-    ui.updateObj(led3);
+    ui.update(led1);
+    ui.update(led2);
+    ui.update(led3);
 
     num.value = random(10);
     numf.value = random(100) / 10.0;
-    ui.updateObj(num);
-    ui.updateObj(numf);
+    ui.update(num);
+    ui.update(numf);
 
     txt.text = random(100);
     pas.text = random(100);
-    ui.updateObj(txt);
-    ui.updateObj(pas);
+    ui.update(txt);
+    ui.update(pas);
 
     ar.text = random(10000);
-    ui.updateObj(ar);
+    ui.update(ar);
 
     ch.state = random(2);
     sw.state = random(2);
-    ui.updateObj(ch);
-    ui.updateObj(sw);
+    ui.update(ch);
+    ui.update(sw);
 
     dat.date = (GPdate) {
       (uint16_t)random(2000, 2030), (uint8_t)random(13), (uint8_t)random(13)
@@ -189,17 +188,17 @@ void action() {
     tm.time = (GPtime) {
       (uint8_t)random(24), (uint8_t)random(60), (uint8_t)random(60)
     };
-    ui.updateObj(dat);
-    ui.updateObj(tm);
+    ui.update(dat);
+    ui.update(tm);
 
     col.color = random(0xffffff);
-    ui.updateObj(col);
+    ui.update(col);
 
     sp.value = random(50);
-    ui.updateObj(sp);
+    ui.update(sp);
 
     sl.value = random(10);
-    ui.updateObj(sl);
+    ui.update(sl);
   }
 }
 
