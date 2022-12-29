@@ -73,6 +73,7 @@ struct GP_NUMBER {
     String placeholder;
     int value;
     String width;
+    String pattern;
     String min = "";
     String max = "";
     bool disabled;
@@ -85,6 +86,7 @@ struct GP_NUMBER_F {
     float value;
     uint8_t decimals;
     String width;
+    String pattern;
     String min = "";
     String max = "";
     bool disabled;

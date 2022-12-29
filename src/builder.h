@@ -169,7 +169,7 @@ struct Builder {
     }
     void JS_BOTTOM() {
         SEND(F("<script>document.querySelectorAll('input[type=range]').forEach(x=>{GP_change(x)});\n"
-        "document.querySelectorAll('.spin_inp').forEach(x=>GP_spinw(x));"
+        "document.querySelectorAll('.spin_inp').forEach(x=>GP_spinw(x));\n"
         "</script>\n"));
     }
     
@@ -1404,7 +1404,7 @@ struct Builder {
     }
     
     // ========================= ВВОД ========================
-    void NUMBER_RAW(const String& name, const String& place, const String& value, const String& minv, const String& maxv, const String& width, bool dis) {
+    void NUMBER_RAW(const String& name, const String& place, const String& value, const String& minv, const String& maxv, const String& width, const String& pattern, bool dis) {
         *_GPP += F("<input type='number' step='any' name='");
         *_GPP += name;
         *_GPP += F("' id='");
@@ -1425,6 +1425,10 @@ struct Builder {
             *_GPP += F("' max='");
             *_GPP += maxv;
         }
+        if (pattern.length()) {
+            *_GPP += F("' pattern=");
+            *_GPP += pattern;
+        }
         *_GPP += F("' placeholder='");
         *_GPP += place;
         *_GPP += F("' onchange='GP_click(this)'");
@@ -1433,10 +1437,10 @@ struct Builder {
         send();
     }
     void NUMBER(const String& name, const String& place = "", int value = INT32_MAX, const String& width = "", bool dis = false) {
-        NUMBER_RAW(name, place, (value == INT32_MAX ? String("") : String(value)), "", "", width, dis);
+        NUMBER_RAW(name, place, (value == INT32_MAX ? String("") : String(value)), "", "", width, "", dis);
     }
     void NUMBER_F(const String& name, const String& place = "", float value = NAN, uint8_t dec = 2, const String& width = "", bool dis = false) {
-        NUMBER_RAW(name, place, (isnan(value) ? String("") : String(value, (uint16_t)dec)), "", "", width, dis);
+        NUMBER_RAW(name, place, (isnan(value) ? String("") : String(value, (uint16_t)dec)), "", "", width, "", dis);
     }
     
     void TEXT(const String& name, const String& place = "", const String& value = "", const String& width = "", int maxlength = 0, const String& pattern = "", bool dis = false) {
@@ -2263,11 +2267,11 @@ struct Builder {
     }
     
     void NUMBER(GP_NUMBER& num) {
-        NUMBER_RAW(num.name, num.placeholder, (num.value == INT32_MAX ? String("") : String(num.value)), num.min, num.max, num.width, num.disabled);
+        NUMBER_RAW(num.name, num.placeholder, (num.value == INT32_MAX ? String("") : String(num.value)), num.min, num.max, num.width, num.pattern, num.disabled);
     }
     void NUMBER_F(GP_NUMBER_F& num) {
         NUMBER_F(num.name, num.placeholder, num.value, num.decimals, num.width, num.disabled);
-        NUMBER_RAW(num.name, num.placeholder, (isnan(num.value) ? String("") : String(num.value, (uint16_t)num.decimals)), num.min, num.max, num.width, num.disabled);
+        NUMBER_RAW(num.name, num.placeholder, (isnan(num.value) ? String("") : String(num.value, (uint16_t)num.decimals)), num.min, num.max, num.width, num.pattern, num.disabled);
     }
     
     void TEXT(GP_TEXT& txt) {
