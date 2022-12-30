@@ -29,7 +29,7 @@ input[type=date],input[type=time]{width:180px;}
 input[type=color]{width:80px;height:40px;}
 input[type=checkbox]{width:27px;height:27px;margin-bottom:10px;}
 input[type=number],input[type=text],input[type=password],select,textarea{display:inline-block;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;cursor:auto;}
-textarea{max-width:300px}
+textarea{width:auto;max-width:100%}
 input[type=submit],input[type=button],button{height:55px;font-size:24px;width:90%;max-width:300px;margin:8px 5px;background-color:#4CAF50;border:none;border-radius:8px;color:white;cursor:pointer;padding:0px 10px;}
 input[type=submit]:hover,input[type=button]:hover,button:hover{filter:brightness(0.95);}
 input[type=button],button{display:flex;align-items:center;justify-content:center;}
@@ -144,12 +144,12 @@ label{white-space:nowrap;font-size:20px;margin:0 5px;}
 .thinText{padding:0px 10px;background:#13161a;font-size:20px;}
 .thinTab{background:none;border:none;color:#9c9ea1;margin-top:-17px;margin-bottom:5px;display:block;}
 .inliner{display:flex;flex-direction:row;align-content:center;flex-wrap:nowrap;align-items:center;}input[type=number],input[type=text],input[type=password],input[type=date],input[type=time],input[type=color],input[type=checkbox],select,textarea{
-    border-radius:8px;padding:3px 10px;color:#bbb;border:none;background-color:#2a2d35;vertical-align:middle;position:relative;margin:6px 4px;font-size:20px;height:40px;cursor:pointer;}
+border-radius:8px;padding:3px 10px;color:#bbb;border:none;background-color:#2a2d35;vertical-align:middle;position:relative;margin:6px 4px;font-size:20px;height:40px;cursor:pointer;}
 input[type=date],input[type=time]{width:180px;}
 input[type=color]{width:80px;height:40px;}
 input[type=checkbox]{width:27px;height:27px;margin-bottom:10px;}
 input[type=number],input[type=text],input[type=password],select,textarea{display:inline-block;border-radius:8px;box-sizing:border-box;cursor:auto;}
-textarea{max-width:300px}
+textarea{width:auto;max-width:100%}
 input[type=submit],input[type=button],button{height:55px;font-size:24px;width:90%;max-width:300px;margin:8px 5px;background-color:#4CAF50;border:none;border-radius:8px;color:white;cursor:pointer;}
 input[type=submit]:hover,input[type=button]:hover,button:hover{filter:brightness(0.95);}
 input[type=button],button{display:flex;align-items:center;justify-content:center;}

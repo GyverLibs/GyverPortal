@@ -1404,7 +1404,7 @@ struct Builder {
     }
     
     // ========================= ВВОД ========================
-    void NUMBER_RAW(const String& name, const String& place, const String& value, const String& minv, const String& maxv, const String& width, const String& pattern, bool dis) {
+    void NUMBER_RAW(const String& name, const String& place = "", const String& value = "", const String& minv = "", const String& maxv = "", const String& width = "", const String& pattern = "", bool dis = 0) {
         *_GPP += F("<input type='number' step='any' name='");
         *_GPP += name;
         *_GPP += F("' id='");
@@ -1497,13 +1497,17 @@ struct Builder {
         send();
     }
     
-    void AREA(const String& name, int rows = 1, const String& value = "", bool dis = false) {
+    void AREA(const String& name, int rows = 1, const String& value = "", const String& width = "", bool dis = false) {
         *_GPP += F("<textarea onchange='GP_click(this)' style='height:auto' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
         *_GPP += F("' rows='");
         *_GPP += rows;
+        if (width.length()) {
+            *_GPP += F("' style='width:");
+            *_GPP += width;
+        }
         *_GPP += "'";
         if (dis) *_GPP += F(" disabled");
         *_GPP += ">";
@@ -2282,7 +2286,7 @@ struct Builder {
     }
     
     void AREA(GP_AREA& ar) {
-        AREA(ar.name, ar.rows, ar.text, ar.disabled);
+        AREA(ar.name, ar.rows, ar.text, ar.width, ar.disabled);
     }
     
     void CHECK(GP_CHECK& ch) {

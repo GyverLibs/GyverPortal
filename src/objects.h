@@ -116,11 +116,12 @@ struct GP_PASS {
 };
 
 struct GP_AREA {
-    GP_AREA(const char* n = nullptr, int r = 1, const String& txt = "", bool dis = false) : 
-    name(n), rows(r), text(txt), disabled(dis) {}
+    GP_AREA(const char* n = nullptr, int r = 1, const String& txt = "", const String& w = "", bool dis = false) : 
+    name(n), rows(r), text(txt), width(w), disabled(dis) {}
     const char* name;
     int rows;
     String text;
+    String width;
     bool disabled;
 };
 
