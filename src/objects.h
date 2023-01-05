@@ -8,36 +8,46 @@
 #define GP_EMPTY_FLOAT NAN
 
 struct GP_TITLE {
-    GP_TITLE(const char* n = nullptr, const String& t = "", PGM_P st = GP_DEFAULT) : name(n), text(t), style(st) {}
+    GP_TITLE(const char* n = nullptr, const String& t = "", PGM_P st = GP_DEFAULT, int s = 0, bool b = 0) : 
+    name(n), text(t), style(st), size(s), bold(b) {}
     const char* name;
     String text;
     PGM_P style;
+    int size;
+    bool bold;
 };
 struct GP_LABEL {
-    GP_LABEL(const char* n = nullptr, const String& t = "", PGM_P st = GP_DEFAULT) : name(n), text(t), style(st) {}
+    GP_LABEL(const char* n = nullptr, const String& t = "", PGM_P st = GP_DEFAULT, int s = 0, bool b = 0, bool w = 0) : 
+    name(n), text(t), style(st), size(s), bold(b), wrap(w) {}
     const char* name;
     String text;
     PGM_P style;
+    int size;
+    bool bold;
+    bool wrap;
 };
 struct GP_LABEL_BLOCK {
-    GP_LABEL_BLOCK(const char* n = nullptr, const String& t = "", PGM_P st = GP_GREEN) : name(n), text(t), style(st) {}
+    GP_LABEL_BLOCK(const char* n = nullptr, const String& t = "", PGM_P st = GP_GREEN, int s = 0, bool b = 0) : 
+    name(n), text(t), style(st), size(s), bold(b) {}
     const char* name;
     String text;
     PGM_P style;
+    int size;
+    bool bold;
 };
 
 struct GP_LED {
-    GP_LED(const char* n = nullptr, bool st = 0) : name(n), state(st) {}
+    GP_LED(const char* n = nullptr, bool s = 0) : name(n), state(s) {}
     const char* name;
     bool state;
 };
 struct GP_LED_RED {
-    GP_LED_RED(const char* n = nullptr, bool st = 0) : name(n), state(st) {}
+    GP_LED_RED(const char* n = nullptr, bool s = 0) : name(n), state(s) {}
     const char* name;
     bool state;
 };
 struct GP_LED_GREEN {
-    GP_LED_GREEN(const char* n = nullptr, bool st = 0) : name(n), state(st) {}
+    GP_LED_GREEN(const char* n = nullptr, bool s = 0) : name(n), state(s) {}
     const char* name;
     bool state;
 };

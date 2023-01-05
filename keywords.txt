@@ -36,7 +36,6 @@ M_TR	KEYWORD1
 
 ############### BUILDER ###############
 GP	KEYWORD2
-setReloadTimeout	KEYWORD2
 setSpinnerPeriod	KEYWORD2
 setBufferSize	KEYWORD2
 
@@ -63,6 +62,8 @@ clear	KEYWORD2
 
 enableAuth	KEYWORD2
 disableAuth	KEYWORD2
+login	KEYWORD2
+pass	KEYWORD2
 enableOTA	KEYWORD2
 
 tick	KEYWORD2
@@ -177,6 +178,7 @@ set	KEYWORD2
 
 encode	KEYWORD2
 decode	KEYWORD2
+encodeDMY	KEYWORD2
 
 GPunix	KEYWORD2
 GPaddUnix	KEYWORD2
@@ -196,6 +198,7 @@ attachError	KEYWORD2
 detachError	KEYWORD2
 
 ############### CANVAS ###############
+clearBuffer	KEYWORD2
 add	KEYWORD2
 clear	KEYWORD2
 background	KEYWORD2
@@ -266,6 +269,9 @@ selected	KEYWORD2
 name	KEYWORD2
 oninput	KEYWORD2
 style	KEYWORD2
+size	KEYWORD2
+bold	KEYWORD2
+wrap	KEYWORD2
 decimals	KEYWORD2
 step	KEYWORD2
 value	KEYWORD2
@@ -500,6 +506,7 @@ GP_CYAN_B	LITERAL1
 GP_GREEN	LITERAL1
 GP_GREEN_B	LITERAL1
 GP_YELLOW	LITERAL1
+GP_YELLOW_B	LITERAL1
 GP_ORANGE	LITERAL1
 GP_ORANGE_B	LITERAL1
 GP_GRAY	LITERAL1

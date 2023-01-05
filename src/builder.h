@@ -401,7 +401,8 @@ struct Builder {
         send();
         
         if (tdw.length()) {
-            TR();
+            //TR();
+            *_GPP += F("<tr style='visibility:collapse;'>\n");
             GP_parser p(tdw);
             while (p.parse()) {
                 if (p.str.length()) {
@@ -670,7 +671,7 @@ struct Builder {
     }
     
     // ======================= ТЕКСТ =======================
-    void TAG_RAW(const String& tag, const String& val, const String& name = "", PGM_P st = GP_DEFAULT) {
+    void TAG_RAW(const String& tag, const String& val, const String& name = "", PGM_P st = GP_DEFAULT, int size = 0, bool bold = 0, bool wrap = 0, PGM_P back = GP_DEFAULT) {
         *_GPP += F("<");
         *_GPP += tag;
         if (name.length()) {
@@ -678,12 +679,25 @@ struct Builder {
             *_GPP += name;
             *_GPP += "'";
         }
+        *_GPP += F(" style='");
         if (st != GP_DEFAULT) {
-            *_GPP += F(" style='color:");
+            *_GPP += F("color:");
             *_GPP += FPSTR(st);
-            *_GPP += "'";
+            *_GPP += ';';
         }
-        *_GPP += F(">");
+        if (back != GP_DEFAULT) {
+            *_GPP += F("background-color:");
+            *_GPP += FPSTR(back);
+            *_GPP += ';';
+        }
+        if (size) {
+            *_GPP += F("font-size:");
+            *_GPP += size;
+            *_GPP += "px;";
+        }
+        if (bold) *_GPP += F("font-weight:bold;");
+        if (wrap) *_GPP += F("white-space:normal;");
+        *_GPP += F("'>");
         *_GPP += val;
         *_GPP += F("</");
         *_GPP += tag;
@@ -691,20 +705,24 @@ struct Builder {
         send();
     }
     
-    void TITLE(const String& val, const String& name = "", PGM_P st = GP_DEFAULT) {
-        TAG_RAW(F("h2"), val, name, st);
+    void TITLE(const String& val, const String& name = "", PGM_P st = GP_DEFAULT, int size = 0, bool bold = 0) {
+        TAG_RAW(F("h2"), val, name, st, size, bold);
     }
-    void LABEL(const String& val, const String& name = "", PGM_P st = GP_DEFAULT) {
-        TAG_RAW(F("label"), val, name, st);
+    void LABEL(const String& val, const String& name = "", PGM_P st = GP_DEFAULT, int size = 0, bool bold = 0, bool wrap = 0) {
+        TAG_RAW(F("label"), val, name, st, size, bold, wrap);
+    }
+    void LABEL_BLOCK(const String& val, const String& name = "", PGM_P st = GP_GREEN, int size = 0, bool bold = 0) {
+        TAG_RAW(F("label class='display'"), val, name, GP_DEFAULT, size, bold, 0, st);
     }
     
-    void SPAN(const String& text, GPalign al = GP_CENTER, const String& name = "", PGM_P st = GP_DEFAULT) {
+    // устарело
+    void SPAN(const String& text, GPalign al = GP_CENTER, const String& name = "", PGM_P st = GP_DEFAULT, int size = 0, bool bold = 0) {
         if (al != GP_CENTER) {
             *_GPP += F("<div style='text-align:");
             *_GPP += FPSTR(GPgetAlign(al));
             *_GPP += F("'>");
         } else *_GPP += F("<div>");
-        TAG_RAW(F("span"), text, name, st);
+        TAG_RAW(F("span"), text, name, st, size, bold);
         *_GPP += F("</div>\n");
         send();
     }
@@ -716,23 +734,7 @@ struct Builder {
         TAG_RAW(F("strong"), text, name, st);
         send();
     }
-    void LABEL_BLOCK(const String& val, const String& name = "", PGM_P st = GP_GREEN) {
-        *_GPP += F("<label class='display' ");
-        if (st != GP_GREEN) {
-            *_GPP += F("style='background:");
-            *_GPP += FPSTR(st);
-            *_GPP += F(";' ");
-        }
-        if (name.length()) {
-            *_GPP += F("id='");
-            *_GPP += name;
-            *_GPP += "'";
-        }
-        *_GPP += F(">");
-        *_GPP += val;
-        *_GPP += F("</label>\n");
-        send();
-    }
+    // устарело
     
     // ======================= ЛЕДЫ =======================
     void LED(const String& name, bool state = 0) {
@@ -745,6 +747,28 @@ struct Builder {
         *_GPP += F("'>\n");
         send();
     }
+    void LED(const String& name, bool state, PGM_P st) {
+        *_GPP += F("<style>.led_");
+        *_GPP += name;
+        *_GPP += F(":checked:after{background-color:");
+        *_GPP += FPSTR(st);
+        *_GPP += F(";box-shadow:inset 0px 3px #fff7,0px 0px 10px 1px ");
+        *_GPP += FPSTR(st);
+        *_GPP += F(";}</style>\n");
+        
+        *_GPP += F("<input class='led led_");
+        *_GPP += name;
+        *_GPP += F("' type='radio' disabled ");
+        if (state) *_GPP += F("checked ");
+        *_GPP += F("name='");
+        *_GPP += name;
+        *_GPP += F("' id='");
+        *_GPP += name;
+        *_GPP += F("'>\n");
+        send();
+    }
+    
+    // устарело
     void LED_RED(const String& name, bool state = 0) {
         *_GPP += F("<input class='led red' type='radio' disabled ");
         if (state) *_GPP += F("checked ");
@@ -813,7 +837,7 @@ struct Builder {
         *_GPP += name;
         *_GPP += F("' name='");
         *_GPP += name;
-        *_GPP += F("' onmousedown='if(!_touch)GP_press(this,1)' onmouseup='if(!_touch)GP_press(this,2)' onmouseleave='if(_pressId&&!_touch)GP_press(this,2);' "
+        *_GPP += F("' onmousedown='if(!_touch)GP_press(this,1)' onmouseup='if(!_touch&&_pressId)GP_press(this,2)' onmouseleave='if(_pressId&&!_touch)GP_press(this,2);' "
         "ontouchstart='_touch=1;GP_press(this,1)' ontouchend='GP_press(this,2)' onclick='GP_click(this)'>");
         *_GPP += icon;
         *_GPP += F("</div>");
@@ -1132,44 +1156,44 @@ struct Builder {
         
         TR();
         TD(GP_LEFT); BOLD(F("WiFi Mode"));
-        TD(GP_RIGHT); PLAIN(WiFi.getMode() == WIFI_AP ? F("AP") : (WiFi.getMode() == WIFI_STA ? F("STA") : F("AP_STA")));
+        TD(GP_RIGHT); SEND(WiFi.getMode() == WIFI_AP ? F("AP") : (WiFi.getMode() == WIFI_STA ? F("STA") : F("AP_STA")));
         
         if (WiFi.getMode() != WIFI_AP) {
             TR();
             TD(GP_LEFT); BOLD(F("SSID"));
-            TD(GP_RIGHT); PLAIN(WiFi.SSID());
+            TD(GP_RIGHT); SEND(WiFi.SSID());
             
             TR();
             TD(GP_LEFT); BOLD(F("Local IP"));
-            TD(GP_RIGHT); PLAIN(WiFi.localIP().toString());
+            TD(GP_RIGHT); SEND(WiFi.localIP().toString());
         }
         if (WiFi.getMode() != WIFI_STA) {
             TR();
             TD(GP_LEFT); BOLD(F("AP IP"));
-            TD(GP_RIGHT); PLAIN(WiFi.softAPIP().toString());
+            TD(GP_RIGHT); SEND(WiFi.softAPIP().toString());
         }
         
         if (_gp_mdns && strlen(_gp_mdns)) {
             TR();
             TD(GP_LEFT); BOLD(F("mDNS"));
-            TD(GP_RIGHT); PLAIN(String(_gp_mdns) + ".local");
+            TD(GP_RIGHT); SEND(String(_gp_mdns) + ".local");
         }
         
         TR();
         TD(GP_LEFT); BOLD(F("Subnet"));
-        TD(GP_RIGHT); PLAIN(WiFi.subnetMask().toString());
+        TD(GP_RIGHT); SEND(WiFi.subnetMask().toString());
         
         TR();
         TD(GP_LEFT); BOLD(F("Gateway"));
-        TD(GP_RIGHT); PLAIN(WiFi.gatewayIP().toString());
+        TD(GP_RIGHT); SEND(WiFi.gatewayIP().toString());
         
         TR();
         TD(GP_LEFT); BOLD(F("MAC Address"));
-        TD(GP_RIGHT); PLAIN(WiFi.macAddress());
+        TD(GP_RIGHT); SEND(WiFi.macAddress());
         
         TR();
         TD(GP_LEFT); BOLD(F("RSSI"));
-        TD(GP_RIGHT); PLAIN("📶 " + String(constrain(2 * (WiFi.RSSI() + 100), 0, 100)) + '%');
+        TD(GP_RIGHT); SEND("📶 " + String(constrain(2 * (WiFi.RSSI() + 100), 0, 100)) + '%');
         
         // ===========
         TR();
@@ -1179,21 +1203,21 @@ struct Builder {
         
         TR();
         TD(GP_LEFT); BOLD(F("Free Heap"));
-        TD(GP_RIGHT); PLAIN(String(ESP.getFreeHeap() / 1000.0, 3) + " kB");
+        TD(GP_RIGHT); SEND(String(ESP.getFreeHeap() / 1000.0, 3) + " kB");
         
     #ifdef ESP8266
         TR();
-        TD(GP_LEFT); BOLD(F("Heap Fragmentation"));
-        TD(GP_RIGHT); PLAIN(String(ESP.getHeapFragmentation()) + '%');
+        TD(GP_LEFT); BOLD(F("Heap Fragm."));
+        TD(GP_RIGHT); SEND(String(ESP.getHeapFragmentation()) + '%');
     #endif
         
         TR();
         TD(GP_LEFT); BOLD(F("Sketch Size (Free)"));
-        TD(GP_RIGHT); PLAIN(String(ESP.getSketchSize() / 1000.0, 1) + " kB (" + String(ESP.getFreeSketchSpace() / 1000.0, 1) + ")");
+        TD(GP_RIGHT); SEND(String(ESP.getSketchSize() / 1000.0, 1) + " kB (" + String(ESP.getFreeSketchSpace() / 1000.0, 1) + ")");
         
         TR();
         TD(GP_LEFT); BOLD(F("Flash Size"));
-        TD(GP_RIGHT); PLAIN(String(ESP.getFlashChipSize() / 1000.0, 1) + " kB");
+        TD(GP_RIGHT); SEND(String(ESP.getFlashChipSize() / 1000.0, 1) + " kB");
         
         // ===========
         TR();
@@ -1204,26 +1228,26 @@ struct Builder {
     #ifdef ESP8266
         TR();
         TD(GP_LEFT); BOLD(F("Chip ID"));
-        TD(GP_RIGHT); PLAIN("0x" + String(ESP.getChipId(), HEX));
+        TD(GP_RIGHT); SEND("0x" + String(ESP.getChipId(), HEX));
     #endif
         
         TR();
         TD(GP_LEFT); BOLD(F("Cycle Count"));
-        TD(GP_RIGHT); PLAIN(String(ESP.getCycleCount()));
+        TD(GP_RIGHT); SEND(String(ESP.getCycleCount()));
         
         TR();
         TD(GP_LEFT); BOLD(F("Cpu Freq."));
-        TD(GP_RIGHT); PLAIN(String(ESP.getCpuFreqMHz()) + F(" MHz"));
+        TD(GP_RIGHT); SEND(String(ESP.getCpuFreqMHz()) + F(" MHz"));
         
         TR();
         TD(GP_LEFT); BOLD(F("Date"));
         GPdate date(_gp_local_unix);
-        TD(GP_RIGHT); PLAIN(date.encode());
+        TD(GP_RIGHT); SEND(_gp_local_unix ? date.encodeDMY() : String("unset"));
         
         TR();
         TD(GP_LEFT); BOLD(F("Time"));
         GPtime time(_gp_local_unix);
-        TD(GP_RIGHT); PLAIN(time.encode());
+        TD(GP_RIGHT); SEND(_gp_local_unix ? time.encode() : String("unset"));
         
         TR();
         TD(GP_LEFT); BOLD(F("Uptime"));
@@ -1241,7 +1265,7 @@ struct Builder {
         s += ':';
         s += second / 10;
         s += second % 10;
-        TD(GP_RIGHT); PLAIN(s);
+        TD(GP_RIGHT); SEND(s);
         
         // ===========
         TR();
@@ -1251,22 +1275,22 @@ struct Builder {
         
         TR();
         TD(GP_LEFT); BOLD(F("SDK"));
-        TD(GP_RIGHT); PLAIN(ESP.getSdkVersion());
+        TD(GP_RIGHT); SEND(ESP.getSdkVersion());
         
     #ifdef ESP8266
         TR();
         TD(GP_LEFT); BOLD(F("Core"));
-        TD(GP_RIGHT); PLAIN(ESP.getCoreVersion());
+        TD(GP_RIGHT); SEND(ESP.getCoreVersion());
     #endif
     
         TR();
         TD(GP_LEFT); BOLD(F("GyverPortal"));
-        TD(GP_RIGHT); PLAIN(GP_VERSION);
+        TD(GP_RIGHT); SEND(GP_VERSION);
         
         if (fwv.length()) {
             TR();
             TD(GP_LEFT); BOLD(F("Firmware"));
-            TD(GP_RIGHT); PLAIN(fwv);
+            TD(GP_RIGHT); SEND(fwv);
         }
 
         TABLE_END();
@@ -1295,7 +1319,7 @@ struct Builder {
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
-        *_GPP += F("' onmousedown='if(!_touch)GP_press(this,1)' onmouseup='if(!_touch)GP_press(this,2)' onmouseleave='if(_pressId&&!_touch)GP_press(this,2);' ");
+        *_GPP += F("' onmousedown='if(!_touch)GP_press(this,1)' onmouseup='if(!_touch&&_pressId)GP_press(this,2)' onmouseleave='if(_pressId&&!_touch)GP_press(this,2);' ");
         if (!dis) *_GPP += F("ontouchstart='_touch=1;GP_press(this,1)' ontouchend='GP_press(this,2)' ");
         if (tar.length()) {
             *_GPP += F("onclick=\"GP_clickid('");
@@ -2244,13 +2268,13 @@ struct Builder {
     
     // ================== ОТПРАВКА ОБЪЕКТОВ ===================
     void TITLE(GP_TITLE& title) {
-        TITLE(title.text, title.name, title.style);
+        TITLE(title.text, title.name, title.style, title.size, title.bold);
     }
     void LABEL(GP_LABEL& label) {
-        LABEL(label.text, label.name, label.style);
+        LABEL(label.text, label.name, label.style, label.size, label.bold, label.wrap);
     }
     void LABEL_BLOCK(GP_LABEL_BLOCK& label) {
-        LABEL_BLOCK(label.text, label.name, label.style);
+        LABEL_BLOCK(label.text, label.name, label.style, label.size, label.bold);
     }
     
     void LED(GP_LED& led) {

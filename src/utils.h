@@ -20,6 +20,7 @@ GP_PGM(GP_CYAN, "#1f8fa9");
 GP_PGM(GP_CYAN_B, "#06b3db");
 GP_PGM(GP_GREEN, "#37a93c");
 GP_PGM(GP_GREEN_B, "#25d52c");
+GP_PGM(GP_YELLOW_B, "#ffff00");
 GP_PGM(GP_YELLOW, "#b4b700");
 GP_PGM(GP_ORANGE, "#b37f0d");
 GP_PGM(GP_ORANGE_B, "#ff4500");
@@ -199,6 +200,22 @@ struct GPdate {
         s += '-';
         s += day / 10;
         s += day % 10;
+        return s;
+    }
+    String encodeDMY() {
+        String s;
+        if (year < 2000) s = F("unset");
+        else {
+            s.reserve(10+1);
+            s += day / 10;
+            s += day % 10;
+            s += '.';
+            s += month / 10;
+            s += month % 10;
+            s += '.';
+            if (!year) s += F("0000");
+            else s += year;
+        }
         return s;
     }
     void decode(const String& str) {

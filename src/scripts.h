@@ -6,22 +6,16 @@ const char GP_JS_TOP[] PROGMEM = R"(
 var _tout=700;
 var _clkRelList=[],_touch=0,_clkRedrList={},_clkUpdList={},_pressId=null,_spinInt=null,_spinF=0;
 document.title='GyverPortal';
+function GP_send(req,r=null,upd=null){
+var xhttp=new XMLHttpRequest();xhttp.open(upd?'GET':'POST',req,true);xhttp.send();xhttp.timeout=_tout;
+xhttp.onreadystatechange=function(){if(!this.status)alert('Device Offline!');
+else if(this.readyState==4&&this.status==200){
+if(r){if(r==1)location.reload();else location.href=r;}if(upd)GP_apply(upd,this.responseText);}}}
+function GP_update(ids){ids=ids.replaceAll(' ','');GP_send('/GP_update?'+ids+'=',null,ids);}
 function GP_delete(url){if(!confirm('Delete '+url+'?'))return;GP_send('/GP_delete?'+url,1);}
 function GP_rename(url){res=prompt('Rename File',url);if(!res)return;GP_send('/GP_rename?'+url+'='+res,1);}
 function GP_hint(id,txt){el=getEl(id);if(el.className=='_sw_c'){el=getEl('_'+id)}el.title=txt;}
-function GP_send(req,r=null){
-    var xhttp=new XMLHttpRequest();xhttp.open('POST',req,true);xhttp.send();xhttp.timeout=_tout;
-    if(r){
-        xhttp.onreadystatechange=function(){
-        if(!this.status)alert('Send Error!');
-        else if(this.readyState==4&&this.status==200){
-            if(r==1)location.reload();else location.href=r;
-            }
-        }
-    }
-}
-
-function GP_press(arg,dir){_pressId=(dir==1)?arg.name:null;if(arg.name)GP_send('/GP_press?'+arg.name+'='+dir);}
+function GP_press(arg,dir){console.log(_pressId);_pressId=(dir==1)?arg.name:null;if(arg.name)GP_send('/GP_press?'+arg.name+'='+dir);}
 function GP_click(arg,r=null){if(!arg.name)arg.name=arg.id;var v;
 if(arg.type=='number'){
 if(arg.hasAttribute('min')&&Number(arg.value)<=Number(arg.min))arg.value=arg.min;
@@ -45,15 +39,13 @@ x=document.getElementsByClassName(btn.className);
 for(var i=0;i<x.length;i++)x[i].style.background='';
 btn.style.background='#2a2d35';}
 function GP_spinw(arg){if(arg.className=='spin_inp')arg.style.width=((arg.value.length+2)*12)+'px';}
-function GP_spin(arg){var num=getEl(arg.name);num.value=(Number(num.value)+Number(arg.min)).toFixed(Number(arg.max));var e=new Event('change');num.dispatchEvent(e);}
-
-function GP_update(ids){ids=ids.replaceAll(' ','');
-var xhttp=new XMLHttpRequest();xhttp.timeout=_tout;xhttp.open('GET','/GP_update?'+ids+'=',true);xhttp.send();
-xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){
-var resps=this.responseText.split('\1');ids=ids.split(',');if(ids.length!=resps.length)return;
-for(let i=0;i<ids.length;i++)GP_apply(getEl(ids[i]),resps[i]);}}}
-
-function GP_apply(item,resp){if(!item||!resp)return;
+function GP_spin(arg){var num=getEl(arg.name);num.value=(Number(num.value)+Number(arg.min)).toFixed(Number(arg.max));
+var e=new Event('change');num.dispatchEvent(e);}
+function GP_apply(ids,resps){
+resps=resps.split('\1');ids=ids.split(',');if(ids.length!=resps.length)return;
+for(let i=0;i<ids.length;i++){
+let item=getEl(ids[i]),resp=resps[i];
+if(!item||!resp)continue;
 if(item.type=='hidden'){var val=item.value?item.value:resp;
 switch(item.name){
 case'_reload':if(resp=='1')location.reload();break;
@@ -68,8 +60,7 @@ else if(item.type==undefined){if(item.className=='_canvas'){var begin='var cv=ge
 else item.innerHTML=resp;}
 else {if(item.name=='_gplog'){item.innerHTML+=resp;item.scrollTop=item.scrollHeight;}
 else item.value=resp;}
-if(item.type=='range')GP_change(item);}
-
+if(item.type=='range')GP_change(item);}}
 function GP_sendForm(id,url){
 var elms=getEl(id).elements;var qs='';
 for(var i=0,elm;elm=elms[i++];){if(elm.name){
@@ -81,7 +72,8 @@ function GP_eye(arg){var p=arg.previousElementSibling;
 p.type=p.type=='text'?'password':'text';
 arg.style.color=p.type=='text'?'#bbb':'#13161a';}
 function getEl(id){return document.getElementById(id);}
-function sdbTgl(){let flag=getEl('dashOver').style.display=='block';getEl('dashOver').style.display=flag?'none':'block';getEl('dashSdb').style.left=flag?'-250px':'0';}
+function sdbTgl(){let flag=getEl('dashOver').style.display=='block';getEl('dashOver').style.display=flag?'none':'block';
+getEl('dashSdb').style.left=flag?'-250px':'0';}
 )";
 
 

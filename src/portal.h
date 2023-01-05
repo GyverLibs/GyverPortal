@@ -326,6 +326,13 @@ public:
         _auth = 0;
     }
     
+    const char* login() {
+        return _login;
+    }
+    const char* pass() {
+        return _pass;
+    }
+    
     
     // ========================== OTA ==========================
     #ifndef GP_NO_OTA
@@ -1178,7 +1185,8 @@ public:
             server.send(200);
             return;
         }
-        server.streamFile(file, GPfileType(file.name()));
+        //server.streamFile(file, GPfileType(file.name()));
+        server.streamFile(file, mime::getContentType(file.name()));
         file.close();
     }
     void sendFile(const String& name) {
