@@ -8,7 +8,7 @@ var _clkRelList=[],_touch=0,_clkRedrList={},_clkUpdList={},_pressId=null,_spinIn
 document.title='GyverPortal';
 function GP_send(req,r=null,upd=null){
 var xhttp=new XMLHttpRequest();xhttp.open(upd?'GET':'POST',req,true);xhttp.send();xhttp.timeout=_tout;
-xhttp.onreadystatechange=function(){if(!this.status)alert('Device Offline!');
+xhttp.onreadystatechange=function(){if(!this.status)alert('ESP Offline!');
 else if(this.readyState==4&&this.status==200){
 if(r){if(r==1)location.reload();else location.href=r;}if(upd)GP_apply(upd,this.responseText);}}}
 function GP_update(ids){ids=ids.replaceAll(' ','');GP_send('/GP_update?'+ids+'=',null,ids);}
@@ -49,9 +49,9 @@ if(!item||!resp)continue;
 if(item.type=='hidden'){var val=item.value?item.value:resp;
 switch(item.name){
 case'_reload':if(resp=='1')location.reload();break;
-case'_alert':alert(val);break;
-case'_prompt':{let res=prompt(item.value,resp);if(res)GP_send('/GP_click?'+item.id+'='+res);}break;
-case'_confirm':{let res=confirm(val);GP_send('/GP_click?'+item.id+'='+(res?'1':'0'));}break;
+case'_alert':alert(val);if(_clkRelList.includes(item.id))location.reload();break;
+case'_prompt':{let res=prompt(item.value,resp);if(res)GP_send('/GP_click?'+item.id+'='+res,_clkRelList.includes(item.id));}break;
+case'_confirm':{let res=confirm(val);GP_send('/GP_click?'+item.id+'='+(res?'1':'0'),res?_clkRelList.includes(item.id):0);}break;
 case'_eval':eval(val);break;
 case'_title':document.title=resp;break;}}
 else if(item.type=='checkbox'||item.type=='radio')item.checked=Number(resp);
@@ -75,6 +75,7 @@ function getEl(id){return document.getElementById(id);}
 function sdbTgl(){let flag=getEl('dashOver').style.display=='block';getEl('dashOver').style.display=flag?'none':'block';
 getEl('dashSdb').style.left=flag?'-250px':'0';}
 )";
+
 
 const char GP_JS_CANVAS[] PROGMEM = R"(
 function GP_canvas(str){var cmd='';
