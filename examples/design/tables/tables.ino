@@ -10,8 +10,8 @@ void build() {
   GP.BUILD_BEGIN(600);
   GP.THEME(GP_DARK);
 
-  // ВКЛЮЧАЕМ ГРАНИЦЫ ТАБЛИЦ ДЛЯ НАГЛЯДНОСТИ
-  GP.SEND(F("<style>td{border:1px solid}</style>"));
+  // включаем границы таблиц (ДЛЯ НАГЛЯДНОСТИ)
+  GP.TABLE_BORDER(true);
 
   // делаем таблицу вручную
   GP.TITLE("Manual Table");

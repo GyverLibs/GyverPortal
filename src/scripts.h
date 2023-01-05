@@ -76,7 +76,6 @@ function sdbTgl(){let flag=getEl('dashOver').style.display=='block';getEl('dashO
 getEl('dashSdb').style.left=flag?'-250px':'0';}
 )";
 
-
 const char GP_JS_CANVAS[] PROGMEM = R"(
 function GP_canvas(str){var cmd='';
 var arr=['fillStyle','strokeStyle','shadowColor','shadowBlur','shadowOffsetX','shadowOffsetY','lineCap','lineJoin','lineWidth','miterLimit','font','textAlign','textBaseline','globalAlpha','globalCompositeOperation','rect','fillRect','strokeRect','clearRect','fill','stroke','beginPath','moveTo','closePath','lineTo','clip','quadraticCurveTo','bezierCurveTo','arc','arcTo','scale','rotate','translate','fillText','strokeText','drawImage','save','restore']

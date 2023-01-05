@@ -38,6 +38,7 @@ M_TR	KEYWORD1
 GP	KEYWORD2
 setSpinnerPeriod	KEYWORD2
 setBufferSize	KEYWORD2
+setTimeout	KEYWORD2
 
 ############### PORTAL ################
 clearCache	KEYWORD2

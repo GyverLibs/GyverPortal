@@ -1,7 +1,7 @@
 // пример организации файла со своими компонентами конструктора
 
 #pragma once
-#include "builder.h"
+#include "GyverPortal.h"
 
 // шаблон "сборного" блока (что-то с надписью или цветом)
 void GP_MY_BLOCK(const String& data) {
