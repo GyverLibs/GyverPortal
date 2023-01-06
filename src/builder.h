@@ -38,6 +38,14 @@ struct Builder {
         _spinInt = prd;
     }
     
+    // установить таймаут ожидания отправки килков и апдейтов
+    void setTimeout(int tout) {
+        JS_BEGIN();
+        *_GPP += F("_tout=");
+        *_GPP += tout;
+        JS_END();
+    }
+    
     // ======================= БИЛДЕР =======================
     void BUILD_BEGIN(int width = 350) {
         PAGE_BEGIN();
@@ -155,6 +163,8 @@ struct Builder {
         SEND(F("<!DOCTYPE HTML><html><head>\n"
         "<meta charset='utf-8'>\n"
         "<meta name='viewport' content='width=device-width, initial-scale=1'>\n"
+        "<meta name='apple-mobile-web-app-capable' content='yes'/>\n"
+        "<meta name='mobile-web-app-capable' content='yes'/>\n"
         "</head><body>\n"));
     }
     void JS_TOP_FILE() {
