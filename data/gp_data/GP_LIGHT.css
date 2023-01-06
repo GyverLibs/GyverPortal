@@ -23,7 +23,7 @@ body {
 
 hr {
   width: 95%;
-  margin-bottom: 10px;
+  margin: 5px 0;
 }
 
 h2 {
@@ -159,7 +159,8 @@ textarea {
 }
 
 textarea {
-  max-width: 300px
+  width: auto;
+  max-width: 100%
 }
 
 input[type=submit],
@@ -346,8 +347,7 @@ input[type=range]:hover {
 .display {
   display: inline-block;
   font-size: 18px;
-  padding: 3px 5px;
-  border-radius: 4px;
+  padding: 0.1em 0.2em;
   color: #fff;
   background: #37a93c;
   margin: 2px 3px;
@@ -530,8 +530,9 @@ body {
   color: #13161a;
 }
 
-.passCont {
-  display: inline-block
+.inlBlock {
+  display: inline-block;
+  position: relative
 }
 
 table {
@@ -733,4 +734,55 @@ input[type='number'] {
 
 .check_c>input:hover+span::before {
   filter: brightness(0.85);
+}
+
+.onlBlock {
+  position: fixed;
+  right: -50px;
+  top: 40%;
+  width: 30px;
+  writing-mode: vertical-rl;
+  cursor: default;
+  font-size: 20px;
+  padding: 10px 10px;
+  background: #3e3e3e;
+  color: white;
+  border-radius: 12px 0 0 12px;
+  transition-duration: .2s;
+}
+
+.ctrlBlock {
+  position: absolute;
+  top: 5px;
+  right: 9px;
+}
+
+.areaCtrl {
+  padding: 3px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.rad {
+  margin: 3px 3px;
+  appearance: none;
+  cursor: pointer
+}
+
+.rad:after {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  top: 2px;
+  left: 3px;
+  position: relative;
+  content: '';
+  display: inline-block;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #37a93c;
+}
+
+.rad:checked:after {
+  background-color: #37a93c;
 }

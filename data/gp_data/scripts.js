@@ -1,4 +1,4 @@
-var _tout = 700;
+var _tout = 1000;
 var _clkRelList = [],
   _touch = 0,
   _clkRedrList = {},
@@ -7,6 +7,29 @@ var _clkRelList = [],
   _spinInt = null,
   _spinF = 0;
 document.title = 'GyverPortal';
+
+function GP_send(req, r = null, upd = null) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open(upd ? 'GET' : 'POST', req, true);
+  xhttp.send();
+  xhttp.timeout = _tout;
+  xhttp.onreadystatechange = function() {
+    onlShow(!this.status);
+    if (!this.status && !upd) alert('Offline!');
+    else if (this.readyState == 4 && this.status == 200) {
+      if (r) {
+        if (r == 1) location.reload();
+        else location.href = r;
+      }
+      if (upd) GP_apply(upd, this.responseText);
+    }
+  }
+}
+
+function GP_update(ids) {
+  ids = ids.replaceAll(' ', '');
+  GP_send('/GP_update?' + ids + '=', null, ids);
+}
 
 function GP_delete(url) {
   if (!confirm('Delete ' + url + '?')) return;
@@ -25,21 +48,6 @@ function GP_hint(id, txt) {
     el = getEl('_' + id)
   }
   el.title = txt;
-}
-
-function GP_send(req, r = null) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.open('POST', req, true);
-  xhttp.send();
-  xhttp.timeout = _tout;
-  if (r) {
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        if (r == 1) location.reload();
-        else location.href = r
-      }
-    }
-  }
 }
 
 function GP_press(arg, dir) {
@@ -114,64 +122,81 @@ function GP_spin(arg) {
   num.dispatchEvent(e);
 }
 
-function GP_update(ids) {
-  ids = ids.replaceAll(' ', '');
-  var xhttp = new XMLHttpRequest();
-  xhttp.timeout = _tout;
-  xhttp.open('GET', '/GP_update?' + ids + '=', true);
-  xhttp.send();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var resps = this.responseText.split('\1');
-      ids = ids.split(',');
-      if (ids.length != resps.length) return;
-      for (let i = 0; i < ids.length; i++) GP_apply(getEl(ids[i]), resps[i]);
+function GP_apply(ids, resps) {
+  resps = resps.split('\1');
+  ids = ids.split(',');
+  if (ids.length != resps.length) return;
+  for (let i = 0; i < ids.length; i++) {
+    let item = getEl(ids[i]),
+      resp = resps[i];
+    if (!item) {
+      item = getEl(ids[i] + '_' + resp);
+      if (item && item.type == 'radio') {
+        item.checked = 1;
+        continue
+      }
     }
-  }
-}
-
-function GP_apply(item, resp) {
-  if (!item || !resp) return;
-  if (item.type == 'hidden') {
-    var val = item.value ? item.value : resp;
-    switch (item.name) {
-      case '_reload':
-        if (resp == '1') location.reload();
-        break;
-      case '_alert':
-        alert(val);
-        break;
-      case '_prompt': {
-        let res = prompt(item.value, resp);
-        if (res) GP_send('/GP_click?' + item.id + '=' + res);
+    if (!item || !resp) continue;
+    switch (item.type) {
+      case 'hidden': {
+        var val = item.value ? item.value : resp;
+        switch (item.name) {
+          case '_reload':
+            if (resp == '1') location.reload();
+            break;
+          case '_alert':
+            alert(val);
+            if (_clkRelList.includes(item.id)) location.reload();
+            break;
+          case '_prompt': {
+            let res = prompt(item.value, resp);
+            if (res) GP_send('/GP_click?' + item.id + '=' + res, _clkRelList.includes(item.id));
+          }
+          break;
+          case '_confirm': {
+            let res = confirm(val);
+            GP_send('/GP_click?' + item.id + '=' + (res ? '1' : '0'), res ? _clkRelList.includes(item.id) : 0);
+          }
+          break;
+          case '_eval':
+            eval(val);
+            break;
+          case '_title':
+            document.title = resp;
+            break;
+        }
       }
       break;
-      case '_confirm': {
-        let res = confirm(val);
-        GP_send('/GP_click?' + item.id + '=' + (res ? '1' : '0'));
+      case 'checkbox':
+      case 'radio':
+        item.checked = Number(resp);
+        break;
+      case 'select-one':
+        document.querySelector('#' + item.id).value = resp;
+        break;
+      case undefined: {
+        if (item.className == '_canvas') {
+          var begin = 'var cv=getEl(\"' + item.id + '\");var cx=cv.getContext(\"2d\");';
+          eval(begin + GP_canvas(resp));
+        } else item.innerHTML = resp;
       }
       break;
-      case '_eval':
-        eval(val);
-        break;
-      case '_title':
-        document.title = resp;
+      default:
+        if (item.name.startsWith('_gplog')) {
+          item.innerHTML += resp;
+          if (item.name == '_gplog') item.scrollTop = item.scrollHeight;
+        } else item.value = resp;
         break;
     }
-  } else if (item.type == 'checkbox' || item.type == 'radio') item.checked = Number(resp);
-  else if (item.type == 'select-one') document.querySelector('#' + item.id).value = resp;
-  else if (item.type == undefined) {
-    if (item.className == '_canvas') {
-      var begin = 'var cv=getEl(\"' + item.id + '\");var cx=cv.getContext(\"2d\");';
-      eval(begin + GP_canvas(resp));
-    } else item.innerHTML = resp;
-  } else {
-    if (item.name == '_gplog') {
-      item.innerHTML += resp;
-      item.scrollTop = item.scrollHeight;
-    } else item.value = resp;
+    switch (item.type) {
+      case 'range':
+        GP_change(item);
+        break;
+      case 'number':
+        GP_spinw(item);
+        break;
+    }
   }
-  if (item.type == 'range') GP_change(item);
 }
 
 function GP_sendForm(id, url) {
@@ -201,4 +226,17 @@ function sdbTgl() {
   let flag = getEl('dashOver').style.display == 'block';
   getEl('dashOver').style.display = flag ? 'none' : 'block';
   getEl('dashSdb').style.left = flag ? '-250px' : '0';
+}
+
+function onlShow(s) {
+  getEl('onlBlock').style.right = s ? '0px' : '-50px';
+}
+
+function logClear(id) {
+  getEl(id).innerHTML = ''
+}
+
+function logToggle(id) {
+  log = getEl(id);
+  log.name = (log.name == '_gplog') ? '_gplog_ns' : '_gplog';
 }
