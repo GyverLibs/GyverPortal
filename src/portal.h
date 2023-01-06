@@ -1185,8 +1185,12 @@ public:
             server.send(200);
             return;
         }
-        //server.streamFile(file, GPfileType(file.name()));
+    #ifdef ESP8266
         server.streamFile(file, mime::getContentType(file.name()));
+    #else
+        server.streamFile(file, GPfileType(file.name()));
+    #endif
+        
         file.close();
     }
     void sendFile(const String& name) {
