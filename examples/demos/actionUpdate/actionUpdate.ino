@@ -15,6 +15,7 @@ GPdate valDate;
 GPtime valTime;
 GPcolor valCol;
 int valSelect;
+int valRad;
 
 // конструктор страницы
 void build() {
@@ -22,7 +23,7 @@ void build() {
   GP.THEME(GP_DARK);
 
   // список имён компонентов на обновление
-  GP.UPDATE("t1,lb,lbb,ch,led,sw,txt,num,pass,sld,date,time,spn,col,sel,seli");
+  GP.UPDATE("t1,lb,lbb,ch,led,sw,txt,num,pass,sld,date,time,spn,col,sel,rad");
 
   // обновление случайным числом
   GP.TITLE("Title", "t1");
@@ -48,7 +49,11 @@ void build() {
   GP.TIME("time", valTime);             GP.BREAK();
   GP.COLOR("col", valCol);              GP.BREAK();
   GP.SELECT("sel", "val 1,val 2,val 3", valSelect);  GP.BREAK();
-
+  GP.RADIO("rad", 0, valRad); GP.LABEL("Value 0"); GP.BREAK();
+  GP.RADIO("rad", 1, valRad); GP.LABEL("Value 1"); GP.BREAK();
+  GP.RADIO("rad", 2, valRad); GP.LABEL("Value 2"); GP.BREAK();
+  GP.RADIO("rad", 3, valRad); GP.LABEL("Value 3"); GP.BREAK();
+  GP.BREAK();
   GP.BUILD_END();
 }
 
@@ -90,6 +95,7 @@ void action() {
     ui.updateTime("time", valTime);
     ui.updateColor("col", valCol);
     ui.updateInt("sel", valSelect);
+    ui.updateInt("rad", valRad);
   }
 }
 
@@ -108,5 +114,6 @@ void loop() {
     valTime.set(random(24), random(60), random(60));
     valCol.setHEX(random(0xffffff));
     valSelect = random(3);
+    valRad = random(4);
   }
 }

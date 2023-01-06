@@ -83,7 +83,7 @@ input[type=button]:disabled,input[type=checkbox]:disabled+.slider:before,input[t
 .dsbl{filter:brightness(0.6);}
 body{-webkit-tap-highlight-color:transparent;}
 .eyepass{position:absolute;margin-left:-35px;margin-top:7px;cursor:pointer;font-size:25px;color:#13161a;}
-.passCont{display:inline-block}
+.inlBlock{display:inline-block;position:relative}
 table{border-collapse:collapse;}
 input[type='number']{-moz-appearance:textfield;}
 .header{font-size:25px;color:#fff;}
@@ -117,6 +117,12 @@ input[type='number']{-moz-appearance:textfield;}
 .check_c>input:checked+span::before{border-color:#4CAF50;background-color:#4CAF50;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='m12.82,3l-6.6,6.6l-3,-3-1.9,1.9l5,5.00687l8.5,-8.5-1.9,-1.9z' fill='%23fff'/%3e%3c/svg%3e");}
 .check_c>input:disabled+span::before{background-color:#e9ecef;}
 .check_c>input:hover+span::before{filter:brightness(0.85);}
+.onlBlock{position:fixed;right:-50px;top:40%;width:30px;writing-mode:vertical-rl;cursor:default;font-size:20px;padding:10px 10px;background:#3e3e3e;color:white;border-radius:12px 0 0 12px;transition-duration:.2s;}
+.ctrlBlock{position:absolute;top:5px;right:9px;}
+.areaCtrl{padding:3px;font-size:13px;cursor:pointer;}
+.rad{margin:3px 3px;appearance:none;cursor:pointer}
+.rad:after{width:15px;height:15px;border-radius:50%;top:2px;left:3px;position:relative;content:'';display:inline-block;border-style:solid;border-width:2px;border-color:#37a93c;}
+.rad:checked:after{background-color:#37a93c;}
 )";
 
 
@@ -205,7 +211,7 @@ input[type=button]:disabled,input[type=checkbox]:disabled+.slider:before,input[t
 body{-webkit-tap-highlight-color:transparent;}
 input[type=text]:focus,input[type=number]:focus,input[type=password]:focus,input[type=date]:focus,input[type=time]:focus{border:2px solid #666}
 .eyepass{position:absolute;margin-left:-35px;margin-top:7px;cursor:pointer;font-size:25px;color:#0b0c0e;}
-.passCont{display:inline-block}
+.inlBlock{display:inline-block;position:relative}
 table{border-collapse:collapse;}
 input[type='number']{-moz-appearance:textfield;}
 .header{font-size:25px;color:#fff;}
@@ -239,4 +245,10 @@ input[type='number']{-moz-appearance:textfield;}
 .check_c>input:checked+span::before{border-color:#4CAF50;background-color:#4CAF50;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='m12.82,3l-6.6,6.6l-3,-3-1.9,1.9l5,5.00687l8.5,-8.5-1.9,-1.9z' fill='%23fff'/%3e%3c/svg%3e");}
 .check_c>input:disabled+span::before{background-color:#e9ecef;}
 .check_c>input:hover+span::before{filter:brightness(0.85);}
+.onlBlock{position:fixed;right:-50px;top:40%;width:30px;writing-mode:vertical-rl;cursor:default;font-size:20px;padding:10px 10px;background:#3e3e3e;color:white;border-radius:12px 0 0 12px;transition-duration:.2s;}
+.ctrlBlock{position:absolute;top:5px;right:9px;}
+.areaCtrl{padding:3px;font-size:13px;cursor:pointer;}
+.rad{margin:3px 3px;appearance:none;cursor:pointer}
+.rad:after{width:15px;height:15px;border-radius:50%;top:2px;left:3px;position:relative;content:'';display:inline-block;border-style:solid;border-width:2px;border-color:#37a93c;}
+.rad:checked:after{background-color:#37a93c;}
 )";

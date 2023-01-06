@@ -18,6 +18,7 @@ GPdate valDate;
 GPtime valTime;
 GPcolor valCol;
 int valSelect;
+int valRad;
 
 // конструктор страницы
 void build() {
@@ -42,6 +43,11 @@ void build() {
   GP.TIME("time", valTime);     GP.BREAK();
   GP.COLOR("col", valCol);      GP.BREAK();
   GP.SELECT("sel", "val 1,val 2,val 3", valSelect);  GP.BREAK();
+  GP.RADIO("rad", 0, valRad); GP.LABEL("Value 0"); GP.BREAK();
+  GP.RADIO("rad", 1, valRad); GP.LABEL("Value 1"); GP.BREAK();
+  GP.RADIO("rad", 2, valRad); GP.LABEL("Value 2"); GP.BREAK();
+  GP.RADIO("rad", 3, valRad); GP.LABEL("Value 3"); GP.BREAK();
+  GP.BREAK();
   
   GP.SUBMIT("Submit");
   GP.FORM_END();
@@ -85,6 +91,7 @@ void action() {
       ui.copyTime("time", valTime);
       ui.copyColor("col", valCol);
       ui.copyInt("sel", valSelect);
+      ui.copyInt("rad", valRad);
       
       // выводим для отладки
       Serial.print(valCheck);
@@ -107,7 +114,9 @@ void action() {
       Serial.print(',');
       Serial.print(valCol.encode());
       Serial.print(',');
-      Serial.println(valSelect);
+      Serial.print(valSelect);
+      Serial.print(',');
+      Serial.println(valRad);
     }
   }
 }

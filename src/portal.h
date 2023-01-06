@@ -95,6 +95,7 @@ public:
         #endif
         
         server.onNotFound([this]() {
+            _onlTmr = millis();
             if (_auth && !server.authenticate(_login, _pass)) return server.requestAuthentication();
             _showPage = 0;
             _uri = server.uri();
@@ -189,6 +190,7 @@ public:
             } else {                                                // любой другой запрос
                 _showPage = 1;
                 _reqF = 1;
+                if (log.available()) log.clear();
             }
             
             _gp_local_unix = getUnix() + getGMT() * 60;
@@ -287,6 +289,16 @@ public:
     // проверить, запущен ли портал
     bool state() {
         return _active;
+    }
+    
+    // проверить, подключен ли клиент (браузер)
+    bool online() {
+        return (millis() - _onlTmr < _onlPrd);
+    }
+    
+    // установить таймаут онлайна (умолч. 1500)
+    void onlineTimeout(uint16_t prd) {
+        _onlPrd = prd;
     }
     
     
@@ -1255,7 +1267,8 @@ private:
     bool downOn = 1, uplOn = 1;
     uint8_t _holdF = 0;
     
-    uint32_t _onlPrd = 1000;
+    uint32_t _onlTmr = 0;
+    uint16_t _onlPrd = 1500;
     
     void (*_build)() = nullptr;
     void (*_buildR)(GyverPortal& p) = nullptr;

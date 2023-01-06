@@ -18,14 +18,15 @@ GPdate valDate;
 GPtime valTime;
 GPcolor valCol;
 int valSelect;
+int valRad;
 
 // конструктор страницы
 void build() {
-  GP.BUILD_BEGIN();
-  GP.THEME(GP_DARK);
+  GP.BUILD_BEGIN(GP_DARK);
 
   GP.TITLE("Title", "t1");
   GP.HR();
+
   GP.LABEL("Value: ");
   GP.LABEL("NAN", "val");       GP.BREAK();
   GP.LABEL("Check: ");
@@ -41,6 +42,11 @@ void build() {
   GP.TIME("time", valTime);     GP.BREAK();
   GP.COLOR("col", valCol);      GP.BREAK();
   GP.SELECT("sel", "val 1,val 2,val 3", valSelect);  GP.BREAK();
+  GP.RADIO("rad", 0, valRad); GP.LABEL("Value 0"); GP.BREAK();
+  GP.RADIO("rad", 1, valRad); GP.LABEL("Value 1"); GP.BREAK();
+  GP.RADIO("rad", 2, valRad); GP.LABEL("Value 2"); GP.BREAK();
+  GP.RADIO("rad", 3, valRad); GP.LABEL("Value 3"); GP.BREAK();
+  GP.BREAK();
   GP.BUTTON("btn", "Button");
 
   GP.BUILD_END();
@@ -66,7 +72,7 @@ void action() {
   // был клик по компоненту
   if (ui.click()) {
     // проверяем компоненты и обновляем переменные
-    
+
     // 1. переписали вручную
     if (ui.click("ch")) {
       valCheck = ui.getBool("ch");
@@ -124,10 +130,12 @@ void action() {
       Serial.print("Select: ");
       Serial.println(valSelect);
     }
+    if (ui.clickInt("rad", valRad)) {
+      Serial.print("Radio: ");
+      Serial.println(valRad);
+    }
 
     if (ui.click("btn")) Serial.println("Button click");
-    if (ui.clickUp("btn")) Serial.println("Button up");
-    if (ui.clickDown("btn")) Serial.println("Button down");
   }
 }
 

@@ -114,8 +114,8 @@ struct GP_TEXT {
     bool disabled;
 };
 struct GP_PASS {
-    GP_PASS(const char* n = nullptr, const String& place = "", const String& txt = "", const String& w = "", int maxl = 0, const String& pat = "", bool dis = false) : 
-    name(n), placeholder(place), text(txt), width(w), maxlen(maxl), pattern(pat), disabled(dis) {}
+    GP_PASS(const char* n = nullptr, const String& place = "", const String& txt = "", const String& w = "", int maxl = 0, const String& pat = "", bool dis = false, bool e = false) : 
+    name(n), placeholder(place), text(txt), width(w), maxlen(maxl), pattern(pat), disabled(dis), eye(e) {}
     const char* name;
     String placeholder;
     String text;
@@ -123,6 +123,7 @@ struct GP_PASS {
     int maxlen;
     String pattern;
     bool disabled;
+    bool eye;
 };
 
 struct GP_AREA {

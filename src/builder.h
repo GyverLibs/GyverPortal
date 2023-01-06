@@ -209,7 +209,7 @@ struct Builder {
         send();
     }
     void PAGE_BLOCK_END() {
-        SEND(F("</div>\n"));
+        SEND(F("</div>\n<div id='onlBlock' class='onlBlock'>🚫 Device offline! 🚫</div>\n"));
     }
     void PAGE_END() {
         SEND(F("</body></html>"));
@@ -255,15 +255,12 @@ struct Builder {
         *_GPP += F("\n</script>\n");
     }
     
-    void ONLINE_CHECK(int prd = 5000, const String& code = "") {
+    void ONLINE_CHECK(int prd = 3000) {
         JS_BEGIN();
-        *_GPP += F("setInterval(function(){var xhttp=new XMLHttpRequest();xhttp.timeout=");
+        *_GPP += F("setInterval(function(){if(!document.hidden){var xhttp=new XMLHttpRequest();xhttp.timeout=");
         *_GPP += prd;
         *_GPP += F(";xhttp.open('GET','/GP_ping?',true);xhttp.send();\n"
-        "xhttp.onreadystatechange=function(){");
-        if (!code.length()) *_GPP += F("if(!this.status)alert('Device offline!');"); //*_GPP += F("document.title=((!this.status)?'🚫':'')+_docTitle;");
-        else *_GPP += code;
-        *_GPP += F("}},");
+        "xhttp.onreadystatechange=function(){onlShow(!this.status)}}},");
         *_GPP += prd;
         *_GPP += F(");\n");
         JS_END();
@@ -324,9 +321,6 @@ struct Builder {
         *_GPP += F(");");
         JS_END();
         send();
-    }
-    void AJAX_UPDATE(const String& list, int prd = 1000) {
-        UPDATE(list, prd);
     }
     
     void JQ_SUPPORT_FILE() {
@@ -1335,7 +1329,7 @@ struct Builder {
         if (dis) *_GPP += F(" disabled");
         *_GPP += ">";
         *_GPP += value;
-        *_GPP += F("</button>");
+        *_GPP += F("</button>\n");
         send();
     }
     
@@ -1493,8 +1487,8 @@ struct Builder {
         *_GPP += ">\n";
         send();
     }
-    void PASS(const String& name, const String& place = "", const String& value = "", const String& width = "", int maxlength = 0, const String& pattern = "", bool dis = false) {
-        *_GPP += F("<div class='passCont'><input type='password' name='");
+    void PASS(const String& name, const String& place = "", const String& value = "", const String& width = "", int maxlength = 0, const String& pattern = "", bool dis = false, bool eye = 0) {
+        *_GPP += F("<div class='inlBlock'><input type='password' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -1517,8 +1511,12 @@ struct Builder {
             *_GPP += pattern;
         }
         *_GPP += ">\n";
-        *_GPP += F("<span class='eyepass' onclick='GP_eye(this)'>&#x1f441;&#xFE0E;</span></div>\n");
+        if (eye) *_GPP += F("<span class='eyepass' onclick='GP_eye(this)'>&#x1f441;&#xFE0E;</span>");
+        *_GPP += F("</div>\n");
         send();
+    }
+    void PASS_EYE(const String& name, const String& place = "", const String& value = "", const String& width = "", int maxlength = 0, const String& pattern = "", bool dis = false) {
+        PASS(name, place, value, width, maxlength, pattern, dis, true);
     }
     
     void AREA(const String& name, int rows = 1, const String& value = "", const String& width = "", bool dis = false) {
@@ -1541,7 +1539,7 @@ struct Builder {
     }
     
     void AREA_LOG_RAW(const String& name, int rows = 5, int prd = 1000, const String& w = "") {
-        *_GPP += F("<textarea name='_gplog' style='height:auto;");
+        *_GPP += F("<div class='inlBlock'><textarea name='_gplog' style='height:auto;");
         if (w.length()) {
             *_GPP += F("width:");
             *_GPP += w;
@@ -1551,6 +1549,13 @@ struct Builder {
         *_GPP += F("' rows='");
         *_GPP += rows;
         *_GPP += F("' disabled></textarea>\n");
+        *_GPP += F("<div class='ctrlBlock'><span class='areaCtrl' style='color:red' onclick='logClear(\"");
+        *_GPP += name;
+        *_GPP += F("\")'>x</span><span class='areaCtrl' style='color:#888' onclick='logToggle(\"");
+        *_GPP += name;
+        *_GPP += F("\")'>s</span></div>\n");
+        *_GPP += F("</div>\n");
+        
         JS_BEGIN();
         *_GPP += F("setInterval(()=>GP_update('");
         *_GPP += name;
@@ -1790,8 +1795,23 @@ struct Builder {
         send();
     }
     
-    void RADIO(const String& name, int num, /*const String& label = "", */int val = -1,  bool dis = 0) {
-        *_GPP += F("<input type='radio' name='");
+    void RADIO(const String& name, int num, int val = -1, PGM_P st = GP_DEFAULT, bool dis = 0) {
+        if (st != GP_DEFAULT) {
+            *_GPP += F("<style>.rad_");
+            *_GPP += name;
+            *_GPP += F(":after{border-color:");
+            *_GPP += FPSTR(st);
+            *_GPP += F("}.rad_");
+            *_GPP += name;
+            *_GPP += F(":checked:after{background-color:");
+            *_GPP += FPSTR(st);
+            *_GPP += F("}</style>\n");
+        }
+        
+        *_GPP += F("<input class='rad rad_");
+        *_GPP += name;
+        if (dis) *_GPP += F(" dsbl");
+        *_GPP += F("' type='radio' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -1799,15 +1819,10 @@ struct Builder {
         *_GPP += num;
         *_GPP += F("' value='");
         *_GPP += num;
-        *_GPP += "' onchange='GP_click(this)'";
+        *_GPP += F("' onchange='GP_click(this)'");
         if (val == num) *_GPP += F(" checked");
         if (dis) *_GPP += F(" disabled");
         *_GPP += ">\n";
-        /*if (label.length()) {
-            *_GPP += F("<label for='");
-            *_GPP += name;
-            *_GPP += F("'label>\n");
-        }*/
         send();
     }
     
@@ -2306,7 +2321,7 @@ struct Builder {
         TEXT(txt.name, txt.placeholder, txt.text, txt.width, txt.maxlen, txt.pattern, txt.disabled);
     }
     void PASS(GP_PASS& pas) {
-        PASS(pas.name, pas.placeholder, pas.text, pas.width, pas.maxlen, pas.pattern, pas.disabled);
+        PASS(pas.name, pas.placeholder, pas.text, pas.width, pas.maxlen, pas.pattern, pas.disabled, pas.eye);
     }
     
     void AREA(GP_AREA& ar) {
