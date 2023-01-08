@@ -338,9 +338,12 @@ public:
         _auth = 0;
     }
     
+    // получить логин авторизации
     const char* login() {
         return _login;
     }
+    
+    // получить пароль авторизации
     const char* pass() {
         return _pass;
     }

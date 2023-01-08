@@ -217,3 +217,13 @@ struct GP_SELECT {
         return GPlistIdx(list, selected);
     }
 };
+
+struct GP_RADIO {
+    GP_RADIO(const char* n = nullptr, int nm = 0, int v = -1, PGM_P st = GP_DEFAULT, bool dis = 0) : 
+    name(n), num(nm), value(v), style(st), disabled(dis) {}
+    const char* name;
+    int num;
+    int value;
+    PGM_P style;
+    bool disabled;
+};

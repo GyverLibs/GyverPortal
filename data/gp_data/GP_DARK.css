@@ -141,6 +141,8 @@ input[type=color],
 input[type=checkbox],
 select,
 textarea {
+  width: 90%;
+  max-width: 200px;
   border-radius: 8px;
   padding: 3px 10px;
   color: #bbb;

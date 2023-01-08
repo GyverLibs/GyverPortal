@@ -2365,4 +2365,8 @@ struct Builder {
     void SELECT(GP_SELECT& s) {
         SELECT(s.name, s.list, s.selected, s.numbers, s.disabled, s.reload);
     }
+    
+    void RADIO(GP_RADIO& r) {
+        RADIO(r.name, r.num, r.value, r.style, r.disabled);
+    }
 };
