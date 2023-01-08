@@ -6,7 +6,7 @@
 [![Foo](https://img.shields.io/badge/ПОДПИСАТЬСЯ-НА%20ОБНОВЛЕНИЯ-brightgreen.svg?style=social&logo=telegram&color=blue)](https://t.me/GyverLibs)
 
 # GyverPortal
-### v3.5 (06.01.2023)
+### v3.5.1 (09.01.2023)
 Простой конструктор веб интерфейсов для ESP8266 и ESP32
 ![img](/docs/feature.png)
 
@@ -310,6 +310,12 @@
   - Убран setReloadTimeout(), механизм улучшен, задаётся общий таймаут в setTimeout()
   - Дизайн LABEL_BLOCK, чтобы отличался от кнопок
   - Поле пароля с "глазом" теперь вызывается компонентом PASS_EYE
+
+## v3.5.1 FIX
+- Добавлено
+ - Объект RADIO
+- Пофикшено
+ - Вернул автоматическую ширину полям ввода текста
 
 <a id="feedback"></a>
 ## Баги и обратная связь
