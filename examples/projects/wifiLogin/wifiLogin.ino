@@ -65,7 +65,7 @@ void loginPortal() {
   // запускаем портал
   GyverPortal ui;
   ui.attachBuild(build);
-  ui.start(WIFI_AP);
+  ui.start();
   ui.attach(action);
 
   // работа портала
