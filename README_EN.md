@@ -20,6 +20,9 @@ Read/offer in Issue https://github.com/gyverlibs/gyverPortal/issues/55
 ### famous bugs
 Some elements may ugly display Firefox, becauseMade under Chrome, Safari, Edge, Opera
 
+### Development on host
+Examples can be compiled and excuted on host by starting `../../onhost [-h]` from any example directory
+
 ## Capabilities
 ! [Demo] (/doc/gyverportal.jpg)
 
