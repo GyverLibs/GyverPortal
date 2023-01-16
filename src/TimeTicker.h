@@ -3,8 +3,8 @@
 // GP Time module
 
 struct TimeTicker {
-    void setUnix(uint32_t unix) {
-        _unix = unix;
+    void setUnix(uint32_t unixx) {
+        _unix = unixx;
         _unixTmr = millis();
     }
     void setGMT(int16_t gmt) {

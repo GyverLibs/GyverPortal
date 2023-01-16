@@ -164,10 +164,10 @@ struct GPdate {
     GPdate(const GPdate& dat) {
         *this = dat;
     }
-    GPdate(uint32_t unix, int16_t gmt = 0) {
-        unix = (unix + gmt * 60L) / (60 * 60 * 24) + 719468;
-        uint8_t era = unix / 146097ul;
-        uint16_t doe = unix - era * 146097ul;
+    GPdate(uint32_t unixx, int16_t gmt = 0) {
+        unixx = (unixx + gmt * 60L) / (60 * 60 * 24) + 719468;
+        uint8_t era = unixx / 146097ul;
+        uint16_t doe = unixx - era * 146097ul;
         uint16_t yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
         year = yoe + era * 400;
         uint16_t doy = doe - (yoe * 365 + yoe / 4 - yoe / 100);
@@ -234,13 +234,13 @@ struct GPtime {
     GPtime(const GPtime& tim) {
         *this = tim;
     }
-    GPtime(uint32_t unix, int16_t gmt = 0) {
-        unix += gmt * 60L;
-        second = unix % 60ul;
-        unix /= 60ul;
-        minute = unix % 60ul;
-        unix /= 60ul;
-        hour = unix % 24ul;
+    GPtime(uint32_t unixx, int16_t gmt = 0) {
+        unixx += gmt * 60L;
+        second = unixx % 60ul;
+        unixx /= 60ul;
+        minute = unixx % 60ul;
+        unixx /= 60ul;
+        hour = unixx % 24ul;
     }
     GPtime(int nhour, int nminute, int nsecond = 0) {
         set(nhour, nminute, nsecond);
