@@ -13,7 +13,7 @@ if [ "$1" = clean ]; then
 fi
 
 if [ ! -r "../../onhost" ]; then
-    echo "please run me from an example directory with '../onhost'"
+    echo "please run me from an example directory with '../../onhost'"
     exit 1
 fi
 
