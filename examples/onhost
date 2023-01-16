@@ -3,7 +3,7 @@
 set -ex
 
 if [ -z "${ESP8266}" ]; then
-    echo "environment variable ESP8266 hould point to the esp8266 arduino core location"
+    echo "environment variable ESP8266 should point to the esp8266 arduino core location"
     exit 1
 fi
 
