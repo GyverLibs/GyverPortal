@@ -162,7 +162,7 @@ struct Builder {
         _gp_nav_id = 0;
         SEND(F("<!DOCTYPE HTML><html><head>\n"
         "<meta charset='utf-8'>\n"
-        "<meta name='viewport' content='width=device-width, initial-scale=1'>\n"
+        "<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>\n"
         "<meta name='apple-mobile-web-app-capable' content='yes'/>\n"
         "<meta name='mobile-web-app-capable' content='yes'/>\n"
         "</head><body>\n"));
@@ -1656,7 +1656,7 @@ struct Builder {
     }
     
     void TIME(const String& name, bool dis = false) {
-        *_GPP += F("<input step='any' type='time' name='");
+        *_GPP += F("<input step='1' type='time' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -1666,7 +1666,7 @@ struct Builder {
         send();
     }
     void TIME(const String& name, GPtime t, bool dis = false) {
-        *_GPP += F("<input step='any' type='time' name='");
+        *_GPP += F("<input step='1' type='time' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;

@@ -3,7 +3,7 @@
 // GP Scripts
 
 const char GP_JS_TOP[] PROGMEM = R"(
-var _tout=1000;
+var _tout=2000;
 var _clkRelList=[],_touch=0,_clkRedrList={},_clkUpdList={},_pressId=null,_spinInt=null,_spinF=0;
 document.title='GyverPortal';
 function GP_send(req,r=null,upd=null){

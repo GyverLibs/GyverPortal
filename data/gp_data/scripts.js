@@ -1,4 +1,4 @@
-var _tout = 1000;
+var _tout = 2000;
 var _clkRelList = [],
   _touch = 0,
   _clkRedrList = {},

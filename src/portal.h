@@ -200,7 +200,8 @@ public:
             if (_showPage) show();                  // показать страницу            
 
             if (_fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
-            _reqF = _fileDF = _clickF = _formF = _delF = _renF = _holdF = 0;     // скидываем флаги
+            _reqF = _fileDF = _clickF = _formF = _delF = _renF = 0;     // скидываем флаги
+            _holdF = 0;
         });
         
         #if defined(FS_H) && !defined(GP_NO_UPLOAD)
@@ -1269,7 +1270,7 @@ private:
     bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 1, _autoU = 1, _autoDel = 1, _autoRen = 1;
     bool downOn = 1, uplOn = 1;
     uint8_t _holdF = 0;
-    
+
     uint32_t _onlTmr = 0;
     uint16_t _onlPrd = 1500;
     
