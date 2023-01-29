@@ -801,10 +801,14 @@ public:
         if (_answPtr) *_answPtr += v;
         return (bool)_answPtr;
     }
-    bool answer(float v, uint8_t dec) {
+    /*bool answer(float v, uint8_t dec) {
         return answer(String(v, (uint16_t)dec));
     }
     bool answer(double v, uint8_t dec) {
+        return answer(String(v, (uint16_t)dec));
+    }*/
+    template <typename T>
+    bool answer(T v, uint8_t dec) {
         return answer(String(v, (uint16_t)dec));
     }
     bool answer(int* v, int am, int dec = 0) {
