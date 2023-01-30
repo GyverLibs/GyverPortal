@@ -1302,7 +1302,7 @@ struct Builder {
     
     // ======================= КНОПКА =======================
     void BUTTON_RAW(const String& name, const String& value, const String& tar, PGM_P st, const String& width = "", const String& cls = "", bool dis = 0, bool rel = 0) {
-        *_GPP += F("<button ");
+        *_GPP += F("<button type='button' ");
         if (cls.length()) {
             *_GPP += F("class='");
             *_GPP += cls;
@@ -1699,7 +1699,7 @@ struct Builder {
         *_GPP += FPSTR(st);
         *_GPP += ',';
         *_GPP += FPSTR(st);
-        *_GPP += F(");' onload='GP_change(this)' ");
+        *_GPP += F(");background-size:0% 100%' onload='GP_change(this)' ");
         if (oninp) *_GPP += F("oninput='GP_change(this);GP_click(this)'");
         else *_GPP += F("onchange='GP_click(this)' oninput='GP_change(this)'");
         *_GPP += F(" onmousewheel='GP_wheel(this);GP_change(this);GP_click(this)' ");
