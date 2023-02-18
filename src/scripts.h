@@ -12,7 +12,7 @@ xhttp.onreadystatechange=function(){onlShow(!this.status);if(!this.status&&!upd)
 else if(this.readyState==4&&this.status==200){
 if(r){if(r==1)location.reload();else location.href=r;}if(upd)GP_apply(upd,this.responseText);}}}
 function GP_update(ids){ids=ids.replaceAll(' ','');GP_send('/GP_update?'+ids+'=',null,ids);}
-function GP_delete(url){if(!confirm('Delete '+url+'?'))return;GP_send('/GP_delete?'+url,1);}
+function GP_delete(url){if(!confirm('Delete '+url+'?'))return;GP_send('/GP_delete?'+url+'=',1);}
 function GP_rename(url){res=prompt('Rename File',url);if(!res)return;GP_send('/GP_rename?'+url+'='+res,1);}
 function GP_hint(id,txt){el=getEl(id);if(el.className=='_sw_c'){el=getEl('_'+id)}el.title=txt;}
 function GP_press(arg,dir){_pressId=(dir==1)?arg.name:null;if(arg.name)GP_send('/GP_press?'+arg.name+'='+dir);}
