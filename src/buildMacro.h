@@ -58,6 +58,7 @@
 #define M_BOX1(args) GP.BOX_BEGIN(); args; GP.BOX_END();
 #define M_BOX2(align, args) GP.BOX_BEGIN(align); args; GP.BOX_END();
 #define M_BOX3(align, width, args) GP.BOX_BEGIN(align, width); args; GP.BOX_END();
+#define M_BOX4(align, width, top, args) GP.BOX_BEGIN(align, width, top); args; GP.BOX_END();
 
 #define M_BLOCK(...) OVR_MACRO(M_BLOCK, __VA_ARGS__)
 #define M_BLOCK1(args) GP.BLOCK_BEGIN(); args; GP.BLOCK_END();

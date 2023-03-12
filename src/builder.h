@@ -582,8 +582,9 @@ struct Builder {
     }
     
     void BLOCK_BEGIN(GPblock type, const String& width = "", const String& text = "", PGM_P st = GP_DEFAULT) {
-        *_GPP += F("<div class='blockBase");
-        if (type != GP_DIV) {
+        *_GPP += F("<div class='");
+        if (type != GP_DIV_RAW) *_GPP += F("blockBase");
+        if (type != GP_DIV && type != GP_DIV_RAW) {
             *_GPP += F(" block");
             if (text.length()) *_GPP += F(" blockTab");
             if (type == GP_THIN) *_GPP += F(" thinBlock");
@@ -604,7 +605,7 @@ struct Builder {
         *_GPP += ">\n";
         
         if (text.length()) {
-            if (type == GP_DIV) {
+            if (type == GP_DIV || type == GP_DIV_RAW) {
                 LABEL(text);
                 HR();
             } else if (type == GP_TAB) {
@@ -650,11 +651,12 @@ struct Builder {
         SEND(F("</div>\n"));
     }
     
-    void BOX_BEGIN(GPalign al = GP_JUSTIFY, const String& w = "100%") {
+    void BOX_BEGIN(GPalign al = GP_JUSTIFY, const String& w = "100%", bool top = 0) {
         *_GPP += F("<div style='width:");
         *_GPP += w;
         *_GPP += F(";justify-content:");
         *_GPP += FPSTR(GPgetAlignFlex(al));
+        if (top) *_GPP += F(";align-items: flex-start");
         *_GPP += F("' class='inliner'>\n");
         send();
     }
