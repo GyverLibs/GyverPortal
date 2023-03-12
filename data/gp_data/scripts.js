@@ -1,4 +1,4 @@
-var _tout = 1000;
+var _tout = 2000;
 var _clkRelList = [],
   _touch = 0,
   _clkRedrList = {},
@@ -33,7 +33,7 @@ function GP_update(ids) {
 
 function GP_delete(url) {
   if (!confirm('Delete ' + url + '?')) return;
-  GP_send('/GP_delete?' + url, 1);
+  GP_send('/GP_delete?' + url + '=', 1);
 }
 
 function GP_rename(url) {

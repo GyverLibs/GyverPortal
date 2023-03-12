@@ -44,6 +44,7 @@ enum GPalign {
 };
 
 enum GPblock {
+    GP_DIV_RAW,
     GP_DIV,
     GP_TAB,
     GP_THIN,
@@ -219,10 +220,15 @@ struct GPdate {
         return s;
     }
     void decode(const String& str) {
-        if (str.length() != 10) return;
-        year = atoi(str.c_str());
-        month = atoi(str.c_str() + 5);
-        day = atoi(str.c_str() + 8);
+        if (str.length() > 10) return;
+        const char* s = str.c_str();
+        year = atoi(s);
+        s = strchr(s, '-');
+        if (!s) return;
+        month = atoi(++s);
+        s = strchr(s, '-');
+        if (!s) return;
+        day = atoi(++s);
     }
 };
 
@@ -268,11 +274,15 @@ struct GPtime {
         return s;
     }
     void decode(const String& str) {
-        if (str.length() != 5 && str.length() != 8) return;
-        hour = atoi(str.c_str());
-        minute = atoi(str.c_str() + 3);
-        if (str.length() == 8) second = atoi(str.c_str() + 6);
-        else second = 0;
+        if (str.length() > 8) return;
+        const char* s = str.c_str();
+        hour = atoi(s);
+        s = strchr(s, ':');
+        if (!s) return;
+        minute = atoi(++s);
+        s = strchr(s, ':');
+        if (!s) return;
+        second = atoi(++s);
     }
 };
 

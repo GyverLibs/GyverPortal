@@ -162,7 +162,7 @@ struct Builder {
         _gp_nav_id = 0;
         SEND(F("<!DOCTYPE HTML><html><head>\n"
         "<meta charset='utf-8'>\n"
-        "<meta name='viewport' content='width=device-width, initial-scale=1'>\n"
+        "<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>\n"
         "<meta name='apple-mobile-web-app-capable' content='yes'/>\n"
         "<meta name='mobile-web-app-capable' content='yes'/>\n"
         "</head><body>\n"));
@@ -582,8 +582,9 @@ struct Builder {
     }
     
     void BLOCK_BEGIN(GPblock type, const String& width = "", const String& text = "", PGM_P st = GP_DEFAULT) {
-        *_GPP += F("<div class='blockBase");
-        if (type != GP_DIV) {
+        *_GPP += F("<div class='");
+        if (type != GP_DIV_RAW) *_GPP += F("blockBase");
+        if (type != GP_DIV && type != GP_DIV_RAW) {
             *_GPP += F(" block");
             if (text.length()) *_GPP += F(" blockTab");
             if (type == GP_THIN) *_GPP += F(" thinBlock");
@@ -604,7 +605,7 @@ struct Builder {
         *_GPP += ">\n";
         
         if (text.length()) {
-            if (type == GP_DIV) {
+            if (type == GP_DIV || type == GP_DIV_RAW) {
                 LABEL(text);
                 HR();
             } else if (type == GP_TAB) {
@@ -650,11 +651,12 @@ struct Builder {
         SEND(F("</div>\n"));
     }
     
-    void BOX_BEGIN(GPalign al = GP_JUSTIFY, const String& w = "100%") {
+    void BOX_BEGIN(GPalign al = GP_JUSTIFY, const String& w = "100%", bool top = 0) {
         *_GPP += F("<div style='width:");
         *_GPP += w;
         *_GPP += F(";justify-content:");
         *_GPP += FPSTR(GPgetAlignFlex(al));
+        if (top) *_GPP += F(";align-items: flex-start");
         *_GPP += F("' class='inliner'>\n");
         send();
     }
@@ -1302,7 +1304,7 @@ struct Builder {
     
     // ======================= КНОПКА =======================
     void BUTTON_RAW(const String& name, const String& value, const String& tar, PGM_P st, const String& width = "", const String& cls = "", bool dis = 0, bool rel = 0) {
-        *_GPP += F("<button ");
+        *_GPP += F("<button type='button' ");
         if (cls.length()) {
             *_GPP += F("class='");
             *_GPP += cls;
@@ -1656,7 +1658,7 @@ struct Builder {
     }
     
     void TIME(const String& name, bool dis = false) {
-        *_GPP += F("<input step='any' type='time' name='");
+        *_GPP += F("<input step='1' type='time' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -1666,7 +1668,7 @@ struct Builder {
         send();
     }
     void TIME(const String& name, GPtime t, bool dis = false) {
-        *_GPP += F("<input step='any' type='time' name='");
+        *_GPP += F("<input step='1' type='time' name='");
         *_GPP += name;
         *_GPP += F("' id='");
         *_GPP += name;
@@ -1699,7 +1701,7 @@ struct Builder {
         *_GPP += FPSTR(st);
         *_GPP += ',';
         *_GPP += FPSTR(st);
-        *_GPP += F(");' onload='GP_change(this)' ");
+        *_GPP += F(");background-size:0% 100%' onload='GP_change(this)' ");
         if (oninp) *_GPP += F("oninput='GP_change(this);GP_click(this)'");
         else *_GPP += F("onchange='GP_click(this)' oninput='GP_change(this)'");
         *_GPP += F(" onmousewheel='GP_wheel(this);GP_change(this);GP_click(this)' ");

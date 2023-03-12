@@ -17,7 +17,7 @@ GP_PGM_LIST(_gp_ext, _gp_img, _gp_txt, _gp_au, _gp_vid, _gp_app);
 GP_PGM_LIST(_gp_val, _gp__img, _gp__txt, _gp__au, _gp__vid, _gp__app);
 
 String GPfileType(const String& uri) {
-    int div = uri.indexOf('.');
+    int div = uri.lastIndexOf('.');
     if (div >= 0) {
         String ext = uri.substring(div + 1, uri.length());
         for (int i = 0; i < 5; i++) {
@@ -83,7 +83,7 @@ int GPinList(const String& s, const String& li) {
     if (s == li) return 0;
     int p = 0, t = 0;
     while (1) {
-        t = li.lastIndexOf(s, p);
+        t = li.indexOf(s, p);
         if (t < 0) return -1;
         if (!t && li[t+l] == ',') break;
         if (t && li[t-1] == ',' && (li[t+l] == ',' || !li[t+l])) break;
