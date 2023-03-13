@@ -8,12 +8,12 @@
 
 class ArgParser {
 public:
-    virtual int args() {}                           // amount
-    virtual const String& arg(const String& n) {}   // value from name
-    virtual const String& arg() {}                  // value from 0
-    virtual const String& argName() {}              // name from 0
-    virtual bool hasArg(const String& n) {}         // check
-    virtual bool clickF() {}
+    virtual int args();                         // amount
+    virtual const String& arg(const String& n); // value from name
+    virtual const String& arg();                // value from 0
+    virtual const String& argName();            // name from 0
+    virtual bool hasArg(const String& n);       // check
+    virtual bool clickF();
     
     // ===================== CLICK =====================
     // вернёт true, если был клик по (кнопка, чекбокс, свитч, слайдер, селектор)
