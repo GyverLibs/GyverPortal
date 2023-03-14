@@ -6,6 +6,7 @@
 
 #define GP_PGM(name, val) static const char name[] PROGMEM = val
 #define GP_PGM_LIST(name, ...) const char* const name[] PROGMEM = {__VA_ARGS__};
+extern String _GP_empty_str;
 
 // ==================== COLORS =====================
 GP_PGM(GP_RED, "#bf1e1e");

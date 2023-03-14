@@ -68,7 +68,7 @@ public:
     void clearCache() {
         _gp_seed = random(0xff);
     }
-
+ 
     // ========================= СИСТЕМА =========================
     // запустить портал. Можно передать имя MDNS (оставь пустым "" если MDNS не нужен) и порт
     void start(const char* mdns = "", uint16_t port = 80) {
@@ -98,6 +98,11 @@ public:
         server.onNotFound([this]() {
             _onlTmr = millis();
             if (_auth && !server.authenticate(_login, _pass)) return server.requestAuthentication();
+            String valS = server.arg(0);
+            _argValPtr = &valS;
+            String nameS = server.argName(0);
+            _argNamePtr = &nameS;
+            
             _showPage = 0;
             _uri = server.uri();
             if (_uri.startsWith(F("/GP_click"))) {              // клик
@@ -198,7 +203,10 @@ public:
 
             if (_action) _action();                 // вызов обычного обработчика действий
             else if (_actionR) _actionR(*this);     // вызов обработчика действий с объектом
-            if (_showPage) show();                  // показать страницу            
+            if (_showPage) show();                  // показать страницу
+            
+            _argValPtr = nullptr;
+            _argNamePtr = nullptr;
 
             if (_fileDF) server.send(200);  // юзер не ответил на update или не отправил файл
             _reqF = _fileDF = _clickF = _formF = _delF = _renF = 0;     // скидываем флаги
@@ -214,6 +222,7 @@ public:
             if (!_autoU && !_action && !_actionR) return;
             HTTPUpload& upl = server.upload();
             if (!upl.filename.length()) return;
+            
             _filePtr = &upl.filename;
             _namePtr = &upl.name;
             
@@ -274,7 +283,6 @@ public:
                 //server.send(200, "text/html", F("<h2>Upload Error, <a href='/'>return back</a></h2>"));
                 break;
             }
-            
         });
         #endif
     }
@@ -437,7 +445,7 @@ public:
     
     // имя (путь) файла для удаления. Начинается с '/'
     String deletePath() {
-        return deleteFile() ? server.argName(0) : String();
+        return deleteFile() ? server.argName(0) : _GP_empty_str;
     }
     
     
@@ -454,12 +462,12 @@ public:
     
     // имя (путь) файла для переименования. Начинается с '/'
     String renamePath() {
-        return renameFile() ? server.argName(0) : String();
+        return renameFile() ? server.argName(0) : _GP_empty_str;
     }
     
     // новое имя (путь) файла
     String renamePathTo() {
-        return renameFile() ? server.arg(0) : String();
+        return renameFile() ? server.arg(0) : _GP_empty_str;
     }
     
     
@@ -560,29 +568,6 @@ public:
         return form() ? _uri.startsWith(name) : 0;
     }
     
-    // ArgParser virtual
-    int args() {
-        return server.args();
-    }
-    const String& arg(const String& n) {
-        return server.arg(n);
-    }
-    const String& arg() {
-        return server.arg(0);
-    }
-    const String& argName() {
-        return server.argName(0);
-    }
-    bool hasArg(const String& n) {
-        return server.hasArg(n);
-    }
-    bool clickF() {
-        return _clickF;
-    }
-    
-
-    // ======================= CLICK =======================
-    using ArgParser::click;
     
     // HOLD
     // вернёт true, если статус удержания кнопки изменился (нажата/отпущена)
@@ -597,12 +582,12 @@ public:
     
     // вернёт имя удерживаемой кнопки
     String holdName() {
-        return _hold.length() ? _hold : String();
+        return _hold.length() ? _hold : _GP_empty_str;
     }
     
     // вернёт часть имени hold компонента, находящейся под номером idx после разделителя /
     String holdNameSub(int idx = 1) {
-        return _hold.length() ? (GPlistIdx(_hold, idx, '/')) : String();
+        return _hold.length() ? (GPlistIdx(_hold, idx, '/')) : _GP_empty_str;
     }
     
     // вернёт true, если кнопка удерживается и имя компонента начинается с указанного
@@ -644,172 +629,6 @@ public:
     
     bool clickUp(GP_BUTTON_MINI& btn) {
         return clickUp(btn.name);
-    }
-
-    // ======================= UPDATE =======================
-    // вернёт true, если было обновление
-    bool update() {
-        return (bool)_updPtr;
-    }
-    
-    // вернёт true, если было update с указанного компонента
-    bool update(const String& name) {
-        return update() ? _updPtr->equals(name) : 0;
-    }
-    
-    // вернёт true, если имя обновляемого компонента НАЧИНАЕТСЯ с указанного
-    bool updateSub(const String& name) {
-        return update() ? _updPtr->startsWith(name) : 0;
-    }
-    
-    // вернёт имя обновлённого компонента
-    String updateName() {
-        return update() ? String(*_updPtr) : String();
-    }
-    
-    // вернёт часть имени обновляемого компонента, находящейся под номером idx после разделителя /
-    String updateNameSub(int idx = 1) {
-        return update() ? (GPlistIdx(*_updPtr, idx, '/')) : String();
-    }
-     
-    
-    // ======================= ANSWER =======================
-    // отправить ответ на обновление
-    bool answer(const String& s) {
-        if (_answPtr) *_answPtr += s;
-        return (bool)_answPtr;
-    }
-    bool answer(int v) {
-        if (_answPtr) *_answPtr += v;
-        return (bool)_answPtr;
-    }
-    /*bool answer(float v, uint8_t dec) {
-        return answer(String(v, (uint16_t)dec));
-    }
-    bool answer(double v, uint8_t dec) {
-        return answer(String(v, (uint16_t)dec));
-    }*/
-    template <typename T>
-    bool answer(T v, uint8_t dec) {
-        return answer(String(v, (uint16_t)dec));
-    }
-    bool answer(int* v, int am, int dec = 0) {
-        String s;
-        s.reserve(am * 4);
-        for (int i = 0; i < am; i++) {
-            if (dec) s += (float)v[i] / dec;
-            else s += v[i];
-            if (i != am - 1) s += ',';
-        }
-        return answer(s);
-    }
-    
-    bool answer(GPcolor col) {
-        return answer(col.encode());
-    }
-    bool answer(GPdate date) {
-        return answer(date.encode());
-    }
-    bool answer(GPtime time) {
-        return answer(time.encode());
-    }
-    bool answer(GPcanvas& cv) {
-        return answer(cv._read());
-    }
-    
-    // ==================== UPDATE AUTO =====================
-    // автоматическое обновление. Отправит значение из указанной переменной
-    // Вернёт true в момент обновления
-    bool updateString(const String& n, String& f) {
-        return update(n) ? (answer(f), 1) : 0;
-    }
-    template <typename T>
-    bool updateInt(const String& n, T f) {
-        return update(n) ? (answer((int)f), 1) : 0;
-    }
-    template <typename T>
-    bool updateFloat(const String& n, T f, int dec = 2) {
-        return update(n) ? (answer(f, dec), 1) : 0;
-    }
-    bool updateBool(const String& n, bool f) {
-        return update(n) ? (answer(f), 1) : 0;
-    }
-    bool updateDate(const String& n, GPdate f) {
-        return update(n) ? (answer(f), 1) : 0;
-    }
-    bool updateTime(const String& n, GPtime f) {
-        return update(n) ? (answer(f), 1) : 0;
-    }
-    bool updateColor(const String& n, GPcolor f) {
-        return update(n) ? (answer(f), 1) : 0;
-    }
-    
-    bool updateLog(GPlog& log) {
-        return update(log.name) ? (answer(log.read()), 1) : 0;
-    }
-    
-    
-    // ================== UPDATE AUTO OBJ ===================
-    bool update(GP_TITLE& title) {
-        return (update(title.name) ? answer(title.text) : 0);
-    }
-    bool update(GP_LABEL& label) {
-        return (update(label.name) ? answer(label.text) : 0);
-    }
-    bool update(GP_LABEL_BLOCK& label) {
-        return (update(label.name) ? answer(label.text) : 0);
-    }
-    
-    bool update(GP_LED& led) {
-        return (update(led.name) ? answer(led.state) : 0);
-    }
-    bool update(GP_LED_RED& led) {
-        return (update(led.name) ? answer(led.state) : 0);
-    }
-    bool update(GP_LED_GREEN& led) {
-        return (update(led.name) ? answer(led.state) : 0);
-    }
-    
-    bool update(GP_NUMBER& num) {
-        return (update(num.name) ? answer(num.value) : 0);
-    }
-    bool update(GP_NUMBER_F& num) {
-        return (update(num.name) ? answer(num.value, num.decimals) : 0);
-    }
-    
-    bool update(GP_TEXT& txt) {
-        return (update(txt.name) ? answer(txt.text) : 0);
-    }
-    bool update(GP_PASS& pas) {
-        return (update(pas.name) ? answer(pas.text) : 0);
-    }
-    
-    bool update(GP_AREA& ar) {
-        return (update(ar.name) ? answer(ar.text) : 0);
-    }
-    
-    bool update(GP_CHECK& ch) {
-        return (update(ch.name) ? answer(ch.state) : 0);
-    }
-    bool update(GP_SWITCH& sw) {
-        return (update(sw.name) ? answer(sw.state) : 0);
-    }
-    
-    bool update(GP_DATE& d) {
-        return (update(d.name) ? answer(d.date) : 0);
-    }
-    bool update(GP_TIME& t) {
-        return (update(t.name) ? answer(t.time) : 0);
-    }
-    bool update(GP_COLOR& c) {
-        return (update(c.name) ? answer(c.color) : 0);
-    }
-    
-    bool update(GP_SPINNER& s) {
-        return (update(s.name) ? answer(s.value, s.decimals) : 0);
-    }
-    bool update(GP_SLIDER& s) {
-        return (update(s.name) ? answer(s.value, s.decimals) : 0);
     }
     
     
@@ -939,14 +758,24 @@ public:
     bool getCheck(const String& n) { return getBool(n); }
     bool getCheck() { return getBool(); }
     
+    
+    // ArgParser virtual
+    int args() {
+        return server.args();
+    }
+    const String arg(const String& n) {
+        return server.arg(n);
+    }
+    bool hasArg(const String& n) {
+        return server.hasArg(n);
+    }
+    bool clickF() {
+        return _clickF;
+    }
+    using ArgParser::click;
+    
     // ======================= PRIVATE =======================
 private:
-    /*int getIntUniv(const String& s) {
-        if (s[0] == '#') {
-            GPcolor col(s);
-            return col.getHEX();
-        } else return s.toInt();
-    }*/
     
     void checkList() {
         if (!list.idx) return;
@@ -973,8 +802,6 @@ private:
     String _hold;
     String *_namePtr = nullptr;
     String *_filePtr = nullptr;
-    String *_answPtr = nullptr;
-    String *_updPtr = nullptr;
     
     int _bufsize = 1000;
     bool _cache = 1;

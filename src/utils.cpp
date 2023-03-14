@@ -1,5 +1,7 @@
 #include "utils.h"
 
+String _GP_empty_str;
+
 // ================== FILE TYPES ====================
 GP_PGM(_gp_types, "image,text,audio,video,application");
 GP_PGM(_gp_img, "ico,gif,bmp,jpeg,jpg,png,tif,tiff,svg,webp");
@@ -98,7 +100,7 @@ String GPlistIdx(const String& li, int idx, char div) {
     while (1) {
         if (li[i] == div || !li[i]) {
             if (cnt == idx) return li.substring(p, i);
-            if (!li[i]) return String();
+            if (!li[i]) return _GP_empty_str;
             cnt++;
             p = i + 1;
         }

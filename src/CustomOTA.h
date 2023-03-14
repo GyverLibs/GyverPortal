@@ -324,7 +324,7 @@ public:
             case UPDATE_ERROR_NO_DATA:
                 out = F("No data supplied");
                 break;
-            /*case UPDATE_ERROR_OOM:
+            case UPDATE_ERROR_OOM:
                 out = F("Out of memory");
                 break;*/
 #endif				

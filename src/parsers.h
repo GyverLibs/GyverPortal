@@ -8,12 +8,17 @@
 
 class ArgParser {
 public:
-    virtual int args();                         // amount
-    virtual const String& arg(const String& n); // value from name
-    virtual const String& arg();                // value from 0
-    virtual const String& argName();            // name from 0
-    virtual bool hasArg(const String& n);       // check
-    virtual bool clickF();
+    virtual const String arg(const String& n) = 0;    // value from name
+    virtual int args() = 0;                     // amount
+    virtual bool hasArg(const String& n) = 0;   // check
+    virtual bool clickF() = 0;
+    
+    const String& arg() {                   // value from 0
+        return _argValPtr ? (*_argValPtr) : _GP_empty_str;
+    }
+    const String& argName() {               // name from 0
+        return _argNamePtr ? (*_argNamePtr) : _GP_empty_str;
+    }
     
     // ===================== CLICK =====================
     // вернёт true, если был клик по (кнопка, чекбокс, свитч, слайдер, селектор)
@@ -33,17 +38,17 @@ public:
     
     // вернёт имя теукщего кликнутого компонента
     String clickName() {
-        return click() ? argName() : String();
+        return click() ? argName() : _GP_empty_str;
     }
     
     // вернёт часть имени кликнутого компонента, находящейся под номером idx после разделителя /
     String clickNameSub(int idx = 1) {
-        return click() ? (GPlistIdx(argName(), idx, '/')) : String();
+        return click() ? (GPlistIdx(argName(), idx, '/')) : _GP_empty_str;
     }
     
     // ===================== CLICK AUTO =====================
     // нулевой аргумент (для вызова в условии)
-    bool clickStr(char* t, int len = 0) {
+    bool clickStr(char* t, uint16_t len = 0) {
         return click() ? copyStr(t, len) : 0;
     }
     bool clickString(String& t) {
@@ -72,7 +77,7 @@ public:
     }
     
     // с указанием имени компонента
-    bool clickStr(const String& n, char* t, int len = 0) {
+    bool clickStr(const String& n, char* t, uint16_t len = 0) {
         return click() ? copyStr(n, t, len) : 0;
     }
     bool clickString(const String& n, String& t) {
@@ -104,10 +109,10 @@ public:
     // ОПАСНЫЕ ФУНКЦИИ (не проверяют есть ли запрос). Конвертируют и возвращают значение
     // получить String строку с компонента
     String getString(const String& n) {
-        return String(arg(n));
+        return arg(n);
     }
     String getString() {
-        return String(arg());
+        return arg();
     }
 
     // получить число с компонента
@@ -128,7 +133,8 @@ public:
 
     // получить состояние чекбокса
     bool getBool(const String& n) {
-        return (arg(n)[0] == '1' || arg(n)[0] == 'o' || arg(n)[0] == 't');
+        String s = arg(n);
+        return (s[0] == '1' || s[0] == 'o' || s[0] == 't');
     }
     bool getBool() {
         return (arg()[0] == '1' || arg()[0] == 'o' || arg()[0] == 't');
@@ -161,7 +167,7 @@ public:
     
     // ===================== COPY-ПАРСЕРЫ =====================
     // ОПАСНЫЕ парсеры (не проверяют запрос). Использовать только в условии!
-    bool copyStr(char* t, int len = 0) {
+    bool copyStr(char* t, uint16_t len = 0) {
         return (args() && (!len || arg().length() < len)) ? (strcpy(t, arg().c_str()), 1) : 0;
     }
     bool copyString(String& t) {
@@ -190,7 +196,7 @@ public:
     }
     
     // БЕЗОПАСНЫЕ парсеры (проверяют запрос). Копируют данные из запроса в переменную
-    bool copyStr(const String& n, char* t, int len = 0) {
+    bool copyStr(const String& n, char* t, uint16_t len = 0) {
         return (hasArg(n) && (!len || arg(n).length() < len)) ? (strcpy(t, arg(n).c_str()), 1) : 0;
     }
     bool copyString(const String& n, String& t) {
@@ -320,6 +326,170 @@ public:
     bool click(GP_SELECT& s) {
         return click() ? copy(s) : 0;
     }
+    
+    // отправить ответ на обновление
+    bool answer(const String& s) {
+        if (_answPtr) *_answPtr += s;
+        return (bool)_answPtr;
+    }
+    bool answer(int v) {
+        if (_answPtr) *_answPtr += v;
+        return (bool)_answPtr;
+    }
+    
+    // для float/double
+    template <typename T>
+    bool answer(T v, uint8_t dec) {
+        return answer(String(v, (uint16_t)dec));
+    }
+    bool answer(int* v, int am, int dec = 0) {
+        String s;
+        s.reserve(am * 4);
+        for (int i = 0; i < am; i++) {
+            if (dec) s += (float)v[i] / dec;
+            else s += v[i];
+            if (i != am - 1) s += ',';
+        }
+        return answer(s);
+    }
+    
+    bool answer(GPcolor col) {
+        return answer(col.encode());
+    }
+    bool answer(GPdate date) {
+        return answer(date.encode());
+    }
+    bool answer(GPtime time) {
+        return answer(time.encode());
+    }
+    bool answer(GPcanvas& cv) {
+        return answer(cv._read());
+    }
+    
+    // ==================== UPDATE AUTO =====================
+    // автоматическое обновление. Отправит значение из указанной переменной
+    // Вернёт true в момент обновления
+    bool updateString(const String& n, String& f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    template <typename T>
+    bool updateInt(const String& n, T f) {
+        return update(n) ? (answer((int)f), 1) : 0;
+    }
+    template <typename T>
+    bool updateFloat(const String& n, T f, int dec = 2) {
+        return update(n) ? (answer(f, dec), 1) : 0;
+    }
+    bool updateBool(const String& n, bool f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    bool updateDate(const String& n, GPdate f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    bool updateTime(const String& n, GPtime f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    bool updateColor(const String& n, GPcolor f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    
+    bool updateLog(GPlog& log) {
+        return update(log.name) ? (answer(log.read()), 1) : 0;
+    }
+    
+    
+    // ================== UPDATE AUTO OBJ ===================
+    bool update(GP_TITLE& title) {
+        return (update(title.name) ? answer(title.text) : 0);
+    }
+    bool update(GP_LABEL& label) {
+        return (update(label.name) ? answer(label.text) : 0);
+    }
+    bool update(GP_LABEL_BLOCK& label) {
+        return (update(label.name) ? answer(label.text) : 0);
+    }
+    
+    bool update(GP_LED& led) {
+        return (update(led.name) ? answer(led.state) : 0);
+    }
+    bool update(GP_LED_RED& led) {
+        return (update(led.name) ? answer(led.state) : 0);
+    }
+    bool update(GP_LED_GREEN& led) {
+        return (update(led.name) ? answer(led.state) : 0);
+    }
+    
+    bool update(GP_NUMBER& num) {
+        return (update(num.name) ? answer(num.value) : 0);
+    }
+    bool update(GP_NUMBER_F& num) {
+        return (update(num.name) ? answer(num.value, num.decimals) : 0);
+    }
+    
+    bool update(GP_TEXT& txt) {
+        return (update(txt.name) ? answer(txt.text) : 0);
+    }
+    bool update(GP_PASS& pas) {
+        return (update(pas.name) ? answer(pas.text) : 0);
+    }
+    
+    bool update(GP_AREA& ar) {
+        return (update(ar.name) ? answer(ar.text) : 0);
+    }
+    
+    bool update(GP_CHECK& ch) {
+        return (update(ch.name) ? answer(ch.state) : 0);
+    }
+    bool update(GP_SWITCH& sw) {
+        return (update(sw.name) ? answer(sw.state) : 0);
+    }
+    
+    bool update(GP_DATE& d) {
+        return (update(d.name) ? answer(d.date) : 0);
+    }
+    bool update(GP_TIME& t) {
+        return (update(t.name) ? answer(t.time) : 0);
+    }
+    bool update(GP_COLOR& c) {
+        return (update(c.name) ? answer(c.color) : 0);
+    }
+    
+    bool update(GP_SPINNER& s) {
+        return (update(s.name) ? answer(s.value, s.decimals) : 0);
+    }
+    bool update(GP_SLIDER& s) {
+        return (update(s.name) ? answer(s.value, s.decimals) : 0);
+    }
+    
+    // вернёт true, если было обновление
+    bool update() {
+        return (bool)_updPtr;
+    }
+    
+    // вернёт true, если было update с указанного компонента
+    bool update(const String& name) {
+        return update() ? _updPtr->equals(name) : 0;
+    }
+    
+    // вернёт true, если имя обновляемого компонента НАЧИНАЕТСЯ с указанного
+    bool updateSub(const String& name) {
+        return update() ? _updPtr->startsWith(name) : 0;
+    }
+    
+    // вернёт имя обновлённого компонента
+    String updateName() {
+        return update() ? (*_updPtr) : _GP_empty_str;
+    }
+    
+    // вернёт часть имени обновляемого компонента, находящейся под номером idx после разделителя /
+    String updateNameSub(int idx = 1) {
+        return update() ? (GPlistIdx(*_updPtr, idx, '/')) : _GP_empty_str;
+    }
+    
+    String *_answPtr = nullptr;
+    String *_updPtr = nullptr;
+    String *_argValPtr = nullptr;
+    String *_argNamePtr = nullptr;
     
 private:
     int getIntUniv(const String& s) {
