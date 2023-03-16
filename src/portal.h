@@ -569,69 +569,6 @@ public:
     }
     
     
-    // HOLD
-    // вернёт true, если статус удержания кнопки изменился (нажата/отпущена)
-    bool hold() {
-        return _holdF && server.args();
-    }
-    
-    // вернёт true, если кнопка удерживается
-    bool hold(const String& name) {
-        return _hold.length() ? _hold.equals(name) : 0;
-    }
-    
-    // вернёт имя удерживаемой кнопки
-    String holdName() {
-        return _hold.length() ? _hold : _GP_empty_str;
-    }
-    
-    // вернёт часть имени hold компонента, находящейся под номером idx после разделителя /
-    String holdNameSub(int idx = 1) {
-        return _hold.length() ? (GPlistIdx(_hold, idx, '/')) : _GP_empty_str;
-    }
-    
-    // вернёт true, если кнопка удерживается и имя компонента начинается с указанного
-    bool holdSub(const String& name) {
-        return _hold.length() ? _hold.startsWith(name) : 0;
-    }
-    
-    // вернёт true, если кнопка была нажата
-    bool clickDown(const String& name) {
-        return hold() ? (_holdF == 1 && server.argName(0).equals(name)) : 0;
-    }
-    // вернёт true, если кнопка была нажата и имя компонента начинается с указанного
-    bool clickDownSub(const String& name) {
-        return hold() ? (_holdF == 1 && server.argName(0).startsWith(name)) : 0;
-    }
-    
-    // вернёт true, если кнопка была отпущена
-    bool clickUp(const String& name) {
-        return hold() ? (_holdF == 2 && server.argName(0).equals(name)) : 0;
-    }
-    // вернёт true, если кнопка была отпущена и имя компонента начинается с указанного
-    bool clickUpSub(const String& name) {
-        return hold() ? (_holdF == 2 && server.argName(0).startsWith(name)) : 0;
-    }
-
-    
-    // ===================== CLICK OBJ ======================
-    bool clickDown(GP_BUTTON& btn) {
-        return clickDown(btn.name);
-    }
-    
-    bool clickUp(GP_BUTTON& btn) {
-        return clickUp(btn.name);
-    }
-    
-    bool clickDown(GP_BUTTON_MINI& btn) {
-        return clickDown(btn.name);
-    }
-    
-    bool clickUp(GP_BUTTON_MINI& btn) {
-        return clickUp(btn.name);
-    }
-    
-    
     // ======================= MISC =======================
     // вернёт true, если открыта главная страница (/)
     bool root() {
@@ -799,7 +736,6 @@ private:
     fs::FS *_fs = nullptr;
     
     String _uri;
-    String _hold;
     String *_namePtr = nullptr;
     String *_filePtr = nullptr;
     
@@ -813,7 +749,6 @@ private:
     bool _formF = 0, _clickF = 0, _reqF = 0, _delF = 0, _renF = 0;
     bool _fileDF = 0, _uplEF = 0, _uplF = 0, _abortF = 0, _autoD = 1, _autoU = 1, _autoDel = 1, _autoRen = 1;
     bool downOn = 1, uplOn = 1;
-    uint8_t _holdF = 0;
 
     uint32_t _onlTmr = 0;
     uint16_t _onlPrd = 1500;
