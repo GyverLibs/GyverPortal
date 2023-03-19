@@ -1263,7 +1263,11 @@ struct Builder {
         uint8_t minute = sec % 60ul;
         sec /= 60ul;
         uint16_t hour = sec % 24ul;
+        sec /= 24ul;
         String s;
+        s.reserve(10);
+        s += sec;   // day
+        s += ':';
         s += hour;
         s += ':';
         s += minute / 10;
