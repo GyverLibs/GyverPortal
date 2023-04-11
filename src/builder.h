@@ -1585,7 +1585,7 @@ struct Builder {
         AREA_LOG_RAW("GP_log", rows, prd, w);
     }
     void AREA_LOG(GPlog& log, int rows = 5, int prd = 1000, const String& w = "") {
-        log.clear();
+        //log.clear();
         AREA_LOG_RAW(log.name, rows, prd, w);
     }
     

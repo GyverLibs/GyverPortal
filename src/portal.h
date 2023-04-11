@@ -96,6 +96,18 @@ public:
         #endif
         
         server.onNotFound([this]() {
+            /*Serial.print(server.uri());
+            if (server.args()) {
+                Serial.print('?');
+                for (int i = 0; i < server.args(); i++) {
+                    Serial.print(server.argName(i));
+                    Serial.print('=');
+                    Serial.print(server.arg(i));
+                    if (i < server.args() - 1) Serial.print('&');
+                }
+            }
+            Serial.println();*/
+            
             _onlTmr = millis();
             if (_auth && !server.authenticate(_login, _pass)) return server.requestAuthentication();
             String valS = server.arg(0);
@@ -115,12 +127,15 @@ public:
                 if (_holdF == 1) _hold = server.argName(0);
                 else _hold = "";
                 server.send(200);
+            } else if (_uri.startsWith(F("/hotspot-detect.html"))) {    // AP
+                _showPage = 1;
                 
                 #ifdef GP_NO_DOWNLOAD
             } else if (_uri.startsWith(F("/favicon.ico"))) {    // иконка
                 server.send(200);
                 return;
                 #endif
+                
             } else if (_uri.startsWith(F("/GP_ping"))) {        // пинг
                 server.send(200);
                 return;
@@ -184,11 +199,13 @@ public:
             } else if (_uri.startsWith(F("/GP_upload"))) {
                 server.send(200, "text/html", F("<meta http-equiv='refresh' content='0; url=/'/>"));
                 return;
+                
                 #if defined(FS_H) && !defined(GP_NO_DOWNLOAD)
             } else if (downOn && !server.args() && _uri[0] == '/' && _uri.indexOf('.') > 0) {   // файл
                 if (_autoD && _fs) sendFile(_fs->open(_uri, "r"));  // авто скачивание
                 else _fileDF = 1;                                   // ручное скачивание (в action)
                 #endif
+                
             } else if (server.argName(0).equals(F("GP_form"))) {    // форма
                 _showPage = 1;
                 _formF = 1;
@@ -196,7 +213,7 @@ public:
             } else {                                                // любой другой запрос
                 _showPage = 1;
                 _reqF = 1;
-                if (log.available()) log.clear();
+                //if (log.available()) log.clear();
             }
             
             _gp_local_unix = getUnix() + getGMT() * 60;

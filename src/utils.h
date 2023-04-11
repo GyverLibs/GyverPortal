@@ -287,6 +287,95 @@ struct GPtime {
     }
 };
 
+struct GPweek {
+    uint8_t week = 0;
+
+    GPweek() {}
+    GPweek(const GPweek& wk) {
+        *this = wk;
+    }
+    GPweek(uint8_t nweek) {
+        week = nweek;
+    }
+    GPweek(const String& s) {
+        decode(s);
+    }
+
+    void set(uint8_t idx, uint8_t val) {
+        if (idx < 8) bitWrite(week, idx, val);
+    }
+    uint8_t get(uint8_t idx) {
+        if (idx < 8) return bitRead(week, idx);
+        else return 0;
+    }
+
+    void decode(const String& s) {
+        if (s.length() != 7) return;
+        week = 0;
+        for (int i = 0; i < 7; i++) {
+            week |= s[6 - i] - '0';
+            week <<= 1;
+        }
+    }
+    String encode() {
+        String s;
+        s.reserve(7);
+        for (int i = 1; i < 8; i++) s += get(i);
+        return s;
+    }
+};
+
+struct GPflags {
+    uint16_t flags = 0;
+    uint8_t len = 16;
+
+    GPflags() {}
+    GPflags(const GPflags& f) {
+        *this = f;
+    }
+    GPflags(uint8_t nlen) {
+        len = nlen;
+    }
+    GPflags(uint16_t nflags, uint8_t nlen) {
+        flags = nflags;
+        len = nlen;
+    }
+    GPflags(const String& s) {
+        decode(s);
+    }
+
+    uint8_t length() {
+        return len;
+    }
+    void setLength(uint8_t nlen) {
+        len = nlen;
+    }
+
+    void set(uint8_t idx, uint8_t val) {
+        if (idx < 16) bitWrite(flags, idx, val);
+    }
+    uint8_t get(uint8_t idx) {
+        if (idx < 16) return bitRead(flags, idx);
+        else return 0;
+    }
+
+    void decode(const String& s) {
+        if (s.length() > 16) return;
+        len = s.length();
+        flags = 0;
+        for (int i = 0; i < len; i++) {
+            flags <<= 1;
+            flags |= s[len - 1 - i] - '0';
+        }
+    }
+    String encode() {
+        String s;
+        s.reserve(len);
+        for (int i = 0; i < len; i++) s += get(i);
+        return s;
+    }
+};
+
 // ===================== DATE-TIME UNIX =====================
 uint32_t GPunix(uint16_t y, uint8_t m, uint8_t d, uint8_t h, uint8_t mn, uint8_t s, int8_t gmt = 0);
 uint32_t GPunix(GPdate d, GPtime t, int8_t gmt = 0);

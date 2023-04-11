@@ -135,6 +135,12 @@ public:
     bool clickTime(GPtime& t) {
         return click() ? copyTime(t) : 0;
     }
+    bool clickWeek(GPweek& t) {
+        return click() ? copyWeek(t) : 0;
+    }
+    bool clickFlags(GPflags& t) {
+        return click() ? copyFlags(t) : 0;
+    }
     bool clickColor(GPcolor& t) {
         return click() ? copyColor(t) : 0;
     }
@@ -163,6 +169,12 @@ public:
     }
     bool clickTime(const String& n, GPtime& t) {
         return click() ? copyTime(n, t) : 0;
+    }
+    bool clickWeek(const String& n, GPweek& t) {
+        return click() ? copyWeek(n, t) : 0;
+    }
+    bool clickFlags(const String& n, GPflags& t) {
+        return click() ? copyFlags(n, t) : 0;
     }
     bool clickColor(const String& n, GPcolor& t) {
         return click() ? copyColor(n, t) : 0;
@@ -218,6 +230,22 @@ public:
     GPtime getTime() {
         return GPtime(arg());
     }
+    
+    // получить неделю с компонента
+    GPweek getWeek(const String& n) {
+        return GPweek(arg(n));
+    }
+    GPweek getWeek() {
+        return GPweek(arg());
+    }
+    
+    // получить флаги с компонента
+    GPflags getFlags(const String& n) {
+        return GPflags(arg(n));
+    }
+    GPflags getFlags() {
+        return GPflags(arg());
+    }
 
     // получить цвет с компонента
     GPcolor getColor(const String& n) {
@@ -226,12 +254,18 @@ public:
     GPcolor getColor() {
         return GPcolor(arg());
     }
-
     
     // ===================== COPY-ПАРСЕРЫ =====================
     // ОПАСНЫЕ парсеры (не проверяют запрос). Использовать только в условии!
     bool copyStr(char* t, uint16_t len = 0) {
-        return (args() && (!len || arg().length() < len)) ? (strcpy(t, arg().c_str()), 1) : 0;
+        //return (args() && (!len || arg().length() < len)) ? (strcpy(t, arg().c_str()), 1) : 0;
+        if (!args()) return 0;
+        if (!len || arg().length() < len) strcpy(t, arg().c_str());
+        else {
+            strncpy(t, arg().c_str(), len - 1);
+            t[len - 1] = '\0';
+        }
+        return 1;
     }
     bool copyString(String& t) {
         return args() ? (t = arg(), 1) : 0;
@@ -253,6 +287,12 @@ public:
     }
     bool copyTime(GPtime& t) {
         return args() ? (t = getTime(), 1) : 0;
+    }
+    bool copyWeek(GPweek& t) {
+        return args() ? (t = getWeek(), 1) : 0;
+    }
+    bool copyFlags(GPflags& t) {
+        return args() ? (t = getFlags(), 1) : 0;
     }
     bool copyColor(GPcolor& t) {
         return args() ? (t = getColor(), 1) : 0;
@@ -282,6 +322,12 @@ public:
     }
     bool copyTime(const String& n, GPtime& t) {
         return hasArg(n) ? (t = getTime(n), 1) : 0;
+    }
+    bool copyWeek(const String& n, GPweek& t) {
+        return hasArg(n) ? (t = getWeek(n), 1) : 0;
+    }
+    bool copyFlags(const String& n, GPflags& t) {
+        return hasArg(n) ? (t = getFlags(n), 1) : 0;
     }
     bool copyColor(const String& n, GPcolor& t) {
         return hasArg(n) ? (t = getColor(n), 1) : 0;
@@ -425,6 +471,12 @@ public:
     bool answer(GPtime time) {
         return answer(time.encode());
     }
+    bool answer(GPweek week) {
+        return answer(week.encode());
+    }
+    bool answer(GPflags flags) {
+        return answer(flags.encode());
+    }
     bool answer(GPcanvas& cv) {
         return answer(cv._read());
     }
@@ -450,6 +502,12 @@ public:
         return update(n) ? (answer(f), 1) : 0;
     }
     bool updateTime(const String& n, GPtime f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    bool updateWeek(const String& n, GPweek f) {
+        return update(n) ? (answer(f), 1) : 0;
+    }
+    bool updateFlags(const String& n, GPflags f) {
         return update(n) ? (answer(f), 1) : 0;
     }
     bool updateColor(const String& n, GPcolor f) {
@@ -551,8 +609,8 @@ public:
     
     String *_answPtr = nullptr;
     String *_updPtr = nullptr;
-    String *_argValPtr = nullptr;
-    String *_argNamePtr = nullptr;
+    const String *_argValPtr = nullptr;
+    const String *_argNamePtr = nullptr;
     String _hold;
     uint8_t _holdF = 0;
     

@@ -9,8 +9,8 @@ public:
     GPlog(const char* nname) : name(nname) {}
 
     void start(int n = 64) {
-        if (buffer) delete [] buffer;
-        head = 0;
+        stop();
+        len = head = 0;
         size = n;
         buffer = new char [size];
     }
@@ -28,45 +28,71 @@ public:
     
     // запись в буфер
     virtual size_t write(uint8_t n) {
-        if (buffer && head <= size - 2) {
-            if (newline) {
-                newline = 0;
-                buffer[head++] = '\r';
-                buffer[head++] = '\n';
-            }
-            buffer[head++] = n;
-        }
+        /*if (newline) {
+            newline = 0;
+            _write('\n');
+        }*/
+        _write(n);
         return 1;
     }
     
-    char* read() {
-        if (buffer[head - 2] == '\r') {
-            head -= 2;
-            newline = 1;
+    String read() {
+        String s;
+        if (!len) return s;
+        s.reserve(len + 1);
+        if (newline) {
+            newline = 0;
+            s += '\n';
         }
-        buffer[head] = '\0';
-        head = 0;
-        return buffer;
+        for (int i = 0; i < len; i++) {
+            char c = read(i);
+            if (i == len - 2 && c == '\r') {
+                newline = 1;
+                break;
+            }
+            if (c == '\r') continue;
+            s += c;
+        }
+        if (clear_f) clear();
+        return s;
     }
     
     void clear() {
-        head = 0;
-        buffer[head] = '\0';
+        len = head = 0;
+    }
+    
+    void autoClear(bool f) {
+        clear_f = f;
     }
     
     bool available() {
-        return (buffer && head);
+        return (buffer && len);
     }
     
     bool state() {
         return buffer;
+    }
+
+    int length() {
+        return len;
     }
     
     const char* name = nullptr;
     char* buffer = nullptr;
     
 private:
+    void _write(uint8_t n) {
+        if (len < size) len++;
+        buffer[head] = n;
+        if (++head >= size) head = 0;
+    }
+    char read(int num) {
+        return buffer[(len < size) ? num : ((head + num) % size)];
+    }
+    
     bool newline = 0;
+    bool clear_f = 1;
     int size;
+    int len = 0;
     int head = 0;
 };
