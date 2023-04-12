@@ -15,6 +15,6 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           disable_web_page_preview: true
           message: |
-            **${{ github.event.repository.name }} ${{ github.event.release.tag_name }}**
+            ${{ github.event.repository.name }} v${{ github.event.release.tag_name }}
             ${{ github.event.release.body }}
             https://github.com/${{ github.repository }}
