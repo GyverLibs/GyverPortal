@@ -123,6 +123,9 @@ struct GPcolor {
     void operator = (uint32_t col) {
         setHEX(col);
     }
+    void operator = (const GPcolor& col) {
+        *this = col;
+    }
     void setHEX(uint32_t col) {
         r = ((uint32_t)col >> 16) & 0xFF;
         g = ((uint32_t)col >>  8) & 0xFF;
@@ -190,6 +193,9 @@ struct GPdate {
         month = nmonth;
         day = nday;
     }
+    void operator = (const GPdate& dat) {
+        *this = dat;
+    }
     
     String encode() {
         String s;
@@ -255,6 +261,9 @@ struct GPtime {
     GPtime(const String& str) {
         decode(str);
     }
+    void operator = (const GPtime& tim) {
+        *this = tim;
+    }
     
     void set(int nhour, int nminute, int nsecond = 0) {
         hour = nhour;
@@ -300,6 +309,9 @@ struct GPweek {
     GPweek(const String& s) {
         decode(s);
     }
+    void operator = (const GPweek& w) {
+        *this = w;
+    }
 
     void set(uint8_t idx, uint8_t val) {
         if (idx < 8) bitWrite(week, idx, val);
@@ -342,6 +354,9 @@ struct GPflags {
     }
     GPflags(const String& s) {
         decode(s);
+    }
+    void operator = (const GPflags& f) {
+        *this = f;
     }
 
     uint8_t length() {

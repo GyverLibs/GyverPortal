@@ -23,11 +23,11 @@ String GPfileType(const String& uri) {
     if (div >= 0) {
         String ext = uri.substring(div + 1, uri.length());
         for (int i = 0; i < 5; i++) {
-            int pos = GPinList(ext, FPSTR(pgm_read_dword(_gp_ext + i)));
+            int pos = GPinList(ext, FPSTR((const char*)pgm_read_dword(_gp_ext + i)));
             if (pos >= 0) {
                 ext = GPlistIdx(FPSTR(_gp_types), i);
                 ext += '/';
-                ext += GPlistIdx(FPSTR(pgm_read_dword(_gp_val + i)), pos);
+                ext += GPlistIdx(FPSTR((const char*)pgm_read_dword(_gp_val + i)), pos);
                 return ext;
             }
         }
