@@ -102,9 +102,7 @@ struct GPcolor {
     uint8_t r = 0, g = 0, b = 0;
     
     GPcolor() {}
-    GPcolor(const GPcolor& col) {
-        *this = col;
-    }
+    GPcolor(const GPcolor& col) = default;
     GPcolor(uint32_t col) {
         setHEX(col);
     }
@@ -122,9 +120,6 @@ struct GPcolor {
     }
     void operator = (uint32_t col) {
         setHEX(col);
-    }
-    void operator = (const GPcolor& col) {
-        *this = col;
     }
     void setHEX(uint32_t col) {
         r = ((uint32_t)col >> 16) & 0xFF;
@@ -166,9 +161,7 @@ struct GPdate {
     uint8_t month = 1, day = 1;
     
     GPdate() {}
-    GPdate(const GPdate& dat) {
-        *this = dat;
-    }
+    GPdate(const GPdate& dat) = default;
     GPdate(uint32_t unix, int16_t gmt = 0) {
         unix = (unix + gmt * 60L) / (60 * 60 * 24) + 719468;
         uint8_t era = unix / 146097ul;
@@ -192,9 +185,6 @@ struct GPdate {
         year = nyear;
         month = nmonth;
         day = nday;
-    }
-    void operator = (const GPdate& dat) {
-        *this = dat;
     }
     
     String encode() {
@@ -244,9 +234,7 @@ struct GPtime {
     uint8_t hour = 0, minute = 0, second = 0;
     
     GPtime() {}
-    GPtime(const GPtime& tim) {
-        *this = tim;
-    }
+    GPtime(const GPtime& tim) = default;
     GPtime(uint32_t unix, int16_t gmt = 0) {
         unix += gmt * 60L;
         second = unix % 60ul;
@@ -260,9 +248,6 @@ struct GPtime {
     }
     GPtime(const String& str) {
         decode(str);
-    }
-    void operator = (const GPtime& tim) {
-        *this = tim;
     }
     
     void set(int nhour, int nminute, int nsecond = 0) {
@@ -300,17 +285,12 @@ struct GPweek {
     uint8_t week = 0;
 
     GPweek() {}
-    GPweek(const GPweek& wk) {
-        *this = wk;
-    }
+    GPweek(const GPweek& wk) = default;
     GPweek(uint8_t nweek) {
         week = nweek;
     }
     GPweek(const String& s) {
         decode(s);
-    }
-    void operator = (const GPweek& w) {
-        *this = w;
     }
 
     void set(uint8_t idx, uint8_t val) {
@@ -342,9 +322,7 @@ struct GPflags {
     uint8_t len = 16;
 
     GPflags() {}
-    GPflags(const GPflags& f) {
-        *this = f;
-    }
+    GPflags(const GPflags& f) = default;
     GPflags(uint8_t nlen) {
         len = nlen;
     }
@@ -354,9 +332,6 @@ struct GPflags {
     }
     GPflags(const String& s) {
         decode(s);
-    }
-    void operator = (const GPflags& f) {
-        *this = f;
     }
 
     uint8_t length() {

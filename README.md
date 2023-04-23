@@ -6,7 +6,7 @@
 [![Foo](https://img.shields.io/badge/ПОДПИСАТЬСЯ-НА%20ОБНОВЛЕНИЯ-brightgreen.svg?style=social&logo=telegram&color=blue)](https://t.me/GyverLibs)
 
 # GyverPortal
-### v3.6.5 (22.04.2023)
+### v3.6.6 (23.04.2023)
 Простой конструктор веб интерфейсов для ESP8266 и ESP32
 ![img](/docs/feature.png)
 
@@ -362,6 +362,9 @@
 ## v3.6.5
 - Исправлены ошибки компиляции под ESP32 2.0.8
 - Исправлены warning на других версиях
+
+## v3.6.6
+- Исправлена критическая ошибка из 3.6.5 ;)
 
 <a id="feedback"></a>
 ## Баги и обратная связь
