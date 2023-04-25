@@ -6,6 +6,7 @@
 
 #define GP_PGM(name, val) static const char name[] PROGMEM = val
 #define GP_PGM_LIST(name, ...) const char* const name[] PROGMEM = {__VA_ARGS__};
+extern String _GP_empty_str;
 
 // ==================== COLORS =====================
 GP_PGM(GP_RED, "#bf1e1e");
@@ -101,9 +102,7 @@ struct GPcolor {
     uint8_t r = 0, g = 0, b = 0;
     
     GPcolor() {}
-    GPcolor(const GPcolor& col) {
-        *this = col;
-    }
+    GPcolor(const GPcolor& col) = default;
     GPcolor(uint32_t col) {
         setHEX(col);
     }
@@ -162,9 +161,7 @@ struct GPdate {
     uint8_t month = 1, day = 1;
     
     GPdate() {}
-    GPdate(const GPdate& dat) {
-        *this = dat;
-    }
+    GPdate(const GPdate& dat) = default;
     GPdate(uint32_t unixx, int16_t gmt = 0) {
         unixx = (unixx + gmt * 60L) / (60 * 60 * 24) + 719468;
         uint8_t era = unixx / 146097ul;
@@ -237,9 +234,7 @@ struct GPtime {
     uint8_t hour = 0, minute = 0, second = 0;
     
     GPtime() {}
-    GPtime(const GPtime& tim) {
-        *this = tim;
-    }
+    GPtime(const GPtime& tim) = default;
     GPtime(uint32_t unixx, int16_t gmt = 0) {
         unixx += gmt * 60L;
         second = unixx % 60ul;
@@ -283,6 +278,91 @@ struct GPtime {
         s = strchr(s, ':');
         if (!s) return;
         second = atoi(++s);
+    }
+};
+
+struct GPweek {
+    uint8_t week = 0;
+
+    GPweek() {}
+    GPweek(const GPweek& wk) = default;
+    GPweek(uint8_t nweek) {
+        week = nweek;
+    }
+    GPweek(const String& s) {
+        decode(s);
+    }
+
+    void set(uint8_t idx, uint8_t val) {
+        if (idx < 8) bitWrite(week, idx, val);
+    }
+    uint8_t get(uint8_t idx) {
+        if (idx < 8) return bitRead(week, idx);
+        else return 0;
+    }
+
+    void decode(const String& s) {
+        if (s.length() != 7) return;
+        week = 0;
+        for (int i = 0; i < 7; i++) {
+            week |= s[6 - i] - '0';
+            week <<= 1;
+        }
+    }
+    String encode() {
+        String s;
+        s.reserve(7);
+        for (int i = 1; i < 8; i++) s += get(i);
+        return s;
+    }
+};
+
+struct GPflags {
+    uint16_t flags = 0;
+    uint8_t len = 16;
+
+    GPflags() {}
+    GPflags(const GPflags& f) = default;
+    GPflags(uint8_t nlen) {
+        len = nlen;
+    }
+    GPflags(uint16_t nflags, uint8_t nlen) {
+        flags = nflags;
+        len = nlen;
+    }
+    GPflags(const String& s) {
+        decode(s);
+    }
+
+    uint8_t length() {
+        return len;
+    }
+    void setLength(uint8_t nlen) {
+        len = nlen;
+    }
+
+    void set(uint8_t idx, uint8_t val) {
+        if (idx < 16) bitWrite(flags, idx, val);
+    }
+    uint8_t get(uint8_t idx) {
+        if (idx < 16) return bitRead(flags, idx);
+        else return 0;
+    }
+
+    void decode(const String& s) {
+        if (s.length() > 16) return;
+        len = s.length();
+        flags = 0;
+        for (int i = 0; i < len; i++) {
+            flags <<= 1;
+            flags |= s[len - 1 - i] - '0';
+        }
+    }
+    String encode() {
+        String s;
+        s.reserve(len);
+        for (int i = 0; i < len; i++) s += get(i);
+        return s;
     }
 };
 

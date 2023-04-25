@@ -1263,7 +1263,11 @@ struct Builder {
         uint8_t minute = sec % 60ul;
         sec /= 60ul;
         uint16_t hour = sec % 24ul;
+        sec /= 24ul;
         String s;
+        s.reserve(10);
+        s += sec;   // day
+        s += ':';
         s += hour;
         s += ':';
         s += minute / 10;
@@ -1581,7 +1585,7 @@ struct Builder {
         AREA_LOG_RAW("GP_log", rows, prd, w);
     }
     void AREA_LOG(GPlog& log, int rows = 5, int prd = 1000, const String& w = "") {
-        log.clear();
+        //log.clear();
         AREA_LOG_RAW(log.name, rows, prd, w);
     }
     

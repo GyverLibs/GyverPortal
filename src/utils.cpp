@@ -1,5 +1,7 @@
 #include "utils.h"
 
+String _GP_empty_str;
+
 // ================== FILE TYPES ====================
 GP_PGM(_gp_types, "image,text,audio,video,application");
 GP_PGM(_gp_img, "ico,gif,bmp,jpeg,jpg,png,tif,tiff,svg,webp");
@@ -21,11 +23,11 @@ String GPfileType(const String& uri) {
     if (div >= 0) {
         String ext = uri.substring(div + 1, uri.length());
         for (int i = 0; i < 5; i++) {
-            int pos = GPinList(ext, FPSTR(pgm_read_dword(_gp_ext + i)));
+            int pos = GPinList(ext, FPSTR((const char*)pgm_read_dword(_gp_ext + i)));
             if (pos >= 0) {
                 ext = GPlistIdx(FPSTR(_gp_types), i);
                 ext += '/';
-                ext += GPlistIdx(FPSTR(pgm_read_dword(_gp_val + i)), pos);
+                ext += GPlistIdx(FPSTR((const char*)pgm_read_dword(_gp_val + i)), pos);
                 return ext;
             }
         }
@@ -98,7 +100,7 @@ String GPlistIdx(const String& li, int idx, char div) {
     while (1) {
         if (li[i] == div || !li[i]) {
             if (cnt == idx) return li.substring(p, i);
-            if (!li[i]) return String();
+            if (!li[i]) return _GP_empty_str;
             cnt++;
             p = i + 1;
         }
