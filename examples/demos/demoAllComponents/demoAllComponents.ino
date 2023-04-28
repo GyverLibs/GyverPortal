@@ -6,6 +6,8 @@
 #include <GyverPortal.h>
 GyverPortal ui;
 
+void action();
+
 void build() {
   GP.BUILD_BEGIN();
   GP.THEME(GP_DARK);

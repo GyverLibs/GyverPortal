@@ -196,7 +196,7 @@ struct Builder {
     
     void THEME(PGM_P style) {
         *_GPP += F("<link rel='stylesheet' href='/GP_STYLE.css?v" GP_VERSION "=");
-        *_GPP += ((uint32_t)style) & 0xFFFF;
+        *_GPP += ((unsigned long)style) & 0xFFFF;
         *_GPP += "'";
         *_GPP += ">\n";
         _gp_style = style;

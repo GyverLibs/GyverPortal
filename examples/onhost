@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -ex
+
+if [ -z "${ESP8266}" ]; then
+    echo "environment variable ESP8266 should point to the esp8266 arduino core location"
+    exit 1
+fi
+
+if [ "$1" = clean ]; then
+    rm -rf ${ESP8266}/tests/host/bin
+    exit 0
+fi
+
+if [ ! -r "../../onhost" ]; then
+    echo "please run me from an example directory with '../../onhost'"
+    exit 1
+fi
+
+VALGRIND=${VALGRIND-valgrind}
+pwd=$(pwd)
+code=${pwd##*/}
+ULIBDIRS=${pwd}/../../..
+echo $ULIBDIRS
+cd ${ESP8266}/tests/host
+make -j 8 V=1 FORCE32=0 ULIBDIRS=${ULIBDIRS} ${pwd}/${code}
+${VALGRIND} ${ESP8266}/tests/host/bin/${code}/${code} "$@"

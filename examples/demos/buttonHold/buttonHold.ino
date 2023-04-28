@@ -6,6 +6,11 @@
 #include <GyverPortal.h>
 GyverPortal ui;
 
+void startup();
+void build();
+void action();
+void asyncPrint(const char* str);
+
 void setup() {
   startup();
 
