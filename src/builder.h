@@ -163,8 +163,9 @@ struct Builder {
         SEND(F("<!DOCTYPE HTML><html><head>\n"
         "<meta charset='utf-8'>\n"
         "<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>\n"
-        "<meta name='apple-mobile-web-app-capable' content='yes'/>\n"
-        "<meta name='mobile-web-app-capable' content='yes'/>\n"
+        "<meta name='apple-mobile-web-app-capable' content='yes'>\n"
+        "<meta name='mobile-web-app-capable' content='yes'>\n"
+		"<title>&nbsp;</title>\n"
         "</head><body>\n"));
     }
     void JS_TOP_FILE() {
@@ -575,7 +576,7 @@ struct Builder {
         BLOCK_END();
     }
     void GRID_RESPONSIVE(int width) {
-        *_GPP += F("<style type='text/css'>@media screen and (max-width:");
+        *_GPP += F("<style>@media screen and (max-width:");
         *_GPP += width;
         *_GPP += F("px){\n.grid{display:block;}\n#grid .block{margin:20px 5px;width:unset;}}</style>\n");
         send();
@@ -894,7 +895,7 @@ struct Builder {
         while (p.parse()) {
             *_GPP += F("<li ");
             if (!p.count) *_GPP += F("style='background:#2a2d35' ");
-            *_GPP += F("' class='");
+            *_GPP += F("class='");
             *_GPP += name;
             *_GPP += F("' onclick='openTab(\"");
             *_GPP += name;
