@@ -16,7 +16,7 @@ void build() {
   GP.TITLE("GyverPortal");
   GP.HR();
 
-  GP.NAV_TABS_LINKS("/,/home,/sett,/kek", "Home,Settings,Kek");
+  GP.NAV_TABS_LINKS("/home,/sett,/kek", "Home,Settings,Kek");
   
   M_SPOILER(
     "Spoiler",
