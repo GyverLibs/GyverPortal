@@ -1,3 +1,6 @@
+|🔥🔥🔥<br>**Обратите внимание на новую библиотеку [GyverHub](https://github.com/GyverLibs/GyverHub) - это как GyverPortal, только сильно проще, удобнее, работает через Интернет и интегрируется с умным домом!**<br>🔥🔥🔥|
+| --- |
+
 [![latest](https://img.shields.io/github/v/release/GyverLibs/GyverPortal.svg?color=brightgreen)](https://github.com/GyverLibs/GyverPortal/releases/latest/download/GyverPortal.zip)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/%E2%82%BD$%E2%82%AC%20%D0%9D%D0%B0%20%D0%BF%D0%B8%D0%B2%D0%BE-%D1%81%20%D1%80%D1%8B%D0%B1%D0%BA%D0%BE%D0%B9-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
@@ -9,9 +12,6 @@
 ### v3.6.6 (23.04.2023)
 Простой конструктор веб интерфейсов для ESP8266 и ESP32
 ![img](/docs/feature.png)
-
-|🔥🔥🔥<br>**Обратите внимание на новую библиотеку [GyverHub](https://github.com/GyverLibs/GyverHub) - это как GyverPortal, только сильно проще, удобнее, работает через Интернет и интегрируется с умным домом!**<br>🔥🔥🔥|
-| --- |
 
 ## Совместимость
 > ### ЕСЛИ НЕ КОМПИЛИТСЯ НА ESP32 - ОБНОВИ ЯДРО, УЖЕ ПОРА. ДА, [ВОТ НА ЭТО](https://github.com/espressif/arduino-esp32)
